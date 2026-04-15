@@ -20,7 +20,7 @@ class VbaVisitor(Visitor):
 
     def visitFunctionName(                                         # noqa: N802
             self: T,
-            ctx: Parser.FunctionNameContext) -> str
+            ctx: Parser.FunctionNameContext) -> str:
         return ctx.getText()
 
     def visitCallStatement(                                        # noqa: N802
