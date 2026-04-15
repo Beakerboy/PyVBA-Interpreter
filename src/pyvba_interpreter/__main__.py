@@ -1,5 +1,6 @@
 import argparse
 from antlr4 import CommonTokenStream, FileStream
+from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from pathlib import Path
 from pyvba_interpreter.vba_visitor import VbaVisitor
 
