@@ -10,13 +10,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("function",
                         help="The function or call statement to execute.")
-    parser.add_argument("directory",
-                        help="The directory that contains your files.")
+    parser.add_argument("module",
+                        help="The module that contains your code.")
     args = parser.parse_args()
-    path = Path(args.directory).resolve()
+    path = Path(args.module).resolve()
     function_to_run = args.function
     if Path(path).exists():
-        input_stream = FileStream(args.directory)
+        input_stream = FileStream(args.module)
         lexer = Lexer(input_stream)
     else:
         raise Exception('file does not exist: ' + path)
