@@ -1,4 +1,5 @@
 import argparse
+from antlr4 import CommonTokenStream, FileStream
 from pathlib import Path
 from pyvba_interpreter.vba_visitor import VbaVisitor
 
@@ -18,8 +19,8 @@ def main() -> None:
     else:
         raise Exception('file does not exist: ' + path)
     ts = CommonTokenStream(lexer)
-    tree = Parser(ts)
-    tree.startRule()  # or module?
+    parser = Parser(ts)
+    tree = parser.startRule()  # or module?
     interpreter = VbaVisitor()
     interpreter.visit(tree)
     if function_to_run in interpreter.functions:
