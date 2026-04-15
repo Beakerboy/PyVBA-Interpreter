@@ -26,4 +26,4 @@ def main() -> None:
         target_node = interpreter.functions[function_to_run]
         interpreter.visitChildren(target_node)
     else:
-        print(f"error:")
+        print("error:")
