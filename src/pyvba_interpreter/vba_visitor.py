@@ -35,5 +35,5 @@ class VbaVisitor(Visitor):
 
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
-            ctx: Pareser.LiteralExpressionContext) -> Any:
+            ctx: Parser.LiteralExpressionContext) -> Any:
         return vba_stdlib.literal_from_string(ctx.getText())
