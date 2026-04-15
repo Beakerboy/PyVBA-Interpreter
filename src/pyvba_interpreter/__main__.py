@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from pyvba_interpreter.vba_visitor import VbaVisitor
 
 
 def main() -> None:
@@ -19,7 +20,7 @@ def main() -> None:
     ts = CommonTokenStream(lexer)
     parser = Parser(ts)
     program = parser.startRule()  # or module?
-    interpreter = VbaInterpreter()
+    interpreter = VbaVisitor()
     interpreter.visit(tree)
     if function_to_run in interpreter.functions:
         target_node = interpreter.functions[function_to_run]
