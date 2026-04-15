@@ -10,7 +10,7 @@ T = TypeVar('T', bound='VbaVisitor')
 class VbaVisitor(Visitor):
 
     def __init__(self: T) -> None:
-        self.functions = {}
+        self.functions:dict[str, 'Context'] = {}
 
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
