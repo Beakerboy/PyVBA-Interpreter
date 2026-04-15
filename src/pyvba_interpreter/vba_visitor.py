@@ -1,7 +1,7 @@
 import vba_stdlib
 from typing import Any, TypeVar
-from antlr4_vba.vba_ccParser import vba_Parser as Parser
-from antlr4_vba.vba_ccVisitor import vbaParserVisitor as Visitor
+from antlr4_vba.vba_Parser import vba_Parser as Parser
+from antlr4_vba.vba_Visitor import vbaParserVisitor as Visitor
 
 
 T = TypeVar('T', bound='VbaVisitor')
