@@ -17,9 +17,9 @@ def main() -> None:
         lexer = Lexer(input_stream)
     else:
         raise Exception('file does not exist: ' + path)
-    tree = CommonTokenStream(lexer)
-    parser = Parser(ts)
-    parser.startRule()  # or module?
+    ts = CommonTokenStream(lexer)
+    tree = Parser(ts)
+    tree.startRule()  # or module?
     interpreter = VbaVisitor()
     interpreter.visit(tree)
     if function_to_run in interpreter.functions:
