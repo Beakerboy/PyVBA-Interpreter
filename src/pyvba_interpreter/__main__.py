@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 
 def main() -> None:
@@ -8,6 +9,8 @@ def main() -> None:
     parser.add_argument("directory",
                         help="The directory that contains your files.")
     args = parser.parse_args()
+    path = Path(args.directory).resolve()
+    function_to_run = args.function
     if Path(path).exists():
         input_stream = FileStream(path)
         lexer = Lexer(input_stream)
