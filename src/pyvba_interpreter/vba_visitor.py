@@ -14,7 +14,7 @@ class VbaVisitor(Visitor):
 
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
-            ctx: Parser.FunctionDeclarationContext) -> None
+            ctx: Parser.FunctionDeclarationContext) -> None:
         func_name = self.visit(ctx.functionName())
         self.functions[func_name] = ctx
 
@@ -25,7 +25,7 @@ class VbaVisitor(Visitor):
 
     def visitCallStatement(                                        # noqa: N802
             self: T,
-            ctx: Parser.CallStatementContext) -> None
+            ctx: Parser.CallStatementContext) -> None:
         command = ctx.getChild(0).getText()
         args = []
         for i in range(ctx.getChildCount()):
@@ -35,5 +35,5 @@ class VbaVisitor(Visitor):
 
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
-            ctx: Pareser.LiteralExpressionContext) -> Any
+            ctx: Pareser.LiteralExpressionContext) -> Any:
         return vba_stdlib.literal_from_string(ctx.getText())
