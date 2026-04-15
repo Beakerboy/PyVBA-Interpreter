@@ -1,5 +1,6 @@
 import vba_stdlib
 from typing import Any, TypeVar
+from antlr4.ParserRuleContext import ParserRuleContext
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 
