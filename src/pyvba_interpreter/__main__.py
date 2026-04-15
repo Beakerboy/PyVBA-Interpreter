@@ -16,7 +16,7 @@ def main() -> None:
     path = Path(args.directory).resolve()
     function_to_run = args.function
     if Path(path).exists():
-        input_stream = FileStream(path)
+        input_stream = FileStream(args.directory)
         lexer = Lexer(input_stream)
     else:
         raise Exception('file does not exist: ' + path)
