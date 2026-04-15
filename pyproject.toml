@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyvba_interpreter"
+version = "0.0.1"
+authors = [
+  { name="Kevin Nowaczyk", email="beakerboy99@yahoo.com" },
+]
+description = "Excute VBA Code."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  'antlr4-python3-runtime',
+  'antlr4-tools',
+  'antlr4_vba',
+  'python-dateutil',
+  'vba-stdlib @ git+https://github.com/Beakerboy/vbaStdLib@dev'
+]
+[project.optional-dependencies]
+tests = [
+  'coveralls',
+  'flake8-annotations',
+  'mypy',
+  'pep8-naming',
+  'pytest',
+  'pytest-cov',
+  'pytest-mock',
+  'types-antlr4-python3-runtime',
+  'types-python-dateutil',
+]
+[project.urls]
+"Homepage" = "https://github.com/Beakerboy/VBA-Precompiler"
+"Bug Tracker" = "https://github.com/Beakerboy/VBA-Precompiler/issues"
+    
+[tool.pytest.ini_options]
+pythonpath = "src:tests"
+testpaths = [
+    "tests",
+]
