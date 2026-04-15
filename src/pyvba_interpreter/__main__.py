@@ -19,7 +19,7 @@ def main() -> None:
         input_stream = FileStream(args.module)
         lexer = Lexer(input_stream)
     else:
-        raise Exception('file does not exist: ' + path)
+        raise Exception('file does not exist: ' + args.module)
     ts = CommonTokenStream(lexer)
     parser = Parser(ts)
     tree = parser.startRule()  # or module?
