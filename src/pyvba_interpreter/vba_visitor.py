@@ -32,7 +32,7 @@ class VbaVisitor(Visitor):
         for i in range(ctx.getChildCount()):
             args += [self.visit(ctx.getChild(i))]
         if command.lower() == "msgbox":
-            print("number of args" + str(len(args)))
+            print(args[2])
 
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
