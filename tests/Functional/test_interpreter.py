@@ -9,8 +9,7 @@ from unittest.mock import patch
 
 
 @patch('builtins.print')
-def test_interpreter(mock_print) -> None:
-    function_to_run = "hello()"
+def test_interpreter(mock_print: str) -> None:
     input_stream = FileStream('tests/files/HelloWorld.bas')
     lexer = Lexer(input_stream)
     ts = CommonTokenStream(lexer)
