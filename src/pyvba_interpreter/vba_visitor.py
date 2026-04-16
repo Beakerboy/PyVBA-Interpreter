@@ -57,7 +57,7 @@ class VbaVisitor(Visitor):
 
     def visitExpression(                                           # noqa: N802
             self: T,
-            ctx) -> Any:
+            ctx: Parser.ExpressionContext) -> Any:
         number = ctx.getAltNumber()
         if number == 5:
             base = self.visit(ctx.expression(0))
