@@ -14,4 +14,4 @@ def test_interpreter() -> None:
     tree = vbaparser.module()  # or module?
     interpreter = VbaVisitor()
     interpreter.visit(tree)
-    assert '' == ''
+    assert len(interpreter.functions) == 1
