@@ -45,8 +45,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
         args = []
-        for i in range(ctx.getChildCount()):
-            child = ctx.getChild(i)
+        for child in ctx.children:
             if child is not None:
                 args += [self.visit(child)]
         return args
