@@ -63,5 +63,4 @@ class VbaVisitor(Visitor):
             base = self.visit(ctx.expression(0))
             exp = self.visit(ctx.expression(1))
             return base ^ exp
-       return False
-        
+        return False
