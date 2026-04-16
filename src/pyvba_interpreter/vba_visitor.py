@@ -35,7 +35,11 @@ class VbaVisitor(Visitor):
             command = ctx.getChild(0).getText()
             args = self.visit(ctx.argumentList())
         if command.lower() == "msgbox":
-            print(args[0])
+            try:
+                string = str(args[0])
+            except Exception:
+                raise Exception("Value cannot be cast to a string")
+            print(string)
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
