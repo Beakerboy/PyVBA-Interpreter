@@ -16,7 +16,7 @@ class VbaVisitor(Visitor):
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
-        func_name = self.visit(ctx.functionName)
+        func_name = self.visit(ctx.functionName())
         self.functions[func_name] = ctx
 
     def visitFunctionName(                                         # noqa: N802
