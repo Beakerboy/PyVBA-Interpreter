@@ -32,8 +32,6 @@ def test_interpreter(mock_print) -> None:
         ('MsgBox 1', 1),
     ])
 def test_msgbox(input: str, expected: Any, mock_print) -> None:
-    test_call = 
-    expected = "Hello World"
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
@@ -43,7 +41,7 @@ def test_msgbox(input: str, expected: Any, mock_print) -> None:
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attribute VB_NAME = "HelloWorld"\n')
         file.write('Function hello()\n')
-        file.write('    ' + test_call + '\n')
+        file.write('    ' + input + '\n')
         file.write('End Function\n')
     input_stream = FileStream(file_path)
     lexer = Lexer(input_stream)
