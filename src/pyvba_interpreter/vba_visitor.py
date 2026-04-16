@@ -29,9 +29,9 @@ class VbaVisitor(Visitor):
             ctx: Parser.CallStatementContext) -> None:
         command = ''
         if ctx.getChild(0).getText().lower() == "call":
-            command = ctx.getChild(0).getText()
+            command = ctx.getChild(2).getText()
             args = ctx.argumentList()
-        else
+        else:
             command = ctx.getChild(0).getText()
         args = self.visit(ctx.argumentList())
         if command.lower() == "msgbox":
