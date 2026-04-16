@@ -27,14 +27,13 @@ class VbaVisitor(Visitor):
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
-        raise Exception("In visitCallStatement")
         command = ctx.getChild(0).getText()
         args = []
         for i in range(ctx.getChildCount()):
             args += [self.visit(ctx.getChild(i))]
         print(command)
         if command.lower() == "msgbox":
-            print(args[0])
+            raise Exception(args[0])
 
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
