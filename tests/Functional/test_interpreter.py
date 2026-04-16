@@ -31,7 +31,7 @@ def test_interpreter(mock_print) -> None:
         ('MsgBox "Hello World"', "Hello World"),
         ('MsgBox 1', 1),
     ])
-def test_msgbox(input: str, expected: Any, mock_print) -> None:
+def test_msgbox(mock_print, input: str, expected: Any) -> None:
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
