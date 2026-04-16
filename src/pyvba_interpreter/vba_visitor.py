@@ -46,7 +46,9 @@ class VbaVisitor(Visitor):
             ctx: Parser.ArgumentListContext) -> list[Any]:
         args = []
         for i in range(ctx.getChildCount()):
-            args += [self.visit(ctx.getChild(i))]
+            child = ctx.getChild(i)
+            if child is not None:
+                args += [self.visit(child)]
         return args
 
     def visitLiteralExpression(                                    # noqa: N802
