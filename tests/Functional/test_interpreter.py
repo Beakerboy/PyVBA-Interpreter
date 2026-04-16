@@ -17,5 +17,6 @@ def test_interpreter(mock_print) -> None:
     interpreter = VbaVisitor()
     interpreter.visit(tree)
     assert len(interpreter.functions) == 1
+    ctx = interpreter.functions["hello"]
     interpreter.visitChildren(ctx)
     mock_print.assert_called_with("Hello World")
