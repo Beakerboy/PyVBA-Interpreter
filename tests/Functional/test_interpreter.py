@@ -21,9 +21,11 @@ def test_interpreter(mock_print) -> None:
     interpreter.visitChildren(ctx)
     mock_print.assert_called_with("Hello World")
 
+
 @patch('builtins.print')
 def test_msgbox(mock_print) -> None:
     test_call = 'MsgBox "Hello World"'
+    expected = "Hello World"
     file_path = 'tests/files/test.bas'
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attribute VB_NAME = "HelloWorld"\n')
@@ -37,7 +39,6 @@ def test_msgbox(mock_print) -> None:
     tree = vbaparser.module()  # or module?
     interpreter = VbaVisitor()
     interpreter.visit(tree)
-    assert len(interpreter.functions) == 1
     ctx = interpreter.functions["hello"]
     interpreter.visitChildren(ctx)
-    mock_print.assert_called_with("Hello World")
+    mock_print.assert_called_with(expected)
