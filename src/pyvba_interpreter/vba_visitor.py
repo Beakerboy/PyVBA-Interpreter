@@ -29,7 +29,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.CallStatementContext) -> None:
         command = ''
         if ctx.getChild(0).getText().lower() == "call":
-            command = ctx.getChild(2).getText()
+            command = ctx.indexExpression().lExpression().getText()
             args = ctx.indexExpression().argumentList()
         else:
             command = ctx.getChild(0).getText()
