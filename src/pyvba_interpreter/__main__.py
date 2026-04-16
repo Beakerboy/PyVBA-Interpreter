@@ -22,7 +22,7 @@ def main() -> None:
         raise Exception('file does not exist: ' + args.module)
     ts = CommonTokenStream(lexer)
     parser = Parser(ts)
-    tree = parser.startRule()  # or module?
+    tree = parser.module()  # or module?
     interpreter = VbaVisitor()
     interpreter.visit(tree)
     if function_to_run in interpreter.functions:
