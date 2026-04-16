@@ -24,7 +24,7 @@ def test_interpreter(mock_print) -> None:
 @patch('builtins.print')
 def test_msgbox(mock_print) -> None:
     test_call = 'MsgBox "Hello World"'
-     = 'tests/files/test.bas'
+    file_path = 'tests/files/test.bas'
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attributes VB_NAME = "HelloWorld"\n')
         file.write('Function hello()\n')
