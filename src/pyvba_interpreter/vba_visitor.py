@@ -54,3 +54,14 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
+
+    def visitExpression(
+            self: T,
+            ctx) -> Any:
+        number = ctx.getAltNumber()
+        if number == 5:
+            base = self.visit(ctx.expression(0))
+            exp = self.visit(ctx.expression(1))
+            return base ^ exp
+       return False
+        
