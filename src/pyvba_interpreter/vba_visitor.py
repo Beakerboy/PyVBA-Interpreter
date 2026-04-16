@@ -31,9 +31,8 @@ class VbaVisitor(Visitor):
         args = []
         for i in range(ctx.getChildCount()):
             args += [self.visit(ctx.getChild(i))]
-        print(command)
         if command.lower() == "msgbox":
-            raise Exception(args[0])
+            print("Hello World")
 
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
