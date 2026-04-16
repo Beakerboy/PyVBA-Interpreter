@@ -25,8 +25,8 @@ def test_interpreter(mock_print) -> None:
 
 @patch('builtins.print')
 def test_msgbox(mock_print) -> None:
-    test_call = 'MsgBox 1'
-    expected = 1
+    test_call = 'Call MsgBox("Hello World")'
+    expected = "Hello World"
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
