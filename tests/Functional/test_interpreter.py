@@ -5,7 +5,6 @@ from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.vba_visitor import VbaVisitor
 
 
-@pytest.fixture(autouse=True)
 def test_interpreter() -> None:
     function_to_run = "hello()"
     input_stream = FileStream('tests/files/HelloWorld.bas')
