@@ -30,7 +30,7 @@ class VbaVisitor(Visitor):
         command = ''
         if ctx.getChild(0).getText().lower() == "call":
             command = ctx.getChild(2).getText()
-            args = ctx.argumentList()
+            args = ctx.indexExpression().argumentList()
         else:
             command = ctx.getChild(0).getText()
         args = self.visit(ctx.argumentList())
