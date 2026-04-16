@@ -55,7 +55,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
 
-    def visitExpression(
+    def visitExpression(                                           # noqa: N802
             self: T,
             ctx) -> Any:
         number = ctx.getAltNumber()
