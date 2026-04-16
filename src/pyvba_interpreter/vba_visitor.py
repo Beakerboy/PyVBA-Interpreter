@@ -27,7 +27,7 @@ class VbaVisitor(Visitor):
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
-        print("In visitCallStatement")
+        raise Exception("In visitCallStatement")
         command = ctx.getChild(0).getText()
         args = []
         for i in range(ctx.getChildCount()):
