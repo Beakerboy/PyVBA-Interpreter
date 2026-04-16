@@ -35,7 +35,7 @@ class VbaVisitor(Visitor):
             command = ctx.getChild(0).getText()
         args = self.visit(ctx.argumentList())
         if command.lower() == "msgbox":
-            print(args[2])
+            print(args[0])
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
