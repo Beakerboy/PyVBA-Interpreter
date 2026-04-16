@@ -4,6 +4,7 @@ from antlr4 import CommonTokenStream, FileStream
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.vba_visitor import VbaVisitor
+from typing import Any
 from unittest.mock import patch
 
 
@@ -24,8 +25,14 @@ def test_interpreter(mock_print) -> None:
 
 
 @patch('builtins.print')
-def test_msgbox(mock_print) -> None:
-    test_call = 'Call MsgBox("Hello World")'
+@pytest.mark.parametrize(
+    "input, expected", [
+        ('Call MsgBox("Hello World")', "Hello World"),
+        ('MsgBox "Hello World"', "Hello World"),
+        ('MsgBox 1', 1),
+    ])
+def test_msgbox(input: str, expected: Any, mock_print) -> None:
+    test_call = 
     expected = "Hello World"
     file_path = 'tests/files/test.bas'
     try:
