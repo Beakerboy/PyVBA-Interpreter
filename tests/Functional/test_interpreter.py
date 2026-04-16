@@ -20,3 +20,24 @@ def test_interpreter(mock_print) -> None:
     ctx = interpreter.functions["hello"]
     interpreter.visitChildren(ctx)
     mock_print.assert_called_with("Hello World")
+
+@patch('builtins.print')
+def test_msgbox(mock_print) -> None:
+    test_call = 'MsgBox "Hello World"'
+    file.open("tests/file/test.bas", "w", newline='\r\n')
+    file.write('Attributes VB_NAME = "HelloWorld"\n')
+    file.write('Function hello()\n')
+    file.write('    ' + test_call + '\n')
+    file.write('End Function\n')
+    file.close()
+    input_stream = FileStream('tests/files/test.bas')
+    lexer = Lexer(input_stream)
+    ts = CommonTokenStream(lexer)
+    vbaparser = Parser(ts)
+    tree = vbaparser.module()  # or module?
+    interpreter = VbaVisitor()
+    interpreter.visit(tree)
+    assert len(interpreter.functions) == 1
+    ctx = interpreter.functions["hello"]
+    interpreter.visitChildren(ctx)
+    mock_print.assert_called_with("Hello World")
