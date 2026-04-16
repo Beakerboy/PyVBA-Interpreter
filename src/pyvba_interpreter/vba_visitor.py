@@ -30,10 +30,10 @@ class VbaVisitor(Visitor):
         command = ''
         if ctx.getChild(0).getText().lower() == "call":
             command = ctx.indexExpression().lExpression().getText()
-            args = ctx.indexExpression().argumentList()
+            args = self.visit(ctx.indexExpression().argumentList())
         else:
             command = ctx.getChild(0).getText()
-        args = self.visit(ctx.argumentList())
+            args = self.visit(ctx.argumentList())
         if command.lower() == "msgbox":
             print(args[0])
 
