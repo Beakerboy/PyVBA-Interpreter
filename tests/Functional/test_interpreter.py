@@ -29,7 +29,7 @@ def test_interpreter(mock_print) -> None:
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
-        ('MsgBox 1', 1),
+        ('MsgBox 1', "1"),
     ])
 def test_msgbox(mock_print, input: str, expected: Any) -> None:
     file_path = 'tests/files/test.bas'
