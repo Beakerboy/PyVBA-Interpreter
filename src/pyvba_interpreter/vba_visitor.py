@@ -59,12 +59,15 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ExpressionContext) -> Any:
         number = ctx.getAltNumber()
-        if number == 6:
-            first = self.visit(ctx.unaryMinusExpression().expression())
-            return -1 * first
         if number in [5]:
             left = self.visit(ctx.expression(0))
             right = self.visit(ctx.expression(1))
             op = ctx.getChild(1).symbol.text
             return left ^ right
         return self.visitChildren(ctx)
+
+    def visitUnaryMinusExpression(
+            self: T,
+            ctx: Parser.UnaryMinusContext) -> int | float:
+        value = self.visit(ctx..expression())
+        return -1 * first
