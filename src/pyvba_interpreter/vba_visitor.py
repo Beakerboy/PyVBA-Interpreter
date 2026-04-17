@@ -70,4 +70,4 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.UnaryMinusContext) -> int | float:
         value = self.visit(ctx.expression())
-        return -1 * first
+        return -1 * value
