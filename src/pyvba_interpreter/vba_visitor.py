@@ -66,7 +66,7 @@ class VbaVisitor(Visitor):
             return left ^ right
         return self.visitChildren(ctx)
 
-    def visitUnaryMinusExpression(
+    def visitUnaryMinusExpression(                                 # noqa: N802
             self: T,
             ctx: Parser.UnaryMinusContext) -> int | float:
         value = self.visit(ctx.expression())
