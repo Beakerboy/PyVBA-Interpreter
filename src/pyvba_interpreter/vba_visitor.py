@@ -66,6 +66,6 @@ class VbaVisitor(Visitor):
 
     def visitUnaryMinusExpression(                                 # noqa: N802
             self: T,
-            ctx: Parser.UnaryMinusContext) -> int | float:
+            ctx: Parser.UnaryMinusExpressionContext) -> int | float:
         value = self.visit(ctx.expression())
         return -1 * value
