@@ -3,6 +3,7 @@ from antlr4.ParserRuleContext import ParserRuleContext
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
+from .symbol_table import SymbolTable
 
 
 T = TypeVar('T', bound='VbaVisitor')
