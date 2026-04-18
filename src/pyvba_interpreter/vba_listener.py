@@ -9,7 +9,7 @@ class VbaListener(VBAListener):
     def __init__(self: T, table: SymbolTable):
         self.table = table
 
-    def enterSubStmt(self, ctx):
+    def enterSubStmt(self: T, ctx):
         name = ctx.IDENTIFIER().getText()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = ctx
