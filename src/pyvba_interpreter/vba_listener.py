@@ -13,7 +13,7 @@ class VbaListener(Listener):
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
-            ctx: Parser.FunctionDeclaration) -> None:
+            ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = ctx
