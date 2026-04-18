@@ -22,8 +22,13 @@ def main() -> None:
         raise Exception('file does not exist: ' + args.module)
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
-    tree = vbaparser.module()  # or module?
-    interpreter = VbaVisitor()
+    tree = vbaparser.module()
+    table = SymbolTable()
+    listener = VBADefinitionListener(table)
+    walker = ParseTreeWalker()
+    walker.walk(listener, tree)
+    
+    interpreter = VbaVisitor(table)
     interpreter.visit(tree)
     if function_to_run in interpreter.functions:
         target_node = interpreter.functions[function_to_run]
