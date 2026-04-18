@@ -13,6 +13,6 @@ class VbaListener(VBAListener):
     def enterFunctionDeclaration(
             self: T, 
             ctx: Parser.FunctionDeclaration) -> None:
-        name = ctx.IDENTIFIER().getText()
+        name = ctx.functionName().getText()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = ctx
