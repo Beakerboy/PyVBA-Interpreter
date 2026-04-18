@@ -4,8 +4,8 @@ from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from .symbol_table import SymbolTable
-from .vba_listener import VbaListener
-from .vba_visitor import VbaVisitor
+from pyvba_interpreter.vba_listener import VbaListener
+from pyvba_interpreter.vba_visitor import VbaVisitor
 from typing import Any
 from unittest.mock import patch
 
