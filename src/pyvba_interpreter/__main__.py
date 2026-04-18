@@ -4,6 +4,7 @@ from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pathlib import Path
 from .symbol_table import SymbolTable
+from .vba_listener import VbaListener
 from .vba_visitor import VbaVisitor
 
 
@@ -25,7 +26,7 @@ def main() -> None:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VBADefinitionListener(table)
+    listener = VbaListener(table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     
