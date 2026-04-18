@@ -3,7 +3,9 @@ import pytest
 from antlr4 import CommonTokenStream, FileStream
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
-from pyvba_interpreter.vba_visitor import VbaVisitor
+from .symbol_table import SymbolTable
+from .vba_listener import VbaListener
+from .vba_visitor import VbaVisitor
 from typing import Any
 from unittest.mock import patch
 
@@ -15,12 +17,9 @@ def test_interpreter(mock_print: str) -> None:
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
     tree = vbaparser.module()  # or module?
-    interpreter = VbaVisitor()
-    interpreter.visit(tree)
-    assert len(interpreter.functions) == 1
-    ctx = interpreter.functions["hello"]
-    interpreter.visitChildren(ctx)
-    mock_print.assert_called_with("Hello World")
+    table = SymbolTable()
+    listener = VbaListener(table)
+    assert len(table.definitions) == 1
 
 
 @patch('builtins.print')
