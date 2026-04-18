@@ -1,5 +1,4 @@
 from typing import Any, TypeVar
-from antlr4.ParserRuleContext import ParserRuleContext
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
@@ -12,7 +11,7 @@ T = TypeVar('T', bound='VbaVisitor')
 class VbaVisitor(Visitor):
 
     def __init__(self: T, table: SymbolTable) -> None:
-        self.functions: dict[str, 'ParserRuleContext'] = table
+        self.functions = table
 
     def visitCallStatement(                                        # noqa: N802
             self: T,
