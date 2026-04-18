@@ -10,7 +10,9 @@ class VbaListener(VBAListener):
     def __init__(self: T, table: SymbolTable):
         self.table = table
 
-    def enterFunctionDeclaration(self: T, ctx: Parser.FunctionDeclaration):
+    def enterFunctionDeclaration(
+            self: T, 
+            ctx: Parser.FunctionDeclaration) -> None:
         name = ctx.IDENTIFIER().getText()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = ctx
