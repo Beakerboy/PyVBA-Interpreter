@@ -14,17 +14,6 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.functions: dict[str, 'ParserRuleContext'] = table
 
-    def visitFunctionDeclaration(                                  # noqa: N802
-            self: T,
-            ctx: Parser.FunctionDeclarationContext) -> None:
-        func_name = self.visit(ctx.functionName())
-        self.functions[func_name] = ctx
-
-    def visitFunctionName(                                         # noqa: N802
-            self: T,
-            ctx: Parser.FunctionNameContext) -> str:
-        return ctx.getText()
-
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
