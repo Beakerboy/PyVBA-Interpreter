@@ -1,5 +1,5 @@
 import argparse
-from antlr4 import CommonTokenStream, FileStream
+from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pathlib import Path
@@ -29,7 +29,7 @@ def main() -> None:
     listener = VbaListener(table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
-    
+
     interpreter = VbaVisitor(table)
     interpreter.visit(tree)
     if function_to_run in interpreter.functions:
