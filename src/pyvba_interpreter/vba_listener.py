@@ -1,5 +1,12 @@
+from typing import TypeVar
+from .symbol_table import SymbolTable
+
+
+T = TypeVar('T', bound='VBADefinitionListener')
+
+
 class VBADefinitionListener(VBAListener):
-    def __init__(self, table):
+    def __init__(self: T, table: SymbolTable):
         self.table = table
 
     def enterSubStmt(self, ctx):
