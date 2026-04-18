@@ -10,8 +10,8 @@ T = TypeVar('T', bound='VbaVisitor')
 
 class VbaVisitor(Visitor):
 
-    def __init__(self: T) -> None:
-        self.functions: dict[str, 'ParserRuleContext'] = {}
+    def __init__(self: T, table: SymbolTable) -> None:
+        self.functions: dict[str, 'ParserRuleContext'] = table
 
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
