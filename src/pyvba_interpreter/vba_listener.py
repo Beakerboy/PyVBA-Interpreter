@@ -7,7 +7,7 @@ T = TypeVar('T', bound='VbaListener')
 
 
 class VbaListener(VBAListener):
-    def __init__(self: T, table: SymbolTable):
+    def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
 
     def enterFunctionDeclaration(                                  # noqa: N802
