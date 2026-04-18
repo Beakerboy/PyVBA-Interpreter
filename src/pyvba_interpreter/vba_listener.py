@@ -1,4 +1,5 @@
 from typing import TypeVar
+from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from antlr4_vba.vbaParser import vbaParser as Parser
 from .symbol_table import SymbolTable
 
@@ -6,7 +7,7 @@ from .symbol_table import SymbolTable
 T = TypeVar('T', bound='VbaListener')
 
 
-class VbaListener(VBAListener):
+class VbaListener(Listener):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
 
