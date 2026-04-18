@@ -2,10 +2,10 @@ from typing import TypeVar
 from .symbol_table import SymbolTable
 
 
-T = TypeVar('T', bound='VBADefinitionListener')
+T = TypeVar('T', bound='VbaListener')
 
 
-class VBADefinitionListener(VBAListener):
+class VbaListener(VBAListener):
     def __init__(self: T, table: SymbolTable):
         self.table = table
 
