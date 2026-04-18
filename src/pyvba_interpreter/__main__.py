@@ -3,6 +3,7 @@ from antlr4 import CommonTokenStream, FileStream
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pathlib import Path
+from .symbol_table import SymbolTable
 from .vba_visitor import VbaVisitor
 
 
