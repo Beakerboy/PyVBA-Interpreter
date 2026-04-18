@@ -1,4 +1,5 @@
 from typing import TypeVar
+from antlr4_vba.vbaParser import vbaParser as Parser
 from .symbol_table import SymbolTable
 
 
