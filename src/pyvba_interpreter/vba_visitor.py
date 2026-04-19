@@ -48,15 +48,13 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ExpressionContext) -> Any:
         number = ctx.getAltNumber()
-        output = f"\nnum: {number}\n"
-        for i in [1, 2, 3]:
-            text = ctx.getChild(i).symbol.text
-            output += f"{i}: {text}\n"
-        raise Exception(output)
         if number in [5, 7, 8, 9, 10, 11, 13]:
             left = self.visit(ctx.expression(0))
             right = self.visit(ctx.expression(1))
-            op = ctx.getChild(2).symbol.text
+            if isinstance(ctx.getChild(1), WscContext):
+                op = ctx.getChild(2).symbol.text
+            else:
+                op = ctx.getChild(1).symbol.text
             if op == '^':
                 return left ^ right
             if op == '*':
