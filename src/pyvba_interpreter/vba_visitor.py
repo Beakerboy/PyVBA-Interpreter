@@ -48,8 +48,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ExpressionContext) -> Any:
         number = ctx.getAltNumber()
-        if number in [5, 7, 8, 9, 10, 11, 13]:
-            return number
+        if number in [5, 7, 8, 9, 10, 11, 13]
             left = self.visit(ctx.expression(0))
             right = self.visit(ctx.expression(1))
             if isinstance(ctx.getChild(1), Parser.WscContext):
@@ -66,10 +65,7 @@ class VbaVisitor(Visitor):
                 return left + right
             if op == '-':
                 return left - right
-        if number == 0:
-            self.visitChildren(ctx)
-        else:
-            return number
+
         return self.visitChildren(ctx)
 
     def visitUnaryMinusExpression(                                 # noqa: N802
