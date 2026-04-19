@@ -55,6 +55,6 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
     interpreter.visit(tree)
-    ctx = interpreter.functions["hello"]
+    ctx = table.definitions["hello"]
     interpreter.visitChildren(ctx)
     mock_print.assert_called_with(expected)
