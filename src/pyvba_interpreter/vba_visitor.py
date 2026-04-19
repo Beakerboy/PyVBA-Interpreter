@@ -62,6 +62,7 @@ class VbaVisitor(Visitor):
             if op == '/':
                 return left / right
             if op == '+':
+                raise Exception("plus is in the house")
                 return left + right
             if op == '-':
                 return left - right
