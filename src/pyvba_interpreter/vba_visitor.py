@@ -48,10 +48,9 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ExpressionContext) -> Any:
         number = ctx.getAltNumber()
-        i = 0
         output = f"\nnum: {number}\n"
-        for child in ctx.children:
-            text = child.symbol.text
+        for i in [1, 2, 3]:
+            text = ctx.getChild(i).symbol.text
             output += f"{i}: {text}\n"
         raise Exception(output)
         if number in [5, 7, 8, 9, 10, 11, 13]:
