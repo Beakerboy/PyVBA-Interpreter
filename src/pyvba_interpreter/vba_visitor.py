@@ -66,6 +66,10 @@ class VbaVisitor(Visitor):
                 return left + right
             if op == '-':
                 return left - right
+        if number == 0:
+            self.visitChildren(ctx)
+        else:
+            return number
         return self.visitChildren(ctx)
 
     def visitUnaryMinusExpression(                                 # noqa: N802
