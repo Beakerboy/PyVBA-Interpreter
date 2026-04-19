@@ -65,6 +65,8 @@ class VbaVisitor(Visitor):
                 return left + right
             if op == '-':
                 return left - right
+            else:
+                return f"{number} {op}"
 
         return self.visitChildren(ctx)
 
