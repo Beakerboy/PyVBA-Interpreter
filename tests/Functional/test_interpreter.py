@@ -48,8 +48,12 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     lexer = Lexer(input_stream)
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
-    tree = vbaparser.module()  # or module?
-    interpreter = VbaVisitor()
+    tree = vbaparser.module()
+    table = SymbolTable()
+    listener = VbaListener(table)
+    walker = ParseTreeWalker()
+    walker.walk(listener, tree)
+    interpreter = VbaVisitor(table)
     interpreter.visit(tree)
     ctx = interpreter.functions["hello"]
     interpreter.visitChildren(ctx)
