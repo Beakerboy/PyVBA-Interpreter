@@ -51,7 +51,7 @@ class VbaVisitor(Visitor):
         if number in [5, 7, 8, 9, 10, 11, 13]:
             left = self.visit(ctx.expression(0))
             right = self.visit(ctx.expression(1))
-            op = ctx.getChild(1).symbol.text
+            op = ctx.getChild(2).symbol.text
             if op == '^':
                 return left ^ right
             if op == '*':
