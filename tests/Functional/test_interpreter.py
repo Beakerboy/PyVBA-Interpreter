@@ -30,11 +30,11 @@ def test_interpreter(mock_print: str) -> None:
         ('Call MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
         ('MsgBox 2', "2"),
-        ('MsgBox 2 ^ 2', "4"),
-        ('MsgBox 6 * 4', "18"),
-        ('MsgBox 10 / 2', "5"),
-        ('MsgBox 4 + 6', "10"),
-        ('MsgBox 6 - 1', "5"),
+        ('MsgBox (2 ^ 2)', "4"),
+        ('MsgBox (6 * 4)', "18"),
+        ('MsgBox (10 / 2)', "5"),
+        ('MsgBox (4 + 6)', "10"),
+        ('MsgBox (6 - 1)', "5"),
     ])
 def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     file_path = 'tests/files/test.bas'
