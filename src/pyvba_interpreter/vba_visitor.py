@@ -104,7 +104,7 @@ class VbaVisitor(Visitor):
 
     def visitBooleanExpress(                                    # noqa: N802
             self: T,
-            ctx: Parser.BooleanExpressionContext
+            ctx: Parser.BooleanExpressContext
     ) -> bool:
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
