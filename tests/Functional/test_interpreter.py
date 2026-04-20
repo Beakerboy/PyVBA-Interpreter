@@ -102,7 +102,6 @@ def test_function_not_defined() -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    interpreter.visit(tree)
     ctx = table.definitions["hello"]
     with pytest.raises(VbaCompileException):
         interpreter.visitChildren(ctx)
