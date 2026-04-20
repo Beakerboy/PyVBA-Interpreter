@@ -102,7 +102,7 @@ class VbaVisitor(Visitor):
         else:  # LIKE
             raise Exception("Currently Unsupported")
 
-    def visitBooleanExpression(                                    # noqa: N802
+    def visitBooleanExpress(                                    # noqa: N802
             self: T,
             ctx: Parser.BooleanExpressionContext
     ) -> bool:
