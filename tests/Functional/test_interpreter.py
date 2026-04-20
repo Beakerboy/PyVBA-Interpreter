@@ -1,5 +1,6 @@
 import os
 import pytest
+import vba_stdlib
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
@@ -77,7 +78,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter = VbaVisitor(table)
     table.definitions["msgbox"] = {
         "type": "builtin",
-        "handle": "vba_stdlib.Interaction.MsgBox"
+        "handle": getattr(vba_stdlib.Interaction, "MsgBox")
     }
     ctx = table.definitions["hello"]["handle"]
     interpreter.visit(ctx)
