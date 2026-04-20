@@ -121,5 +121,7 @@ class VbaVisitor(Visitor):
             return left != right
         elif op == "IMP":
             return not left or right
-        else:  # op = "EQV"
+        elif op = "EQV":
             return left == right
+        else:
+            raise Exception(f"Unknown Boolean Expression: {op}")
