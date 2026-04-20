@@ -48,7 +48,8 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
         left = self.visit(ctx.getChild(0))
-        right = self.visit(ctx.getChild(4))
+        last = ctx.getChildCount() - 1
+        right = self.visit(ctx.getChild(last))
         if isinstance(ctx.getChild(1), Parser.WscContext):
             op = ctx.getChild(2).symbol.text
         else:
@@ -73,3 +74,52 @@ class VbaVisitor(Visitor):
             ctx: Parser.UnaryMinusExpressionContext) -> int | float:
         value = self.visit(ctx.expression())
         return -1 * value
+
+    def visitRelationExpression(  # noqa: N802
+            self: T,
+            ctx: Parser.RelationExpressionContext
+    ) -> bool:
+        left = self.visit(ctx.getChild(0))
+        last = ctx.getChildCount() - 1
+        right = self.visit(ctx.getChild(last))
+        if isinstance(ctx.getChild(1), Parser.WscContext):
+            op = ctx.getChild(2).symbol.text
+        else:
+            op = ctx.getChild(1).symbol.text
+
+        if op == '<':
+            return left < right
+        elif op == '>':
+            return left > right
+        elif op == '=':
+            return left == right
+        elif op == '<>' or op == '><':
+            return left != right
+        elif op == '>=' or op == '=>':
+            return left >= right
+        elif op == '<=' or op == '=<':
+            return left <= right
+        else:  # LIKE
+            raise Exception("Currently Unsupported")
+
+     def visitBooleanExpression(  # noqa: N802
+            self: T,
+            ctx: Parser.BooleanExpressionContext
+    ) -> bool:
+        left = self.visit(ctx.getChild(0))
+        last = ctx.getChildCount() - 1
+        right = self.visit(ctx.getChild(last))
+        i = 1
+        if isinstance(ctx.getChild(1), Parser.WscContext):
+            i = 2
+        op = ctx.getChild(i).symbol.text.upper()
+        if op == "AND":
+            return left and right
+        elif op == "OR":
+            return left or right
+        elif op == "XOR":
+            return left != right
+        elif op == "IMP":
+            return not left or right
+        else:  # op = "EQV"
+            return left == right
