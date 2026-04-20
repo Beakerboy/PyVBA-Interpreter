@@ -106,4 +106,3 @@ def test_function_not_defined() -> None:
     ctx = table.definitions["hello"]
     with pytest.raises(VbaCompileException):
         interpreter.visitChildren(ctx)
-    interpreter.visitChildren(ctx)
