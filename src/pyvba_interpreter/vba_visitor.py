@@ -48,7 +48,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
         left = self.visit(ctx.getChild(0))
-        right = self.visit(ctx.getChild(2))
+        right = self.visit(ctx.getChild(4))
         if isinstance(ctx.getChild(1), Parser.WscContext):
             op = ctx.getChild(2).symbol.text
         else:
