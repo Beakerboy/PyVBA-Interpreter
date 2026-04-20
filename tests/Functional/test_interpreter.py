@@ -30,6 +30,7 @@ def test_interpreter(mock_print: str) -> None:
         ('Call MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
         ('MsgBox 2', "2"),
+        ('MsgBox -2', "-2"),
         ('Call MsgBox(2 ^ 2)', "4"),
         ('Call MsgBox(6 * 4)', "18"),
         ('Call MsgBox(10 / 2)', "5"),
