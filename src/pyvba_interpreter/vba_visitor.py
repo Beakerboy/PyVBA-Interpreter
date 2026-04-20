@@ -44,34 +44,29 @@ class VbaVisitor(Visitor):
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
 
-    def visitExpression(                                           # noqa: N802
+     def visitArithmeticExpression(                                # noqa: N802
             self: T,
-            ctx: Parser.ExpressionContext) -> Any:
-        number = ctx.getAltNumber()
-        if number != 0:
-            return number
-        if number in [5, 7, 8, 9, 10, 11, 13]:
-            left = self.visit(ctx.expression(0))
-            right = self.visit(ctx.expression(1))
-            if isinstance(ctx.getChild(1), Parser.WscContext):
+            ctx: Parser.ArithmeticExpressionContext) -> Any:
+        left = self.visit(ctx.getChild(0))
+        right = self.visit(ctx.getChild(2))
+        if isinstance(ctx.getChild(1), Parser.WscContext):
                 op = ctx.getChild(2).symbol.text
             else:
                 op = ctx.getChild(1).symbol.text
-            return op
-            if op == '^':
-                return left ^ right
-            if op == '*':
-                return left * right
-            if op == '/':
-                return left / right
-            if op == '+':
-                return left + right
-            if op == '-':
-                return left - right
-            else:
-                return f"{number} {op}"
-
-        return self.visitChildren(ctx)
+        if op == '*':
+            return left * right
+        elif op == '/':
+            return left / right
+        elif op == '+':
+            return left + right
+        elif op == '-':
+            return left - right
+        elif op == '^':
+            return left ** right
+        elif op.upper() == 'MOD':
+            return left % right
+        else:  # op == '\\':
+            return left // right
 
     def visitUnaryMinusExpression(                                 # noqa: N802
             self: T,
