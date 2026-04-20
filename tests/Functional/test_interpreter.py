@@ -78,7 +78,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter = VbaVisitor(table)
     table.definitions["msgbox"] = {
         "type": "builtin",
-        "handle": getattr(vba_stdlib.Interaction, "MsgBox")
+        "handle": getattr(vba_stdlib.interaction, "Interaction.MsgBox")
     }
     ctx = table.definitions["hello"]["handle"]
     interpreter.visit(ctx)
