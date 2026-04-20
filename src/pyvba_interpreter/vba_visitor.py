@@ -12,7 +12,7 @@ T = TypeVar('T', bound='VbaVisitor')
 class VbaVisitor(Visitor):
 
     def __init__(self: T, table: SymbolTable) -> None:
-        self.functions = table
+        self.table = table
 
     @staticmethod
     def _get_op(ctx) -> str:
@@ -125,5 +125,5 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LExpressionContext) -> bool:
         name = self.visit(ctx.getChild(0))
-        if name not in self.functions:
+        if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
