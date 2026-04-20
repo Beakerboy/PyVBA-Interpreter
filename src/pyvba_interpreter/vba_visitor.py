@@ -13,6 +13,13 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.functions = table
 
+    @staticmethod
+    def _get_op(ctx) -> str:
+        i = 1
+        if isinstance(ctx.getChild(1), Parser.WscContext):
+            i = 2
+        return ctx.getChild(i).symbol.text
+
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
@@ -50,10 +57,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        if isinstance(ctx.getChild(1), Parser.WscContext):
-            op = ctx.getChild(2).symbol.text
-        else:
-            op = ctx.getChild(1).symbol.text
+        op =  self._get_op(ctx)
         if op == '*':
             return left * right
         elif op == '/':
@@ -82,11 +86,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        if isinstance(ctx.getChild(1), Parser.WscContext):
-            op = ctx.getChild(2).symbol.text
-        else:
-            op = ctx.getChild(1).symbol.text
-
+        op =  self._get_op(ctx)
         if op == '<':
             return left < right
         elif op == '>':
@@ -109,10 +109,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        i = 1
-        if isinstance(ctx.getChild(1), Parser.WscContext):
-            i = 2
-        op = ctx.getChild(i).symbol.text.upper()
+        op =  self._get_op(ctx)
         if op == "AND":
             return left and right
         elif op == "OR":
