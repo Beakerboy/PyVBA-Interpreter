@@ -26,17 +26,14 @@ class VbaVisitor(Visitor):
             ctx: Parser.CallStatementContext) -> None:
         command = ''
         if ctx.getChild(0).getText().lower() == "call":
-            command = ctx.indexExpression().lExpression().getText()
+            command = ctx.indexExpression().lExpression().getText().lower()
             args = self.visit(ctx.indexExpression().argumentList())
         else:
-            command = ctx.getChild(0).getText()
+            command = ctx.simpleNameExpression().getText().lower()
             args = self.visit(ctx.argumentList())
-        if command.lower() == "msgbox":
-            try:
-                string = str(args[0])
-            except Exception:
-                raise Exception("Value cannot be cast to a string")
-            print(string)
+        func_info = self.table.definitions.get(command)
+        if func_info and func_info["type"] == "builtin":
+            return func_info["handle"](*args)
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
