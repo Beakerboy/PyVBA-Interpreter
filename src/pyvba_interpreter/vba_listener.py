@@ -16,4 +16,7 @@ class VbaListener(Listener):
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText()
         # Save the context (subtree) so the Visitor can find it later
-        self.table.definitions[name] = ctx
+        self.table.definitions[name] = {
+            "type": "module",
+            "handle": ctx
+        }
