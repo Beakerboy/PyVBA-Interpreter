@@ -109,7 +109,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        op =  self._get_op(ctx)
+        op =  self._get_op(ctx).upper()
         if op == "AND":
             return left and right
         elif op == "OR":
