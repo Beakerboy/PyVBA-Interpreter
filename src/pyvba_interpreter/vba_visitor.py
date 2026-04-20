@@ -3,7 +3,7 @@ from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
-from .Exceptions.vba_exception import VbaException
+from .Exceptions.vba_compile_exception import VbaCompileException
 
 
 T = TypeVar('T', bound='VbaVisitor')
