@@ -3,6 +3,7 @@ from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
+from .Exceptions.vba_exception import VbaException
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -104,8 +105,7 @@ class VbaVisitor(Visitor):
 
     def visitBooleanExpress(                                    # noqa: N802
             self: T,
-            ctx: Parser.BooleanExpressContext
-    ) -> bool:
+            ctx: Parser.BooleanExpressContext) -> bool:
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
@@ -121,3 +121,9 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return left == right
 
+    def visitLExpression(                                       # noqa: N802
+            self: T,
+            ctx: Parser.LExpressionContext) -> bool:
+        name = self.visit(ctx.getChild(0))
+        if name not in self.functions:
+            raise VbaCompileException("Sub or Function not defined")
