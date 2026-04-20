@@ -44,7 +44,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
 
-     def visitArithmeticExpression(                                # noqa: N802
+    def visitArithmeticExpression(                                 # noqa: N802
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
         left = self.visit(ctx.getChild(0))
