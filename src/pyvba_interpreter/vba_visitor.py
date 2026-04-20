@@ -75,7 +75,7 @@ class VbaVisitor(Visitor):
         value = self.visit(ctx.expression())
         return -1 * value
 
-    def visitRelationExpression(  # noqa: N802
+    def visitRelationExpression(                                   # noqa: N802
             self: T,
             ctx: Parser.RelationExpressionContext
     ) -> bool:
@@ -102,7 +102,7 @@ class VbaVisitor(Visitor):
         else:  # LIKE
             raise Exception("Currently Unsupported")
 
-    def visitBooleanExpression(  # noqa: N802
+    def visitBooleanExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.BooleanExpressionContext
     ) -> bool:
