@@ -50,9 +50,9 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         right = self.visit(ctx.getChild(2))
         if isinstance(ctx.getChild(1), Parser.WscContext):
-                op = ctx.getChild(2).symbol.text
-            else:
-                op = ctx.getChild(1).symbol.text
+            op = ctx.getChild(2).symbol.text
+        else:
+            op = ctx.getChild(1).symbol.text
         if op == '*':
             return left * right
         elif op == '/':
