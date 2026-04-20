@@ -79,7 +79,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         "type": "builtin",
         "handle": "vba_stdlib.Interaction.MsgBox"
     }
-    ctx = table.definitions["hello"]
+    ctx = table.definitions["hello"]["handle"]
     interpreter.visit(ctx)
     mock_print.assert_called_with(expected)
 
