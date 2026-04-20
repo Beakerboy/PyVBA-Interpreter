@@ -55,6 +55,7 @@ class VbaVisitor(Visitor):
                 op = ctx.getChild(2).symbol.text
             else:
                 op = ctx.getChild(1).symbol.text
+            return op
             if op == '^':
                 return left ^ right
             if op == '*':
