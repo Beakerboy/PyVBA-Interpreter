@@ -116,7 +116,9 @@ class VbaVisitor(Visitor):
         if op == "AND":
             return left and right
         elif op == "OR":
-            return left or right
+            t1 = type(left)
+            t2 = type(right)
+            return f"{t1} or {t2}"
         elif op == "XOR":
             return left != right
         elif op == "IMP":
