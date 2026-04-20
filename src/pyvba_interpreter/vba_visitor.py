@@ -114,16 +114,24 @@ class VbaVisitor(Visitor):
             i = 2
         op = ctx.getChild(i).symbol.text.upper()
         if op == "AND":
-            return left and right
+            t1 = type(left)
+            t2 = type(right)
+            return f"{t1} and {t2}"
         elif op == "OR":
             t1 = type(left)
             t2 = type(right)
             return f"{t1} or {t2}"
         elif op == "XOR":
-            return left != right
+            t1 = type(left)
+            t2 = type(right)
+            return f"{t1} != {t2}"
         elif op == "IMP":
-            return not left or right
+            t1 = type(left)
+            t2 = type(right)
+            return f"not {t1} or {t2}"
         elif op == "EQV":
-            return left == right
+            t1 = type(left)
+            t2 = type(right)
+            return f"{t1} == {t2}"
         else:
             raise Exception(f"Unknown Boolean Expression: {op}")
