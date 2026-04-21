@@ -124,9 +124,8 @@ class VbaVisitor(Visitor):
     def vistLExpression(                                        # noqa: N802
             self: T,
             ctx: Parser.LetStatementContext) -> Any:
-        if ctx.argumentList() is not None:
-            name = ctx.getChild(0).getText().lower()
-            if name not in self.table.definitions:
-                raise VbaCompileException("Sub or Function not defined")
-            if self.table.definitions[name]["type"] == "sub":
-                raise VbaCompileException("Unexpected Function or variable")
+        name = ctx.getChild(0).getText().lower()
+        if name not in self.table.definitions:
+            raise VbaCompileException("Sub or Function not defined")
+        if self.table.definitions[name]["type"] == "sub":
+            raise VbaCompileException("Unexpected Function or variable")
