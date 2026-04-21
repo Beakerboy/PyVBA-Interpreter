@@ -41,7 +41,7 @@ class VbaVisitor(Visitor):
                     func_info["handle"]
                 else:
                     self.visit(func_info["handle"])
-            elif ctx.indexExpress() is not None:
+            elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
         else:
             command = first_child.getText().lower()
