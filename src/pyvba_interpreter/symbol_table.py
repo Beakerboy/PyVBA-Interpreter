@@ -1,10 +1,10 @@
 from antlr4.ParserRuleContext import ParserRuleContext
-from typing import TypedDict, TypeVar
+from typing import Callable, TypedDict, TypeVar
 
 
 class FunctionDefinition(TypedDict):
     type: str
-    handle: ParserRuleContext
+    handle: ParserRuleContext | Callable
 
 
 T = TypeVar('T', bound='SymbolTable')
