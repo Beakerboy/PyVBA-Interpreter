@@ -28,7 +28,9 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> Any:
         function_name = ctx.functionName().getText().lower()
-        current_env[function_name] = None
+        current_env = {
+            function_name: None
+        }
         self.env_stack.append(urrent_env)
         self.visitChildren(ctx)
         output = current_env[function_name]
