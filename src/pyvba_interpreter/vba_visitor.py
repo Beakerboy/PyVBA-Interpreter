@@ -89,7 +89,7 @@ class VbaVisitor(Visitor):
         current_env = self.env_stack[-1]
         var_name = ctx.getText().lower()
         return current_env[var_name]
-        
+
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
