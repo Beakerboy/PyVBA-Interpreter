@@ -125,5 +125,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.LetStatementContext) -> None:
         if ctx.expression().getChild(0).argumentList() is not None:
             name = self.visit(ctx.expression().getChild(0).getChild(0)).lower()
+            if name not in self.table.definitions:
+                raise VbaCompileException("Sub or Function not defined")
             if self.table.definitions[name]["type"] == "sub":
-            raise VbaCompileException("Unexpected Function or variable")
+                raise VbaCompileException("Unexpected Function or variable")
