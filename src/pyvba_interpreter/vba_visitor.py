@@ -13,7 +13,7 @@ class VbaVisitor(Visitor):
 
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
-        self.env_stack = []
+        self.env_stack: list[] = []
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
