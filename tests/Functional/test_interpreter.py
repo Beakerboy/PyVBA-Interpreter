@@ -144,7 +144,7 @@ def test_override(mock_print:str) -> None:
     walker.walk(listener, tree)
     assert len(table.definitions) == 2
     interpreter = VbaVisitor(table)
-     table.definitions["msgbox"] = {
+    table.definitions["msgbox"] = {
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
