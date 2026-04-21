@@ -31,6 +31,8 @@ class VbaVisitor(Visitor):
         else:
             command = ctx.simpleNameExpression().getText().lower()
             args = self.visit(ctx.argumentList())
+        if name not in self.table.definitions:
+            raise VbaCompileException("Sub or Function not defined")
         func_info = self.table.definitions.get(command)
         if func_info and func_info["type"] == "builtin":
             return func_info["handle"](*args)
@@ -118,11 +120,10 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return left == right
 
-    def visitLExpression(                                       # noqa: N802
+    def visitLetStatement(                                      # noqa: N802
             self: T,
-            ctx: Parser.LExpressionContext) -> bool:
-        name = self.visit(ctx.getChild(0)).lower()
-        if name not in self.table.definitions:
-            raise VbaCompileException("Sub or Function not defined")
-        if self.table.definitions[name]["type"] == "sub":
+            ctx: Parser.LetStatementContext) -> None:
+        if ctx.expression().getChild(0).argumentList() is not None:
+            name = self.visit(ctx.expression().getChild(0).getChild(0)).lower()
+            if self.table.definitions[name]["type"] == "sub":
             raise VbaCompileException("Unexpected Function or variable")
