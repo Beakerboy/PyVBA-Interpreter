@@ -32,8 +32,8 @@ class VbaVisitor(Visitor):
         assert first_child is not None
         if first_child.getText().lower() == "call":
             # If no arguments, then it's just a simple name expression
-            if ctx.simpleNameExpress() is not None:
-                command = ctx.simpleNameExpress().getText().lower()
+            if ctx.simpleNameExpression() is not None:
+                command = ctx.simpleNameExpression().getText().lower()
                 if command not in self.table.definitions:
                     raise VbaCompileException("Sub or Function not defined")
                 func_info = self.table.definitions.get(command)
