@@ -193,7 +193,8 @@ class VbaVisitor(Visitor):
             try:
                 output = lib_def["handle"](*args)
             except Exception as e:
-                raise VbaCompileException("Argument not optional")
+                if str(e) != "":
+                    raise VbaCompileException("Argument not optional")
             return output
         else:
             mod_def = self.table.definitions[command]
