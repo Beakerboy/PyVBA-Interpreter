@@ -83,6 +83,13 @@ class VbaVisitor(Visitor):
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
 
+    def visitAmbiguousIdentifier(                                  # noqa: N802
+            self: T,
+            ctx: Parser.AmbiguousIdentifierContext) -> Any:
+        current_env = self.env_stack[-1]
+        var_name = ctx.getText().lower()
+        return current_env[var_name]
+        
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
