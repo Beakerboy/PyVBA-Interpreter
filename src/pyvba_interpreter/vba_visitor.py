@@ -188,9 +188,15 @@ class VbaVisitor(Visitor):
 
     def _execute_function(self: T, command: str,
                           args: list, no_sub: bool) -> Any:
-        if command not in self.table.definitions:
+        if (
+            command not in self.table.definitions and
+            command not in self.table.library_definitions
+        ):
             raise VbaCompileException("Sub or Function not defined")
-        definition = self.table.definitions[command]
+        if command not in self.table.definition:
+            definition = self.table.library_definitions[command]
+        else:
+            definition = self.table.definitions[command]
         if no_sub and definition["type"] == "sub":
             raise VbaCompileException("Unexpected Function or variable")
         func_info = self.table.definitions[command]
