@@ -60,10 +60,14 @@ class VbaVisitor(Visitor):
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
-        left = self.visit(ctx.getChild(0))
+        left_child = ctx.getChild(0)
+        assert left_child is not None
+        left = self.visit(left_child)
         assert left is not None
         last = ctx.getChildCount() - 1
-        right = self.visit(ctx.getChild(last))
+        right_child = ctx.getChild(last)
+        assert right_child is not None
+        right = self.visit(right_child)
         assert right is not None
         op = self._get_op(ctx)
         if op == '*':
