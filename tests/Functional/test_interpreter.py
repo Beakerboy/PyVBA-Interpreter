@@ -110,6 +110,6 @@ def test_function_not_defined() -> None:
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
-    ctx = table.definitions["hello"]["handler"]
+    ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException):
         interpreter.visitChildren(ctx)
