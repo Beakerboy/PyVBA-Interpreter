@@ -128,7 +128,7 @@ def test_use_sub_as_function() -> None:
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attribute VB_NAME = "HelloWorld"\n')
         file.write('Function hello()\n')
-        file.write('    Foo = Hello1()\n')
+        file.write('    Foo = Hello1\n')
         file.write('End Function\n')
         file.write('Sub Hello1()\n')
         file.write('End Sub\n')
