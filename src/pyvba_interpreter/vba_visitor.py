@@ -34,13 +34,7 @@ class VbaVisitor(Visitor):
             # If no arguments, then it's just a simple name expression
             if ctx.simpleNameExpression() is not None:
                 command = ctx.simpleNameExpression().getText().lower()
-                if command not in self.table.definitions:
-                    raise VbaCompileException("Sub or Function not defined")
-                func_info = self.table.definitions.get(command)
-                if func_info and func_info["type"] == "builtin":
-                    func_info["handle"]
-                else:
-                    self.visit(func_info["handle"])
+                self._execute_function(command, [], False)
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
         else:
