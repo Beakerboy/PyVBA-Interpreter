@@ -197,9 +197,9 @@ class VbaVisitor(Visitor):
             definition = self.table.library_definitions[command]
             if no_sub and definition["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
-            return func_info["handle"](*args)
+            return definition["handle"](*args)
         else:
             definition = self.table.definitions[command]
             if no_sub and definition["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
-            return self.visit(func_info["handle"])
+            return self.visit(definition["handle"])
