@@ -15,7 +15,7 @@ class VbaVisitor(Visitor):
         self.table = table
 
     @staticmethod
-    def _get_op(ctx: ParserRuleCOntext) -> str:
+    def _get_op(ctx: ParserRuleContext) -> str:
         i = 1
         if isinstance(ctx.getChild(1), Parser.WscContext):
             i = 2
