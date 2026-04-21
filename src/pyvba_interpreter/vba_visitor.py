@@ -1,5 +1,5 @@
 from typing import Any, TypeVar
-from antlr4_vba.vbaParser import vbaParser as Parser
+from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
@@ -15,7 +15,7 @@ class VbaVisitor(Visitor):
         self.table = table
 
     @staticmethod
-    def _get_op(ctx: str) -> str:
+    def _get_op(ctx: ParserRuleCOntext) -> str:
         i = 1
         if isinstance(ctx.getChild(1), Parser.WscContext):
             i = 2
