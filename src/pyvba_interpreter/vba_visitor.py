@@ -86,9 +86,6 @@ class VbaVisitor(Visitor):
     def visitAmbiguousIdentifier(                                  # noqa: N802
             self: T,
             ctx: Parser.AmbiguousIdentifierContext) -> Any:
-        if len(self.env_stack) == 0:
-            var_name = ctx.getText().lower()
-            raise Exception(var_name)
         current_env = self.env_stack[-1]
         var_name = ctx.getText().lower()
         return current_env[var_name]
