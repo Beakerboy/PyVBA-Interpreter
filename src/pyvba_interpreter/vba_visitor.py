@@ -151,7 +151,7 @@ class VbaVisitor(Visitor):
 
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
-    def vistIndexExpress(                                       # noqa: N802
+    def visitIndexExpress(                                       # noqa: N802
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
         raise VbaCompileException("")
