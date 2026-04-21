@@ -115,7 +115,7 @@ def test_function(mock_print: str, input: str, expected: Any) -> None:
     interpreter = VbaVisitor(table)
     ctx = table.definitions["hello"]["handle"]
     result = interpreter.visit(ctx)
-    assert result = expected
+    assert result == expected
 
 
 def test_function_not_defined() -> None:
