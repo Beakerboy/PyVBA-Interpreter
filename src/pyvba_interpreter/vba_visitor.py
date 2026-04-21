@@ -124,3 +124,5 @@ class VbaVisitor(Visitor):
         name = self.visit(ctx.getChild(0))
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
+        if self.table.definitions[name]["type"] == "sub":
+            raise VbaCompileException("Unexpected Function or variable")
