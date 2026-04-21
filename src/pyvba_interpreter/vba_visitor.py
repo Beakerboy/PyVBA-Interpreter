@@ -121,7 +121,7 @@ class VbaVisitor(Visitor):
     def visitLExpression(                                       # noqa: N802
             self: T,
             ctx: Parser.LExpressionContext) -> bool:
-        name = self.visit(ctx.getChild(0))
+        name = self.visit(ctx.getChild(0)).lower()
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
         if self.table.definitions[name]["type"] == "sub":
