@@ -124,9 +124,13 @@ class VbaVisitor(Visitor):
     def visitBooleanExpress(                                    # noqa: N802
             self: T,
             ctx: Parser.BooleanExpressContext) -> bool:
-        left = self.visit(ctx.getChild(0))
+        left_child = ctx.getChild(0)
+        assert left_child is not None
+        left = self.visit(left_child)
         last = ctx.getChildCount() - 1
-        right = self.visit(ctx.getChild(last))
+        right_child = ctx.getChild(last)
+        assert right_child is not None
+        right = self.visit(right_child)
         assert left is not None
         assert right is not None
         op = self._get_op(ctx).upper()
@@ -158,7 +162,9 @@ class VbaVisitor(Visitor):
                 Parser.IndexExpressContext |
                 Parser.IndexExpressionContext
             )) -> Any:
-        name = ctx.getChild(0).getText().lower()
+        name_child = ctx.getChild(0)
+        assert name_chald is not None
+        name = name_child.getText().lower()
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
         definition = self.table.definitions[name]
