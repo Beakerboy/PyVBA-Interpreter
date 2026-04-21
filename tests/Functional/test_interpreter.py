@@ -119,7 +119,7 @@ def test_function_not_defined() -> None:
 
 
 @patch('builtins.print')
-def test_override(mock_print:str) -> None:
+def test_override(mock_print: str) -> None:
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
