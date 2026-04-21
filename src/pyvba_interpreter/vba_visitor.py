@@ -174,15 +174,15 @@ class VbaVisitor(Visitor):
                 Parser.IndexExpressContext |
                 Parser.IndexExpressionContext
             )) -> Any:
-        name_child = ctx.getChild(0)
-        assert name_child is not None
-        name = name_child.getText().lower()
+        command_child = ctx.getChild(0)
+        assert command_child is not None
+        command = name_child.getText().lower()
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
-        if name not in self.table.definitions:
+        if command not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
-        definition = self.table.definitions[name]
+        definition = self.table.definitions[command]
         if definition["type"] == "sub":
             raise VbaCompileException("Unexpected Function or variable")
         func_info = self.table.definitions.get(command)
