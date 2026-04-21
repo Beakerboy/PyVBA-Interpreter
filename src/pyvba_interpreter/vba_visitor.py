@@ -186,7 +186,7 @@ class VbaVisitor(Visitor):
             args = self.visit(ctx.argumentList())
         return self._execute_function(command, args, no_sub)
 
-    def _execute_function(command: str, args: list, no_sub: bool) -> Any:
+    def _execute_function(self: T, command: str, args: list, no_sub: bool) -> Any:
         if command not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
         definition = self.table.definitions[command]
