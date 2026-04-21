@@ -143,5 +143,6 @@ def test_use_sub_as_function() -> None:
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
     ctx = table.definitions["hello"]["handle"]
-    with pytest.raises(VbaCompileException):
+    with pytest.raises(VbaCompileException) as e:
         interpreter.visitChildren(ctx)
+    assert str(e.value) == "Unexpected Function or variable"
