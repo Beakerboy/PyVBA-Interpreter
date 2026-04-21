@@ -182,7 +182,7 @@ def test_missing_argument() -> None:
     ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
         interpreter.visitChildren(ctx)
-    assert str(e.value) == "Compile Error:\nArgument not optional"
+    assert str(e.value) == "Compile error:\nArgument not optional"
 
 
 def futuretest_use_sub_as_function() -> None:
