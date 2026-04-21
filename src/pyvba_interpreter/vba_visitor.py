@@ -19,7 +19,9 @@ class VbaVisitor(Visitor):
         i = 1
         if isinstance(ctx.getChild(1), Parser.WscContext):
             i = 2
-        return ctx.getChild(i).symbol.text
+        child = ctx.getChild(i)
+        assert child is not None
+        return child.symbol.text
 
     def visitCallStatement(                                        # noqa: N802
             self: T,
