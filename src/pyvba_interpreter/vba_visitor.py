@@ -31,7 +31,7 @@ class VbaVisitor(Visitor):
         else:
             command = ctx.simpleNameExpression().getText().lower()
             args = self.visit(ctx.argumentList())
-        if name not in self.table.definitions:
+        if command not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
         func_info = self.table.definitions.get(command)
         if func_info and func_info["type"] == "builtin":
