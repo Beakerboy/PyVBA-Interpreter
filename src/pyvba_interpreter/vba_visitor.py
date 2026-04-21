@@ -162,7 +162,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
         raise VbaCompileException("")
-        return self._visit_shared_index_expression(ctx)
+        return self._visit_shared_index_expression(ctx, True)
 
     # Only used within implicit call statement.
     # Must be a Function or Sub
@@ -176,20 +176,24 @@ class VbaVisitor(Visitor):
             ctx: (
                 Parser.IndexExpressContext |
                 Parser.IndexExpressionContext
-            )) -> Any:
+            ),
+            no_sub: bool = False) -> Any:
         command_child = ctx.getChild(0)
         assert command_child is not None
         command = command_child.getText().lower()
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
-        if command not in self.table.definitions:
+        return self._execute_function(command, args, no_sub)
+
+    def _execute_function(command: str, args: list, no_sub: bool) -> Any:
+         if command not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
         definition = self.table.definitions[command]
-        if definition["type"] == "sub":
+        if no_sub and definition["type"] == "sub":
             raise VbaCompileException("Unexpected Function or variable")
         func_info = self.table.definitions.get(command)
         if func_info and func_info["type"] == "builtin":
-            func_info["handle"](*args)
+            return func_info["handle"](*args)
         else:
-            self.visit(func_info["handle"])
+            return self.visit(func_info["handle"])
