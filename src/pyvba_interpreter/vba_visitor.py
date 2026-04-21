@@ -89,15 +89,20 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.UnaryMinusExpressionContext) -> int | float:
         value = self.visit(ctx.expression())
+        assert value is not None
         return -1 * value
 
     def visitRelationExpression(                                   # noqa: N802
             self: T,
             ctx: Parser.RelationExpressionContext
     ) -> bool:
-        left = self.visit(ctx.getChild(0))
+        left_child = ctx.getChild(0)
+        assert left_child is not None
+        left = self.visit(left_child)
         last = ctx.getChildCount() - 1
-        right = self.visit(ctx.getChild(last))
+        right_child = ctx.getChild(last)
+        assert right_child is not None
+        right = self.visit(right_child)
         assert left is not None
         assert right is not None
         op = self._get_op(ctx)
