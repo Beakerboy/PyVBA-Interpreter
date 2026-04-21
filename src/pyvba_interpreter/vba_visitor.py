@@ -183,7 +183,6 @@ class VbaVisitor(Visitor):
     def visitIndexExpress(                                       # noqa: N802
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
-        raise VbaCompileException("")
         return self._visit_shared_index_expression(ctx, True)
 
     # Only used within implicit call statement.
