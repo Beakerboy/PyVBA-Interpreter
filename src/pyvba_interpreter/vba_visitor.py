@@ -31,7 +31,7 @@ class VbaVisitor(Visitor):
         current_env = {
             function_name: None
         }
-        self.env_stack.append(urrent_env)
+        self.env_stack.append(current_env)
         self.visitChildren(ctx)
         output = current_env[function_name]
         self.env_stack.pop()
@@ -44,7 +44,7 @@ class VbaVisitor(Visitor):
         var_name = ctx.lExpression().getText().lower()
         value = self.visit(ctx.expression())
         current_env[var_name] = value
-        
+
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
