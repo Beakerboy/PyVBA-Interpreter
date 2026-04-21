@@ -168,8 +168,8 @@ class VbaVisitor(Visitor):
     # Must be a Function or Sub
     def vistIndexExpression(                                    # noqa: N802
             self: T,
-            ctx: Parser.IndexExpressionContext) -> Any:
-        return self._visit_shared_index_expression(ctx)
+            ctx: Parser.IndexExpressionContext) -> None:
+        self._visit_shared_index_expression(ctx)
 
     def _visit_shared_index_expression(
             self: T,
