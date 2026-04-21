@@ -14,7 +14,7 @@ class VbaListener(Listener):
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
-        name = ctx.functionName().getText()
+        name = ctx.functionName().getText().lower()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = {
             "type": "function",
@@ -24,7 +24,7 @@ class VbaListener(Listener):
     def enterSubroutineDeclaration(                                # noqa: N802
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
-        name = ctx.subroutineName().getText()
+        name = ctx.subroutineName().getText().lower()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = {
             "type": "sub",
