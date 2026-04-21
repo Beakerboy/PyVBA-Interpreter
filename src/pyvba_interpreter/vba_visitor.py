@@ -37,6 +37,8 @@ class VbaVisitor(Visitor):
                 self._execute_function(command, [], False)
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
+            else:
+                raise Exception("Unsupported")
         else:
             command = first_child.getText().lower()
             args = []
