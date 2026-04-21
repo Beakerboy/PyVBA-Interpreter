@@ -55,6 +55,7 @@ def test_interpreter(mock_print: str) -> None:
         ('Call MsgBox(1 >= 2)', "False"),
         ('Call MsgBox(1 = 2)', "False"),
         ('Call MsgBox(1 <> 2)', "True"),
+        ('MsgBox', ""),
     ])
 def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     file_path = 'tests/files/test.bas'
