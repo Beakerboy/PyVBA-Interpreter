@@ -31,17 +31,28 @@ class VbaVisitor(Visitor):
         first_child = ctx.getChild(0)
         assert first_child is not None
         if first_child.getText().lower() == "call":
-            command = ctx.indexExpression().lExpression().getText().lower()
-            args = self.visit(ctx.indexExpression().argumentList())
+            # If no arguments, then it's just a simple name expression
+            if ctx.simpleNameExpress() is not None:
+                command = ctx.simpleNameExpress().getText().lower()
+                if command not in self.table.definitions:
+                    raise VbaCompileException("Sub or Function not defined")
+                func_info = self.table.definitions.get(command)
+                if func_info and func_info["type"] == "builtin":
+                    func_info["handle"]
+                else:
+                    self.visit(func_info["handle"])
+                
+            elif ctx.indexExpress() is not None:
+                self.visit(ctx.indexExpression())
         else:
             command = first_child.getText().lower()
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
-        if command not in self.table.definitions:
-            raise VbaCompileException("Sub or Function not defined")
-        func_info = self.table.definitions.get(command)
-        if func_info and func_info["type"] == "builtin":
-            return func_info["handle"](*args)
+            if command not in self.table.definitions:
+                raise VbaCompileException("Sub or Function not defined")
+            func_info = self.table.definitions.get(command)
+            if func_info and func_info["type"] == "builtin":
+                func_info["handle"](*args)
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -166,6 +177,9 @@ class VbaVisitor(Visitor):
         name_child = ctx.getChild(0)
         assert name_child is not None
         name = name_child.getText().lower()
+        args = []
+        if ctx.argumentList() is not None:
+            args = self.visit(ctx.argumentList())
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
         definition = self.table.definitions[name]
