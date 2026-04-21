@@ -27,7 +27,10 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.CallStatementContext) -> None:
         command = ''
-        if ctx.getChild(0).getText().lower() == "call":
+        # Either CALL or simpleNameExpression
+        first_child = ctx.getChild(0)
+        assert first_child is not None
+        if first_child.getText().lower() == "call":
             command = ctx.indexExpression().lExpression().getText().lower()
             args = self.visit(ctx.indexExpression().argumentList())
         else:
