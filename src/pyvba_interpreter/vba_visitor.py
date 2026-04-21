@@ -36,7 +36,6 @@ class VbaVisitor(Visitor):
                 command = ctx.simpleNameExpression().getText().lower()
                 self._execute_function(command, [], False)
             elif ctx.indexExpression() is not None:
-                raise Exception("index expression found")
                 self.visit(ctx.indexExpression())
             else:
                 raise Exception("Unsupported")
@@ -163,6 +162,7 @@ class VbaVisitor(Visitor):
     def vistIndexExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.IndexExpressionContext) -> None:
+        raise Exception("index expression found")
         self._visit_shared_index_expression(ctx)
 
     def _visit_shared_index_expression(
