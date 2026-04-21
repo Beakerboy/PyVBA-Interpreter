@@ -159,10 +159,9 @@ class VbaVisitor(Visitor):
 
     # Only used within implicit call statement.
     # Must be a Function or Sub
-    def vistIndexExpression(                                    # noqa: N802
+    def visitIndexExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.IndexExpressionContext) -> None:
-        raise Exception("index expression found")
         self._visit_shared_index_expression(ctx)
 
     def _visit_shared_index_expression(
