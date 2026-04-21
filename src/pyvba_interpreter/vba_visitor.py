@@ -41,7 +41,6 @@ class VbaVisitor(Visitor):
                     func_info["handle"]
                 else:
                     self.visit(func_info["handle"])
-                
             elif ctx.indexExpress() is not None:
                 self.visit(ctx.indexExpression())
         else:
@@ -157,12 +156,16 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return left == right
 
+    # Can be an Array() or a function call because expressions are assigned
+    # in Let Statements
     def vistIndexExpress(                                       # noqa: N802
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
         raise VbaCompileException("")
         return self._visit_shared_index_expression(ctx)
 
+    # Only used within implicit call statement.
+    # Must be a Function or Sub
     def vistIndexExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.IndexExpressionContext) -> Any:
@@ -176,7 +179,7 @@ class VbaVisitor(Visitor):
             )) -> Any:
         command_child = ctx.getChild(0)
         assert command_child is not None
-        command = name_child.getText().lower()
+        command = command_child.getText().lower()
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
