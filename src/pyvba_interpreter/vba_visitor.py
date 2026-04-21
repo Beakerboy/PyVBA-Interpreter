@@ -121,9 +121,17 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return left == right
 
-    def vistLExpression(                                        # noqa: N802
+    def vistIndexExpress(                                       # noqa: N802
             self: T,
-            ctx: Parser.LetStatementContext) -> Any:
+            ctx: Parser.IndexExpressContext) -> Any:
+        return self._visit_shared_index_expression(ctx)
+
+    def vistIndexExpression(                                    # noqa: N802
+            self: T,
+            ctx: Parser.IndexExpressionContext) -> Any:
+        return self._visit_shared_index_expression(ctx)
+
+    def _visit_shared_index_expression(
         name = ctx.getChild(0).getText().lower()
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
