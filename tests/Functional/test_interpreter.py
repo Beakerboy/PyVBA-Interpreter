@@ -78,7 +78,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    table.definitions["msgbox"] = {
+    table.library_definitions["msgbox"] = {
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
