@@ -121,16 +121,6 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return left == right
 
-    def visitLetStatement(                                      # noqa: N802
-            self: T,
-            ctx: Parser.LetStatementContext) -> None:
-        if ctx.expression().getChild(0).argumentList() is not None:
-            name = self.visit(ctx.expression().getChild(0).getChild(0)).lower()
-            if name not in self.table.definitions:
-                raise VbaCompileException("Sub or Function not defined")
-            if self.table.definitions[name]["type"] == "sub":
-                raise VbaCompileException("Unexpected Function or variable")
-
     def vistLExpression(                                        # noqa: N802
             self: T,
             ctx: Parser.LetStatementContext) -> Any:
@@ -138,3 +128,5 @@ class VbaVisitor(Visitor):
             name = ctx.getChild(0).getText().lower()
             if name not in self.table.definitions:
                 raise VbaCompileException("Sub or Function not defined")
+            if self.table.definitions[name]["type"] == "sub":
+                raise VbaCompileException("Unexpected Function or variable")
