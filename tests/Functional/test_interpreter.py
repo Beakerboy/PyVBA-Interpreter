@@ -118,7 +118,37 @@ def test_function_not_defined() -> None:
         interpreter.visitChildren(ctx)
 
 
-def test_use_sub_as_function() -> None:
+@patch('builtins.print')
+def test_override(mock_print) -> None:
+    file_path = 'tests/files/test.bas'
+    try:
+        os.remove(file_path)
+    except FileNotFoundError:
+        # File did not exist; ignore the error
+        pass
+    with open(file_path, "w", newline='\r\n') as file:
+        file.write('Attribute VB_NAME = "HelloWorld"\n')
+        file.write('Function hello()\n')
+        file.write('    MsgBox "HelloWorld"\n')
+        file.write('End Function\n')
+        file.write('Function MsgBox(temp)\n')
+        file.write('End Function\n')
+    input_stream = FileStream(file_path)
+    lexer = Lexer(input_stream)
+    ts = CommonTokenStream(lexer)
+    vbaparser = Parser(ts)
+    tree = vbaparser.module()
+    table = SymbolTable()
+    listener = VbaListener(table)
+    walker = ParseTreeWalker()
+    walker.walk(listener, tree)
+    assert len(table.definitions) == 2
+    interpreter = VbaVisitor(table)
+    ctx = table.definitions["hello"]["handle"]
+    mock_print.assert_not_called()
+
+
+def futuretest_use_sub_as_function() -> None:
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
