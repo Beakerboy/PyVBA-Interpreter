@@ -6,6 +6,7 @@ class FunctionDefinition(TypedDict):
     type: str
     handle: ParserRuleContext
 
+
 T = TypeVar('T', bound='SymbolTable')
 
 
