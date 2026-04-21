@@ -44,14 +44,8 @@ class VbaVisitor(Visitor):
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
         else:
-            command = first_child.getText().lower()
-            if ctx.argumentList() is not None:
-                args = self.visit(ctx.argumentList())
-            if command not in self.table.definitions:
-                raise VbaCompileException("Sub or Function not defined")
-            func_info = self.table.definitions.get(command)
-            if func_info and func_info["type"] == "builtin":
-                func_info["handle"](*args)
+            elif ctx.indexExpression() is not None:
+                self.visit(ctx.indexExpression())
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
