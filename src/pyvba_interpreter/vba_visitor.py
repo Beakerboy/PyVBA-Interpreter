@@ -89,6 +89,8 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
+        assert left is not None
+        assert right is not None
         op = self._get_op(ctx)
         if op == '<':
             return left < right
@@ -111,6 +113,8 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
+        assert left is not None
+        assert right is not None
         op = self._get_op(ctx).upper()
         if op == "AND":
             return left and right
