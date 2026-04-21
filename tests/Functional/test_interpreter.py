@@ -119,7 +119,7 @@ def test_function_not_defined() -> None:
 
 
 @patch('builtins.print')
-def test_override(mock_print) -> None:
+def test_override(mock_print:str) -> None:
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
@@ -144,7 +144,12 @@ def test_override(mock_print) -> None:
     walker.walk(listener, tree)
     assert len(table.definitions) == 2
     interpreter = VbaVisitor(table)
+     table.definitions["msgbox"] = {
+        "type": "builtin",
+        "handle": getattr(Interaction, "MsgBox")
+    }
     ctx = table.definitions["hello"]["handle"]
+    interpreter.visit(ctx)
     mock_print.assert_not_called()
 
 
