@@ -13,6 +13,7 @@ class VbaVisitor(Visitor):
 
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
+        self.env_stack = []
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -23,6 +24,25 @@ class VbaVisitor(Visitor):
         assert child is not None
         return child.symbol.text
 
+    def visitFunctionDeclaration(                                  # noqa: N802
+            self: T,
+            ctx: Parser.FunctionDeclarationContext) -> Any:
+        function_name = ctx.functionName().getText().lower()
+        current_env[function_name] = None
+        self.env_stack.append(urrent_env)
+        self.visitChildren(ctx)
+        output = current_env[function_name]
+        self.env_stack.pop()
+        return output
+
+    def visitLetStatement(                                         # noqa: N802
+            self: T,
+            ctx: Parser.LetStatementContext) -> None:
+        current_env = self.env_stack[-1]
+        var_name = ctx.lExpression().getText().lower()
+        value = self.visit(ctx.expression())
+        current_env[var_name] = value
+        
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
