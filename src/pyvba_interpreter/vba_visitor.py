@@ -163,7 +163,7 @@ class VbaVisitor(Visitor):
                 Parser.IndexExpressionContext
             )) -> Any:
         name_child = ctx.getChild(0)
-        assert name_chald is not None
+        assert name_child is not None
         name = name_child.getText().lower()
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
