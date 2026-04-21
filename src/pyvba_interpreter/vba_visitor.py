@@ -32,7 +32,8 @@ class VbaVisitor(Visitor):
             function_name: None
         }
         self.env_stack.append(current_env)
-        self.visitChildren(ctx.procedureBody())
+        if ctx.procedureBody() is not None:
+            self.visitChildren(ctx.procedureBody())
         output = current_env[function_name]
         self.env_stack.pop()
         return output
