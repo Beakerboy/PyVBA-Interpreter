@@ -8,4 +8,4 @@ T = TypeVar('T', bound='VbaCompileException')
 class VbaCompileException(VbaException):
 
     def __init__(self: T, msg: str) -> None:
-          super().__init__("Compile error:\n" + msg)
+        super().__init__("Compile error:\n" + msg)
