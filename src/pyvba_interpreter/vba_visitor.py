@@ -132,6 +132,11 @@ class VbaVisitor(Visitor):
         return self._visit_shared_index_expression(ctx)
 
     def _visit_shared_index_expression(
+            self: T,
+            ctx: (
+                Parser.IndexExpressContext |
+                Parser.IndexExpressionContext
+            )) -> Any:
         name = ctx.getChild(0).getText().lower()
         if name not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
