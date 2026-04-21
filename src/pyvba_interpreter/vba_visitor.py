@@ -32,7 +32,8 @@ class VbaVisitor(Visitor):
             function_name: None
         }
         self.env_stack.append(current_env)
-        self.visitChildren(ctx)
+        if ctx.procedureBody() is not None:
+            self.visitChildren(ctx.procedureBody())
         output = current_env[function_name]
         self.env_stack.pop()
         return output
@@ -82,6 +83,13 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
+
+    def visitAmbiguousIdentifier(                                  # noqa: N802
+            self: T,
+            ctx: Parser.AmbiguousIdentifierContext) -> Any:
+        current_env = self.env_stack[-1]
+        var_name = ctx.getText().lower()
+        return current_env[var_name]
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
@@ -176,7 +184,6 @@ class VbaVisitor(Visitor):
     def visitIndexExpress(                                       # noqa: N802
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
-        raise VbaCompileException("")
         return self._visit_shared_index_expression(ctx, True)
 
     # Only used within implicit call statement.
