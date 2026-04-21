@@ -190,7 +190,11 @@ class VbaVisitor(Visitor):
             lib_def = self.table.library_definitions[command]
             if no_sub and lib_def["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
-            return lib_def["handle"](*args)
+            try:
+                output = lib_def["handle"](*args)
+            except:
+                raise VbaCompileException("Argument not optional")
+            return output
         else:
             mod_def = self.table.definitions[command]
             if no_sub and mod_def["type"] == "sub":
