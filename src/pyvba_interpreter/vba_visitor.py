@@ -15,7 +15,7 @@ class VbaVisitor(Visitor):
         self.table = table
 
     @staticmethod
-    def _get_op(ctx) -> str:
+    def _get_op(ctx: str) -> str:
         i = 1
         if isinstance(ctx.getChild(1), Parser.WscContext):
             i = 2
@@ -55,7 +55,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        op =  self._get_op(ctx)
+        op = self._get_op(ctx)
         if op == '*':
             return left * right
         elif op == '/':
@@ -84,7 +84,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        op =  self._get_op(ctx)
+        op = self._get_op(ctx)
         if op == '<':
             return left < right
         elif op == '>':
@@ -106,7 +106,7 @@ class VbaVisitor(Visitor):
         left = self.visit(ctx.getChild(0))
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
-        op =  self._get_op(ctx).upper()
+        op = self._get_op(ctx).upper()
         if op == "AND":
             return left and right
         elif op == "OR":
