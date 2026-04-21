@@ -48,7 +48,7 @@ class VbaVisitor(Visitor):
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
-            self._execute_function(command, args)
+            self._execute_function(command, args, False)
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
