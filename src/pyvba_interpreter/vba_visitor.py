@@ -130,7 +130,7 @@ class VbaVisitor(Visitor):
     def vistIndexExpress(                                       # noqa: N802
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
-        raise VbaCompileException()
+        raise VbaCompileException("")
         return self._visit_shared_index_expression(ctx)
 
     def vistIndexExpression(                                    # noqa: N802
