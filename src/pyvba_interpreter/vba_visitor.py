@@ -185,3 +185,8 @@ class VbaVisitor(Visitor):
         definition = self.table.definitions[name]
         if definition["type"] == "sub":
             raise VbaCompileException("Unexpected Function or variable")
+        func_info = self.table.definitions.get(command)
+        if func_info and func_info["type"] == "builtin":
+            func_info["handle"](*args)
+        else:
+            self.visit(func_info["handle"])
