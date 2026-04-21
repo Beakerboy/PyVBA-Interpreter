@@ -44,8 +44,11 @@ class VbaVisitor(Visitor):
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
         else:
-            if ctx.indexExpression() is not None:
-                self.visit(ctx.indexExpression())
+            command = first_child.getText().lower()
+            args = []
+            if ctx.argumentList() is not None:
+                args = self.visit(ctx.argumentList())
+            self._execute_function(command, args)
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
