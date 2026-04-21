@@ -17,6 +17,16 @@ class VbaListener(Listener):
         name = ctx.functionName().getText()
         # Save the context (subtree) so the Visitor can find it later
         self.table.definitions[name] = {
-            "type": "module",
+            "type": "function",
+            "handle": ctx
+        }
+
+    def enterSubroutineDeclaration(                                # noqa: N802
+            self: T,
+            ctx: Parser.SubroutineDeclarationContext) -> None:
+        name = ctx.subroutineName().getText()
+        # Save the context (subtree) so the Visitor can find it later
+        self.table.definitions[name] = {
+            "type": "sub",
             "handle": ctx
         }
