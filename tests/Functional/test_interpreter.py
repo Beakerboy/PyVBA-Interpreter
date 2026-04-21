@@ -97,7 +97,7 @@ def test_function_not_defined() -> None:
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attribute VB_NAME = "HelloWorld"\n')
         file.write('Function hello()\n')
-        file.write('    Hello\n')
+        file.write('    Hello1\n')
         file.write('End Function\n')
     input_stream = FileStream(file_path)
     lexer = Lexer(input_stream)
