@@ -194,12 +194,12 @@ class VbaVisitor(Visitor):
         ):
             raise VbaCompileException("Sub or Function not defined")
         if command not in self.table.definitions:
-            definition = self.table.library_definitions[command]
-            if no_sub and definition["type"] == "sub":
+            lib_def = self.table.library_definitions[command]
+            if no_sub and lib_def["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
             return definition["handle"](*args)
         else:
-            definition = self.table.definitions[command]
+            mod_def = self.table.definitions[command]
             if no_sub and definition["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
-            return self.visit(definition["handle"])
+            return self.visit(mod_def["handle"])
