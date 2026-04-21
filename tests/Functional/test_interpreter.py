@@ -86,6 +86,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter.visit(ctx)
     mock_print.assert_called_with(expected)
 
+
 def test_function_not_defined() -> None:
     file_path = 'tests/files/test.bas'
     try:
