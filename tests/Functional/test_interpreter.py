@@ -90,6 +90,8 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
 @pytest.mark.parametrize(
     "input, expected", [
         ('hello = 1', 1),
+        ('hello = "1"', "1"),
+        ('hello = 1 + 1', 2),
     ])
 def test_function(input: str, expected: Any) -> None:
     file_path = 'tests/files/test.bas'
