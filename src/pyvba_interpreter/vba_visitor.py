@@ -32,7 +32,7 @@ class VbaVisitor(Visitor):
             function_name: None
         }
         self.env_stack.append(current_env)
-        self.visitChildren(ctx)
+        self.visitChildren(ctx.procedureBody())
         output = current_env[function_name]
         self.env_stack.pop()
         return output
