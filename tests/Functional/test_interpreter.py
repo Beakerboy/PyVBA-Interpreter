@@ -148,7 +148,7 @@ def test_function_not_defined() -> None:
     }
     ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException):
-        interpreter.visitChildren(ctx)
+        interpreter.visit(ctx)
 
 
 @patch('builtins.print')
@@ -214,7 +214,7 @@ def test_missing_argument() -> None:
     }
     ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.visitChildren(ctx)
+        interpreter.visit(ctx)
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
@@ -276,5 +276,5 @@ def futuretest_use_sub_as_function() -> None:
     interpreter = VbaVisitor(table)
     ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.visitChildren(ctx)
+        interpreter.visit(ctx)
     assert str(e.value) == "Unexpected Function or variable"
