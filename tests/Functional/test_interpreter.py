@@ -248,6 +248,7 @@ def test_two_functions() -> None:
     result = interpreter.visit(ctx)
     assert result == 2
 
+
 def futuretest_use_sub_as_function() -> None:
     file_path = 'tests/files/test.bas'
     try:
