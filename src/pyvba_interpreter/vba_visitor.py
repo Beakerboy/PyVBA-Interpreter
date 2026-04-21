@@ -192,7 +192,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Unexpected Function or variable")
             try:
                 output = lib_def["handle"](*args)
-            except:
+            except Exception as e:
                 raise VbaCompileException("Argument not optional")
             return output
         else:
