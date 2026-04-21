@@ -34,7 +34,7 @@ class VbaVisitor(Visitor):
             command = ctx.indexExpression().lExpression().getText().lower()
             args = self.visit(ctx.indexExpression().argumentList())
         else:
-            command = ctx.simpleNameExpression().getText().lower()
+            command = first_child.getText().lower()
             args = self.visit(ctx.argumentList())
         if command not in self.table.definitions:
             raise VbaCompileException("Sub or Function not defined")
