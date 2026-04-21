@@ -141,6 +141,7 @@ def test_use_sub_as_function() -> None:
     listener = VbaListener(table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
+    assert len(table.definitions) == 2
     interpreter = VbaVisitor(table)
     ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
