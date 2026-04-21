@@ -56,8 +56,10 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
         left = self.visit(ctx.getChild(0))
+        assert left is not None
         last = ctx.getChildCount() - 1
         right = self.visit(ctx.getChild(last))
+        assert right is not None
         op = self._get_op(ctx)
         if op == '*':
             return left * right
