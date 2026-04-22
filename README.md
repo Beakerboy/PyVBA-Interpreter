@@ -74,6 +74,7 @@ flake8 .
 
 We are working toward full compliance with the [VBA Language Specification](https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/d5418146-0bd2-45eb-9c7a-fd9502722c74). Future updates will focus on:
 
+-   **Control Structures** Currently no control structures have been implemented. Priority is `If/Then/Else`.
 -   **Arrays**: Support for fixed and dynamic arrays, including `Dim`, `ReDim`, and `Preserve` statements.
 -   **Error Handling**: Implementation of [On Error GoTo](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/on-error-statement) and [On Error Resume Next](https://stackoverflow.com/questions/29390673/error-handling-in-vba-on-error-resume-next) logic.
 -   **Object Support**: Support for custom **Class Modules**, properties (`Property Get/Let/Set`), and early/late binding.
