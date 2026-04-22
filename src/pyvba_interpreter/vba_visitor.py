@@ -62,7 +62,8 @@ class VbaVisitor(Visitor):
         if condition:
             self.visit(ctx.statementBlock())
         else:
-            self.visit(ctx.elseBlock().statementBlock())
+            if ctx.elseBlock() is not None:
+                self.visit(ctx.elseBlock().statementBlock())
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
