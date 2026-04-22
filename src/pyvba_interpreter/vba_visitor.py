@@ -219,9 +219,9 @@ class VbaVisitor(Visitor):
                 command: None
             }
             i = 0
-            foreach mod_def.params as param:
-                if not param.optional:
-                    current_env[param.name] = args[i]
+            foreach mod_def[params] as param:
+                if not param["optional"]:
+                    current_env[param["name"]] = args[i]
                     i += 1
             self.env_stack.append(current_env)
             ctx = mod_def["handle"]
