@@ -24,7 +24,7 @@ class VbaListener(Listener):
             if parameter_list.positionalParameters() is not None:
                 pos_params = parameter_list.positionalParameters()
                 while pos_params.positionalParam(i) is not None:
-                    name = parameter_list.positionalParameter(i).getText().lower()
+                    name = pos_params.positionalParam(i).getText().lower()
                     param = {
                         "name": name,
                         "optional": False,
