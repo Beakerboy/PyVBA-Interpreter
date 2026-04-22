@@ -104,6 +104,36 @@ def test_function(input: str, expected: Any) -> None:
     assert result == expected
 
 
+@pytest.mark.parametrize(
+    "arg_list, input, args, expected", [
+        ('Arg', 'hello = Arg', [1], 1),
+    ])
+def test_function_arguments(arg_list: str, input: str, args: list[], expected: Any) -> None:
+    file_path = 'tests/files/test.bas'
+    try:
+        os.remove(file_path)
+    except FileNotFoundError:
+        # File did not exist; ignore the error
+        pass
+    with open(file_path, "w", newline='\r\n') as file:
+        file.write('Attribute VB_NAME = "HelloWorld"\n')
+        file.write('Function hello(' + arg_list + ')\n')
+        file.write('    ' + input + '\n')
+        file.write('End Function\n')
+    input_stream = FileStream(file_path)
+    lexer = Lexer(input_stream)
+    ts = CommonTokenStream(lexer)
+    vbaparser = Parser(ts)
+    tree = vbaparser.module()
+    table = SymbolTable()
+    listener = VbaListener(table)
+    walker = ParseTreeWalker()
+    walker.walk(listener, tree)
+    interpreter = VbaVisitor(table)
+    result = interpreter.execute_function("hello", args, True)
+    assert result == expected
+
+
 def test_function_not_defined() -> None:
     file_path = 'tests/files/test.bas'
     try:
