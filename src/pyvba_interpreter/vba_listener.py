@@ -47,7 +47,7 @@ class VbaListener(Listener):
                 pos_params = parameter_list.positionalParameters()
                 while pos_params.positionalParam(i) is not None:
                     name = pos_params.positionalParam(i).getText().lower()
-                    param = {
+                    param: ParamDefinition = {
                         "name": name,
                         "optional": False,
                         "default": None
@@ -68,7 +68,7 @@ class VbaListener(Listener):
                         default = literal_from_string(
                             def_val.constantExpression().getText()
                         )
-                    param = {
+                    param: ParamDefinition = {
                         "name": name,
                         "optional": True,
                         "default": default
