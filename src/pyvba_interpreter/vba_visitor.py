@@ -24,20 +24,6 @@ class VbaVisitor(Visitor):
         assert child is not None
         return child.symbol.text
 
-    def visitFunctionDeclaration(                                  # noqa: N802
-            self: T,
-            ctx: Parser.FunctionDeclarationContext) -> Any:
-        function_name = ctx.functionName().getText().lower()
-        current_env = {
-            function_name: None
-        }
-        self.env_stack.append(current_env)
-        if ctx.procedureBody() is not None:
-            self.visitChildren(ctx.procedureBody())
-        output = current_env[function_name]
-        self.env_stack.pop()
-        return output
-
     def visitLetStatement(                                         # noqa: N802
             self: T,
             ctx: Parser.LetStatementContext) -> None:
@@ -229,4 +215,14 @@ class VbaVisitor(Visitor):
             mod_def = self.table.definitions[command]
             if no_sub and mod_def["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
-            return self.visit(mod_def["handle"])
+            current_env = {
+                command: None
+            }
+            self.env_stack.append(current_env)
+            ctx = mod_def["handle"]
+            if ctx.procedureBody() is not None:
+                self.visitChildren(ctx.procedureBody())
+            output = current_env[function_name]
+            self.env_stack.pop()
+            return output
+           
