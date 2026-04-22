@@ -108,7 +108,8 @@ def test_function(input: str, expected: Any) -> None:
     "arg_list, input, args, expected", [
         ('Arg', 'hello = Arg', [1], 1),
     ])
-def test_function_arguments(arg_list: str, input: str, args: list, expected: Any) -> None:
+def test_function_arguments(
+        arg_list: str, input: str, args: list, expected: Any) -> None:
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
