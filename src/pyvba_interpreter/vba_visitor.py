@@ -220,8 +220,8 @@ class VbaVisitor(Visitor):
             }
             self.env_stack.append(current_env)
             ctx = mod_def["handle"]
-            if ctx.procedureBody() is not None:
-                self.visitChildren(ctx.procedureBody())
+            if ctx is not None:
+                self.visitChildren(ctx)
             output = current_env[command]
             self.env_stack.pop()
             return output
