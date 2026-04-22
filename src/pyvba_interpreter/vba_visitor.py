@@ -192,9 +192,9 @@ class VbaVisitor(Visitor):
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
-        return self._execute_function(command, args, no_sub)
+        return self.execute_function(command, args, no_sub)
 
-    def _execute_function(self: T, command: str,
+    def execute_function(self: T, command: str,
                           args: list, no_sub: bool) -> Any:
         if (
             command not in self.table.definitions and
