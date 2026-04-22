@@ -195,7 +195,7 @@ class VbaVisitor(Visitor):
         return self.execute_function(command, args, no_sub)
 
     def execute_function(self: T, command: str,
-                          args: list, no_sub: bool) -> Any:
+                         args: list, no_sub: bool) -> Any:
         if (
             command not in self.table.definitions and
             command not in self.table.library_definitions
