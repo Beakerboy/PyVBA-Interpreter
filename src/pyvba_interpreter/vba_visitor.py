@@ -219,7 +219,7 @@ class VbaVisitor(Visitor):
                 command: None
             }
             i = 0
-            for param in mod_def[params]:
+            for param in mod_def["params"]:
                 if not param["optional"]:
                     current_env[param["name"]] = args[i]
                     i += 1
