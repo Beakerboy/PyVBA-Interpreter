@@ -1,10 +1,17 @@
-from antlr4.ParserRuleContext import ParserRuleContext
-from typing import Callable, TypedDict, TypeVar
+from antlr4_vba.vbaParser import vbaParser as Parser
+from typing import Any, Callable, TypedDict, TypeVar
+
+
+class ParamDefinition(TypedDict):
+    name: str
+    optional: bool
+    default: Any
 
 
 class FunctionDefinition(TypedDict):
     type: str
-    handle: ParserRuleContext
+    handle: Parser.ProcedureBodyContext | None
+    params: list[ParamDefinition]
 
 
 class LibraryDefinition(TypedDict):

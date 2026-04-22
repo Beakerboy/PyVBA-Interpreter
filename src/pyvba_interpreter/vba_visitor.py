@@ -24,20 +24,6 @@ class VbaVisitor(Visitor):
         assert child is not None
         return child.symbol.text
 
-    def visitFunctionDeclaration(                                  # noqa: N802
-            self: T,
-            ctx: Parser.FunctionDeclarationContext) -> Any:
-        function_name = ctx.functionName().getText().lower()
-        current_env = {
-            function_name: None
-        }
-        self.env_stack.append(current_env)
-        if ctx.procedureBody() is not None:
-            self.visitChildren(ctx.procedureBody())
-        output = current_env[function_name]
-        self.env_stack.pop()
-        return output
-
     def visitLetStatement(                                         # noqa: N802
             self: T,
             ctx: Parser.LetStatementContext) -> None:
@@ -57,7 +43,7 @@ class VbaVisitor(Visitor):
             # If no arguments, then it's just a simple name expression
             if ctx.simpleNameExpression() is not None:
                 command = ctx.simpleNameExpression().getText().lower()
-                self._execute_function(command, [], False)
+                self.execute_function(command, [], False)
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
             else:
@@ -67,7 +53,7 @@ class VbaVisitor(Visitor):
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
-            self._execute_function(command, args, False)
+            self.execute_function(command, args, False)
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -206,10 +192,10 @@ class VbaVisitor(Visitor):
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
-        return self._execute_function(command, args, no_sub)
+        return self.execute_function(command, args, no_sub)
 
-    def _execute_function(self: T, command: str,
-                          args: list, no_sub: bool) -> Any:
+    def execute_function(self: T, command: str,
+                         args: list, no_sub: bool) -> Any:
         if (
             command not in self.table.definitions and
             command not in self.table.library_definitions
@@ -229,4 +215,18 @@ class VbaVisitor(Visitor):
             mod_def = self.table.definitions[command]
             if no_sub and mod_def["type"] == "sub":
                 raise VbaCompileException("Unexpected Function or variable")
-            return self.visit(mod_def["handle"])
+            current_env = {
+                command: None
+            }
+            i = 0
+            for param in mod_def["params"]:
+                if not param["optional"]:
+                    current_env[param["name"]] = args[i]
+                    i += 1
+            self.env_stack.append(current_env)
+            ctx = mod_def["handle"]
+            if ctx is not None:
+                self.visitChildren(ctx)
+            output = current_env[command]
+            self.env_stack.pop()
+            return output
