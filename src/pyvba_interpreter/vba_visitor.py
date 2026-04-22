@@ -57,7 +57,7 @@ class VbaVisitor(Visitor):
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
-            ctx: Parser.ArgumentListContext) -> None:
+            ctx: Parser.IfStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
         if condition:
             self.visit(ctx.statementBlock())
