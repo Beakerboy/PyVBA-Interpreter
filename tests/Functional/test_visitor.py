@@ -101,8 +101,7 @@ def test_function(input: str, expected: Any) -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    ctx = table.definitions["hello"]["handle"]
-    result = interpreter.visit(ctx)
+    result = interpreter.execute_function("hello", [])
     assert result == expected
 
 
