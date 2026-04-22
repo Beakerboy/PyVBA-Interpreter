@@ -54,7 +54,7 @@ class VbaListener(Listener):
         self.table.definitions[name] = {
             "type": "function",
             "handle": ctx,
-            "params: params
+            "params": params
         }
 
     def enterSubroutineDeclaration(                                # noqa: N802
