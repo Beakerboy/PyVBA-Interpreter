@@ -36,9 +36,9 @@ class VbaListener(Listener):
             "params": params
         }
 
-    def _get_params(self: T,
-                    ctx: Parser.ProcedureParametersContext
-                   ) -> list[ParamDefinition]:
+    def _get_params(
+            self: T,
+            ctx: Parser.ProcedureParametersContext) -> list[ParamDefinition]:
         params = []
         parameter_list = ctx.parameterList()
         i = 0
