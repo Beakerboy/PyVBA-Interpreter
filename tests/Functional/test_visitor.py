@@ -228,8 +228,7 @@ def test_two_functions() -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    ctx = table.definitions["hello"]["handle"]
-    result = interpreter.visit(ctx)
+    result = interpreter.execute_function("hello", [], True)
     assert result == 2
 
 
