@@ -17,7 +17,7 @@ class VbaListener(Listener):
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText().lower()
         # Save the context (subtree) so the Visitor can find it later
-        params = self._getparams(ctx.procedureParameters())
+        params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
             "type": "function",
             "handle": ctx,
@@ -29,7 +29,7 @@ class VbaListener(Listener):
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText().lower()
         # Save the context (subtree) so the Visitor can find it later
-        params = self._getparams(ctx.procedureParameters())
+        params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
             "type": "sub",
             "handle": ctx,
