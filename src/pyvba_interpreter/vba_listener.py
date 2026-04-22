@@ -68,7 +68,7 @@ class VbaListener(Listener):
                         default = literal_from_string(
                             def_val.constantExpression().getText()
                         )
-                    param: ParamDefinition = {
+                    param = {
                         "name": name,
                         "optional": True,
                         "default": default
