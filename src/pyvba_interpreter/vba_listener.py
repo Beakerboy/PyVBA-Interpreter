@@ -1,6 +1,7 @@
 from typing import TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
+from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
 
 
@@ -23,7 +24,7 @@ class VbaListener(Listener):
             if parameter_list.positionalParameters() is not None:
                 pos_params = parameter_list.positionalParameters()
                 while pos_params.positionalParam(i) is not None:
-                    name = self.visit(parameter_list.positionalParameter(i))
+                    name = parameter_list.positionalParameter(i).getText().lower()
                     param = {
                         "name": name,
                         "optional": False,
@@ -36,13 +37,14 @@ class VbaListener(Listener):
                 opt_params = parameter_list.optionalParameters()
                 while opt_params.optionalParam(i) is not None:
                     opt_param = opt_params.optionalParam(i)
-                    name = self.visit(opt_param.paramDcl())
+                    name = opt_param.paramDcl().getText().lower()
                     # ToDo, evaluate that the ConstantExpression meets the
                     # static semantics outlined in 5.6.16.1
                     default = None
                     if opt_param.defaultValue() is not None:
-                        default = self.visit(
-                            opt_param.defaultValue().constantExpression()
+                        def_val = opt_param.defaultValue()
+                        default = literal_from_string(
+                            def_val.constantExpression().getText()
                         )
                     param = {
                         "name": name,
