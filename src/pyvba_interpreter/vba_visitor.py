@@ -225,4 +225,3 @@ class VbaVisitor(Visitor):
             output = current_env[command]
             self.env_stack.pop()
             return output
-           
