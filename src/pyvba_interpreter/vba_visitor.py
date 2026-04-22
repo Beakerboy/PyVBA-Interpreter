@@ -55,6 +55,15 @@ class VbaVisitor(Visitor):
                 args = self.visit(ctx.argumentList())
             self.execute_function(command, args, False)
 
+    def visitIfStatement(                                          # noqa: N802
+            self: T,
+            ctx: Parser.IfStatementContext) -> None:
+        condition = self.visit(ctx.booleanExpression())
+        if condition:
+            self.visit(ctx.statementBlock())
+        else:
+            self.visit(ctx.elseBlock().statementBlock())
+
     def visitArgumentList(                                         # noqa: N802
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
@@ -196,6 +205,7 @@ class VbaVisitor(Visitor):
 
     def execute_function(self: T, command: str,
                          args: list, no_sub: bool) -> Any:
+        command = command.lower()
         if (
             command not in self.table.definitions and
             command not in self.table.library_definitions
