@@ -20,7 +20,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
             "type": "function",
-            "handle": ctx,
+            "handle": ctx.procedureBody(),
             "params": params
         }
 
@@ -32,7 +32,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
             "type": "sub",
-            "handle": ctx,
+            "handle": ctx.procedureBody(),
             "params": params
         }
 
