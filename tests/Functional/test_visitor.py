@@ -68,8 +68,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
-    ctx = table.definitions["hello"]["handle"]
-    interpreter.visit(ctx)
+    interpreter.execute_function("hello", [])
     mock_print.assert_called_with(expected)
 
 
