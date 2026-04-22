@@ -68,7 +68,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
-    interpreter.execute_function("hello", [])
+    interpreter.execute_function("hello", [], True)
     mock_print.assert_called_with(expected)
 
 
@@ -100,7 +100,7 @@ def test_function(input: str, expected: Any) -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    result = interpreter.execute_function("hello", [])
+    result = interpreter.execute_function("hello", [], True)
     assert result == expected
 
 
