@@ -20,9 +20,9 @@ A Python-based VBA interpreter built with ANTLR4. This tool allows you to execut
 Since the project is not currently on PyPI, clone the repository and install the dependencies locally:
 
 ```bash
-git clone https://github.com
+git clone https://github.com/Beakerboy/PyVBA-Interpreter.git
 cd PyVBA-Interpreter
-pip install -r requirements.txt
+pip install -e .[tests]
 ```
 
 ## Usage
