@@ -16,9 +16,45 @@ class VbaListener(Listener):
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText().lower()
         # Save the context (subtree) so the Visitor can find it later
+        params = []
+        parameter_list = ctx.procedureParameters().parameterList()
+        i = 0
+        if parameter_list is not None:
+            if parameter_list.positionalParameters() is not None:
+                pos_params = parameter_list.positionalParameters()
+                while pos_params.positionalParam(i) is not None:
+                    name = self.visit(parameter_list.positionalParameter(i))
+                    param = {
+                        "name": name,
+                        "optional": False,
+                        "default": None
+                    }
+                    params.append(param)
+                    i += 1
+            i = 0
+            if parameter_list.optionalParameters() is not None:
+                opt_params = parameter_list.optionalParameters()
+                while opt_params.optionalParam(i) is not None:
+                    opt_param = opt_params.optionalParam(i)
+                    name = self.visit(opt_param.paramDcl())
+                    # ToDo, evaluate that the ConstantExpression meets the
+                    # static semantics outlined in 5.6.16.1
+                    default = None
+                    if opt_param.defaultValue() is not None:
+                        default = self.visit(
+                            opt_param.defaultValue().constantExpression()
+                        )
+                    param = {
+                        "name": name,
+                        "optional": True,
+                        "default": default
+                    }
+                    params.append(param)
+                    i += 1
         self.table.definitions[name] = {
             "type": "function",
-            "handle": ctx
+            "handle": ctx,
+            "params: params
         }
 
     def enterSubroutineDeclaration(                                # noqa: N802
