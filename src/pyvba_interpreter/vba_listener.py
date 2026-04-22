@@ -2,7 +2,7 @@ from typing import TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import SymbolTable
+from .symbol_table import ParamDefinition, SymbolTable
 
 
 T = TypeVar('T', bound='VbaListener')
@@ -17,6 +17,26 @@ class VbaListener(Listener):
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText().lower()
         # Save the context (subtree) so the Visitor can find it later
+        params = self._getparams(ctx)
+        self.table.definitions[name] = {
+            "type": "function",
+            "handle": ctx,
+            "params": params
+        }
+
+    def enterSubroutineDeclaration(                                # noqa: N802
+            self: T,
+            ctx: Parser.SubroutineDeclarationContext) -> None:
+        name = ctx.subroutineName().getText().lower()
+        # Save the context (subtree) so the Visitor can find it later
+        params = self._getparams(ctx)
+        self.table.definitions[name] = {
+            "type": "sub",
+            "handle": ctx,
+            "params": params
+        }
+
+    def _get_params(self: T, ctx) -> list[ParamDefinition]:
         params = []
         parameter_list = ctx.procedureParameters().parameterList()
         i = 0
@@ -53,18 +73,4 @@ class VbaListener(Listener):
                     }
                     params.append(param)
                     i += 1
-        self.table.definitions[name] = {
-            "type": "function",
-            "handle": ctx,
-            "params": params
-        }
-
-    def enterSubroutineDeclaration(                                # noqa: N802
-            self: T,
-            ctx: Parser.SubroutineDeclarationContext) -> None:
-        name = ctx.subroutineName().getText().lower()
-        # Save the context (subtree) so the Visitor can find it later
-        self.table.definitions[name] = {
-            "type": "sub",
-            "handle": ctx
-        }
+        return params
