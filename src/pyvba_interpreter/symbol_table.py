@@ -1,5 +1,5 @@
 from antlr4.ParserRuleContext import ParserRuleContext
-from typing import Callable, TypedDict, TypeVar
+from typing import Any, Callable, TypedDict, TypeVar
 
 
 class ParamDefinition(TypedDict):
