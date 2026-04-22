@@ -1,4 +1,4 @@
-from antlr4.ParserRuleContext import ProcedureBodyContext
+from antlr4_vba.vbaParser import vbaParser as Parser
 from typing import Any, Callable, TypedDict, TypeVar
 
 
@@ -10,7 +10,7 @@ class ParamDefinition(TypedDict):
 
 class FunctionDefinition(TypedDict):
     type: str
-    handle: ProcedureBodyContext | None
+    handle: Parser.ProcedureBodyContext | None
     params: list[ParamDefinition]
 
 
