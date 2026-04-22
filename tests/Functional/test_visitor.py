@@ -165,8 +165,7 @@ def test_override(mock_print: str) -> None:
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
-    ctx = table.definitions["hello"]["handle"]
-    interpreter.visit(ctx)
+    interpreter.execute_function("hello", [], True)
     mock_print.assert_not_called()
 
 
@@ -196,9 +195,8 @@ def test_missing_argument() -> None:
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
-    ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.visit(ctx)
+        interpreter.execute_function("hello", [], True)
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
@@ -257,7 +255,6 @@ def futuretest_use_sub_as_function() -> None:
     walker.walk(listener, tree)
     assert len(table.definitions) == 2
     interpreter = VbaVisitor(table)
-    ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.visit(ctx)
+        interpreter.execute_function("hello", [], True)
     assert str(e.value) == "Unexpected Function or variable"
