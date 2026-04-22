@@ -61,7 +61,7 @@ class VbaVisitor(Visitor):
         condition = self.visit(ctx.booleanExpression())
         if condition:
             self.visit(ctx.statementBlock())
-        else
+        else:
             self.visit(ctx.elseBlock().statementBlock())
 
     def visitArgumentList(                                         # noqa: N802
