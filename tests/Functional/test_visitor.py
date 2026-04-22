@@ -161,7 +161,7 @@ def test_factorial() -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    result = interpreter.execute_function("Fact", [5], True)
+    result = interpreter.execute_function("fact", [5], True)
     expected = 120
     assert result == expected
 
