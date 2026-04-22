@@ -1,4 +1,4 @@
-from antlr4.ParserRuleContext import ParserRuleContext
+from antlr4.ParserRuleContext import ProcedureBodyContext
 from typing import Any, Callable, TypedDict, TypeVar
 
 
@@ -10,7 +10,7 @@ class ParamDefinition(TypedDict):
 
 class FunctionDefinition(TypedDict):
     type: str
-    handle: ParserRuleContext
+    handle: ProcedureBodyContext | None
     params: list[ParamDefinition]
 
 
