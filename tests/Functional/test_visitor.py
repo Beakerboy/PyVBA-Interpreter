@@ -205,7 +205,7 @@ def test_while() -> None:
         pass
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attribute VB_NAME = "Factorial"\n')
-        file.write('Function Fact(num)\n')
+        file.write('Function Fact(Num)\n')
         file.write('    Fact = 1\n')
         file.write('    While Num > 1 \n')
         file.write('        Fact = Num * Fact\n')
