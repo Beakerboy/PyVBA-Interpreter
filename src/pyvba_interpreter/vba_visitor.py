@@ -73,6 +73,7 @@ class VbaVisitor(Visitor):
         while condition:
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
+            condition = self.visit(ctx.booleanExpression())
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
