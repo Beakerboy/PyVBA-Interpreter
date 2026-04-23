@@ -79,9 +79,9 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
         args = []
-        if ctx.children is not None:
-            for child in ctx.children:
-                if child is not None:
+        if ctx.positionalOrNamedArgumentList() is not None:
+            for child in ctx.positionalOrNamedArgumentList().children:
+                if not isinstance(child, Parser.WscContext):
                     args += [self.visit(child)]
         return args
 
