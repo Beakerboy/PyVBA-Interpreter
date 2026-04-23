@@ -60,10 +60,20 @@ class VbaVisitor(Visitor):
             ctx: Parser.IfStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
         if condition:
-            self.visit(ctx.statementBlock())
+            if ctx.statementBlock() is not None:
+                self.visit(ctx.statementBlock())
         else:
             if ctx.elseBlock() is not None:
                 self.visit(ctx.elseBlock().statementBlock())
+
+    def visitWhileStatement(                                       # noqa: N802
+            self: T,
+            ctx: Parser.WhileStatementContext) -> None:
+        condition = self.visit(ctx.booleanExpression())
+        while condition:
+            if ctx.statementBlock() is not None:
+                self.visit(ctx.statementBlock())
+            condition = self.visit(ctx.booleanExpression())
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
