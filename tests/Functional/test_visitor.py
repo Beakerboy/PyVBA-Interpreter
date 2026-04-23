@@ -196,7 +196,7 @@ def test_no_else() -> None:
     assert result == expected
 
 
-def test_while) -> None:
+def test_while() -> None:
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
