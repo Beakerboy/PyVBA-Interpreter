@@ -79,9 +79,12 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
         args = []
-        if ctx.children is not None:
-            for child in ctx.children:
-                if child is not None:
+        if ctx.positionalOrNamedArgumentList() is not None:
+            for child in ctx.positionalOrNamedArgumentList().children:
+                if not (
+                    isinstance(child, Parser.WscContext) or
+                    child.getText() == ','
+                ):
                     args += [self.visit(child)]
         return args
 
@@ -217,6 +220,8 @@ class VbaVisitor(Visitor):
     def execute_function(self: T, command: str,
                          args: list, no_sub: bool) -> Any:
         command = command.lower()
+        if command == "array":
+            return args
         if (
             command not in self.table.definitions and
             command not in self.table.library_definitions
