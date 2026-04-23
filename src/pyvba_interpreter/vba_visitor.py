@@ -81,7 +81,10 @@ class VbaVisitor(Visitor):
         args = []
         if ctx.positionalOrNamedArgumentList() is not None:
             for child in ctx.positionalOrNamedArgumentList().children:
-                if not (isinstance(child, Parser.WscContext) or child.getText() == ','):
+                if not (
+                    isinstance(child, Parser.WscContext) or
+                    child.getText() == ','
+                ):
                     args += [self.visit(child)]
         return args
 
