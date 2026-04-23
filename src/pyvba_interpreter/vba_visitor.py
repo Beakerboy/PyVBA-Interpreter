@@ -73,7 +73,7 @@ class VbaVisitor(Visitor):
         while condition:
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
-      
+
     def visitArgumentList(                                         # noqa: N802
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
