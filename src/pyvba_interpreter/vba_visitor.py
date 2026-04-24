@@ -81,7 +81,12 @@ class VbaVisitor(Visitor):
         n = self.visit(ctx.forClause().boundVariableExpression())
         start = self.visit(ctx.forClause().startValue())
         end = self.visit(ctx.forClause().endValue())
-        for i in range(end):
+        step = 1
+        if ctx.forClause().stepClause() os not None:
+            step = self.visit(ctx.forClause().stepClause().stepIncrement())
+        for i in range(start, end, step):
+            # set n to i
+            # visit internals
             pass
 
     def visitArgumentList(                                         # noqa: N802
