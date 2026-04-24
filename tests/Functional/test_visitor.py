@@ -159,10 +159,6 @@ def test_function_not_defined() -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    table.library_definitions["msgbox"] = {
-        "type": "builtin",
-        "handle": getattr(Interaction, "MsgBox")
-    }
     ctx = table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException):
         interpreter.visit(ctx)
