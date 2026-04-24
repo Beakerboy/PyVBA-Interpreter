@@ -82,12 +82,13 @@ class VbaVisitor(Visitor):
             stmt = ctx.simpleForStatement()
         else:
             stmt = ctx.explicitForStatement()
-        n = stmt.forClause().boundVariableExpression().getText().lower()
-        start = self.visit(stmt.forClause().startValue())
-        end = self.visit(stmt.forClause().endValue()) + 1
+        clause = stmt.forClause()
+        n = clause.boundVariableExpression().getText().lower()
+        start = self.visit(clause.startValue())
+        end = self.visit(clause.endValue()) + 1
         step = 1
-        if stmt.forClause().stepClause() is not None:
-            step = self.visit(stmt.forClause().stepClause().stepIncrement())
+        if clause.stepClause() is not None:
+            step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
         for i in range(start, end, step):
             current_env[n] = i
