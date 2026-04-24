@@ -46,8 +46,15 @@ def build_interp(code: str) -> VbaVisitor:
          '    End If\n'
          'End Function\n'),
         ('Function Fact(num)\n'
+         '    If Num = 1 Then Fact = 1 Else Fact = Num * Fact(Num - 1)\n'
+         'End Function\n'),
+        ('Function Fact(num)\n'
          '    Fact = 1\n'
          '    If Num > 1 Then Fact = Num * Fact(Num - 1)\n'
+         'End Function\n'),
+        ('Function Fact(num)\n'
+         '    Fact = 1\n'
+         '    If Num <= 1 Then Else Fact = Num * Fact(Num - 1)\n'
          'End Function\n'),
         ('Function Fact(Num)\n'
          '    Fact = 1\n'
