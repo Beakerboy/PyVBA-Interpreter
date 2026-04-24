@@ -6,4 +6,6 @@ T = TypeVar('T', bound='ExitForException')
 
 
 class ExitForException(VbaCompileException):
-    super().__init__("Exit For not within For...Next")
+
+    def __init__(self: T) -> None:
+        super().__init__("Exit For not within For...Next")
