@@ -58,7 +58,7 @@ def test_no_else() -> None:
 
 
 def test_while() -> None:
-   code = ('Function Fact(Num)\n'
+    code = ('Function Fact(Num)\n'
            '    Fact = 1\n'
            '    While Num > 1\n'
            '        Fact = Num * Fact\n'
