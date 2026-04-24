@@ -4,7 +4,11 @@ from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
+from .Exceptions.exit_do_exception import ExitDoException
 from .Exceptions.exit_for_exception import ExitForException
+from .Exceptions.exit_function_exception import ExitFunctionException
+from .Exceptions.exit_property_exception import ExitPropertyException
+from .Exceptions.exit_sub_exception import ExitSubException
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -167,10 +171,30 @@ class VbaVisitor(Visitor):
         else:  # op == '\\':
             return left // right
 
+    def visitExitDoStatement(                                      # noqa: N802
+            self: T,
+            ctx: Parser.ExitDoStatementContext) -> None:
+        raise ExitDoException()
+
     def visitExitForStatement(                                     # noqa: N802
             self: T,
             ctx: Parser.ExitForStatementContext) -> None:
         raise ExitForException()
+
+    def visitExitFunctionStatement(                                # noqa: N802
+            self: T,
+            ctx: Parser.ExitFunctionStatementContext) -> None:
+        raise ExitFunctionException()
+
+    def visitExitPropertyStatement(                                # noqa: N802
+            self: T,
+            ctx: Parser.ExitPropertyStatementContext) -> None:
+        raise ExitPropertyException()
+
+    def visitExitSubStatement(                                     # noqa: N802
+            self: T,
+            ctx: Parser.ExitSubStatementContext) -> None:
+        raise ExitSubException()
 
     def visitUnaryMinusExpression(                                 # noqa: N802
             self: T,
