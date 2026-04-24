@@ -78,16 +78,21 @@ class VbaVisitor(Visitor):
     def visitForStatement(                                         # noqa: N802
             self: T,
             ctx: Parser.ForStatementContext) -> None:
-        n = self.visit(ctx.forClause().boundVariableExpression())
-        start = self.visit(ctx.forClause().startValue())
-        end = self.visit(ctx.forClause().endValue())
+        if ctx.explicitForStatement() is None:
+            stmt = ctx.simpleForStatement()
+        else:
+            stmt = ctx.explicitForStatement()
+        n = self.visit(stmt.forClause().boundVariableExpression())
+        start = self.visit(stmt.forClause().startValue())
+        end = self.visit(stmt.forClause().endValue())
         step = 1
-        if ctx.forClause().stepClause() os not None:
-            step = self.visit(ctx.forClause().stepClause().stepIncrement())
+        if stmt.forClause().stepClause() is not None:
+            step = self.visit(stmt.forClause().stepClause().stepIncrement())
+        current_env = self.env_stack[-1]
         for i in range(start, end, step):
-            # set n to i
-            # visit internals
-            pass
+            current_env[n] = i
+            if stmt.statementBlock() is not None:
+                self.visit(stmt.statementBlock())
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
