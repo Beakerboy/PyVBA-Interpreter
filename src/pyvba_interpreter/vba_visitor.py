@@ -74,7 +74,7 @@ class VbaVisitor(Visitor):
         assert stmt is not None
         condition = self.visit(stmt.booleanExpression())
         if condition:
-            if stmt.listOrLabel() is not None:
+            if hasattr(type(stmt), "listOrLabel"):
                 self.visit(stmt.listOrLabel())
         else:
             if stmt.singleLineElseClause() is not None:
