@@ -74,7 +74,7 @@ class VbaVisitor(Visitor):
         condition = self.visit(stmt.booleanExpression())
         if condition:
             if stmt.listOrLabel() is not None:
-                self.visit(stmt.listOrLabel() )
+                self.visit(stmt.listOrLabel())
         else:
             if stmt.sameLineElseStatement() is not None:
                 self.visit(stmt.sameLineElseStatement())
