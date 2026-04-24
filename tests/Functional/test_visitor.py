@@ -65,9 +65,9 @@ def build_interp(code: str) -> VbaVisitor:
         ('Call MsgBox(1 <> 2)', "True"),
     ])
 def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
-        code = ('Function hello()\n'
-                '    ' + input + '\n'
-                'End Function\n')
+    code = ('Function hello()\n'
+            '    ' + input + '\n'
+            'End Function\n')
     interpreter = build_interp(code)
     table.library_definitions["msgbox"] = {
         "type": "builtin",
