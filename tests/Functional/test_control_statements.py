@@ -1,4 +1,5 @@
 import os
+import pytest
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
@@ -52,11 +53,11 @@ def build_interp(code: str) -> VbaVisitor:
          '    Wend\n'
          'End Function\n'),
         ('Function Fact(Num)\n'
-          '    Fact = 1\n'
-          '    For I = 1 To Num\n'
-          '        Fact = I * Fact\n'
-          '    Next I\n'
-          'End Function\n'),
+         '    Fact = 1\n'
+         '    For I = 1 To Num\n'
+         '        Fact = I * Fact\n'
+         '    Next I\n'
+         'End Function\n'),
     ])
 def test_factorial(code: str) -> None:
     interpreter = build_interp(code)
