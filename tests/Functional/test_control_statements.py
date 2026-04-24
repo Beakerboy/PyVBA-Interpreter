@@ -8,6 +8,7 @@ from pyvba_interpreter.vba_visitor import VbaVisitor
 
 
 def build_interp(code: str) -> VbaVisitor
+    code = 'Attribute VB_NAME = "Factorial"\n' + code
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
@@ -44,8 +45,7 @@ def test_factorial() -> None:
 
 
 def test_no_else() -> None:
-    code = ('Attribute VB_NAME = "Factorial"\n'
-            'Function Fact(num)\n'
+    code = ('Function Fact(num)\n'
             '    Fact = 1\n'
             '    If Num > 1 Then\n'
             '        Fact = Num * Fact(Num - 1)\n'
@@ -58,8 +58,7 @@ def test_no_else() -> None:
 
 
 def test_while() -> None:
-   code = ('Attribute VB_NAME = "Factorial"\n'
-           'Function Fact(Num)\n'
+   code = ('Function Fact(Num)\n'
            '    Fact = 1\n'
            '    While Num > 1\n'
            '        Fact = Num * Fact\n'
@@ -73,8 +72,7 @@ def test_while() -> None:
 
 
 def test_for() -> None:
-    code = ('Attribute VB_NAME = "Factorial"\n'
-            'Function Fact(Num)\n'
+    code = ('Function Fact(Num)\n'
             '    Fact = 1\n'
             '    For I = 1 To Num\n'
             '        Fact = I * Fact\n'
