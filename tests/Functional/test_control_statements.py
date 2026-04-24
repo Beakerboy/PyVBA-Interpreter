@@ -6,6 +6,9 @@ from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.symbol_table import SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
+from pyvba_interpreter.Exceptions.exit_for_exception import (
+    ExitForException
+)
 
 
 def build_interp(code: str) -> VbaVisitor:
@@ -82,3 +85,12 @@ def test_factorial(code: str) -> None:
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
     assert result == expected
+
+
+def test_factorial(code: str) -> None:
+    code = ('Function Fact(Num)\n'
+            '    Exit For\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    with pytest.raises(ExitForException):
+        interpreter.execute_function("fact", [5], True)
