@@ -83,6 +83,7 @@ class VbaVisitor(Visitor):
         else:
             stmt = ctx.explicitForStatement()
         clause = stmt.forClause()
+        assert clause is not None
         n = clause.boundVariableExpression().getText().lower()
         start = self.visit(clause.startValue())
         end = self.visit(clause.endValue()) + 1
