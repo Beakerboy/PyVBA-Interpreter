@@ -77,7 +77,7 @@ class VbaVisitor(Visitor):
             if stmt.listOrLabel() is not None:
                 self.visit(stmt.listOrLabel())
         else:
-            if stmt.sameLineElseStatement() is not None:
+            if stmt.singleLineElseClause() is not None:
                 self.visit(stmt.singleLineElseClause())
 
     def visitWhileStatement(                                       # noqa: N802
