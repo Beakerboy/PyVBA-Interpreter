@@ -82,7 +82,7 @@ class VbaVisitor(Visitor):
             stmt = ctx.simpleForStatement()
         else:
             stmt = ctx.explicitForStatement()
-        n = self.visit(stmt.forClause().boundVariableExpression()).lower()
+        n = stmt.forClause().boundVariableExpression().getText().lower()
         start = self.visit(stmt.forClause().startValue())
         end = self.visit(stmt.forClause().endValue())
         step = 1
