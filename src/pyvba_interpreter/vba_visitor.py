@@ -94,7 +94,7 @@ class VbaVisitor(Visitor):
         if clause.stepClause() is not None:
             step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
-        for i in range(start, end, step):
+        for i in range(start, stop, step):
             current_env[n] = i
             if stmt.statementBlock() is not None:
                 self.visit(stmt.statementBlock())
