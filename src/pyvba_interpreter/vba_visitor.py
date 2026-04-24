@@ -78,7 +78,11 @@ class VbaVisitor(Visitor):
     def visitForStatement(                                         # noqa: N802
             self: T,
             ctx: Parser.ForStatementContext) -> None:
-        pass
+        n = self.visit(ctx.forClause().boundVariableExpression())
+        start = self.visit(ctx.forClause().startValue())
+        end = self.visit(ctx.forClause().endValue())
+        for i in range(end):
+            pass
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
