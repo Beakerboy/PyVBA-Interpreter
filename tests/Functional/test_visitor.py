@@ -69,7 +69,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    table.library_definitions["msgbox"] = {
+    interpreter.table.library_definitions["msgbox"] = {
         "type": "builtin",
         "handle": getattr(Interaction, "MsgBox")
     }
@@ -113,7 +113,7 @@ def test_function_not_defined() -> None:
             '    Hello1\n'
             'End Function\n')
     interpreter = build_interp(code)
-    ctx = table.definitions["hello"]["handle"]
+    ctx = interpreter.table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException):
         interpreter.visit(ctx)
 
