@@ -67,6 +67,18 @@ class VbaVisitor(Visitor):
             if ctx.elseBlock() is not None:
                 self.visit(ctx.elseBlock().statementBlock())
 
+    def visitSingleLineIfStatement(                                # noqa: N802
+            self: T,
+            ctx: Parser.SingleLineIfStatement) -> None:
+        stmt = ctx.getChild(0)
+        condition = self.visit(stmt.booleanExpression())
+        if condition:
+            if stmt.listOrLabel() is not None:
+                self.visit(stmt.listOrLabel() )
+        else:
+            if stmt.sameLineElseStatement() is not None:
+                self.visit(stmt.sameLineElseStatement())
+
     def visitWhileStatement(                                       # noqa: N802
             self: T,
             ctx: Parser.WhileStatementContext) -> None:
