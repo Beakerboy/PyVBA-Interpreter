@@ -58,6 +58,14 @@ def build_interp(code: str) -> VbaVisitor:
          '        Fact = I * Fact\n'
          '    Next I\n'
          'End Function\n'),
+        ('Function Fact(Num)\n'
+         '    Fact = 1\n'
+         '    For I = 1 To Num + 2\n'
+         '        Fact = I * Fact\n'
+         '        If I = Num Then\n
+         '            Exit For\n'
+         '    Next I\n'
+         'End Function\n'),
     ])
 def test_factorial(code: str) -> None:
     interpreter = build_interp(code)
