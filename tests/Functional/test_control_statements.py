@@ -7,7 +7,7 @@ from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
 
 
-def build_interp(code: str) -> VbaVisitor
+def build_interp(code: str) -> VbaVisitor:
     code = 'Attribute VB_NAME = "Factorial"\n' + code
     file_path = 'tests/files/test.bas'
     try:
