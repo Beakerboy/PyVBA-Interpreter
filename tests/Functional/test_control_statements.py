@@ -87,7 +87,7 @@ def test_factorial(code: str) -> None:
     assert result == expected
 
 
-def test_factorial(code: str) -> None:
+def test_exit_sub_exception(code: str) -> None:
     code = ('Function Fact(Num)\n'
             '    Exit For\n'
             'End Function\n')
