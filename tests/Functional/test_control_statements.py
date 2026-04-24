@@ -29,55 +29,36 @@ def build_interp(code: str) -> VbaVisitor:
     return VbaVisitor(table)
 
 
-def test_factorial() -> None:
-    code = ('Attribute VB_NAME = "Factorial"\n'
-            'Function Fact(num)\n'
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Fact(num)\n'
             '    If Num = 1 Then\n'
             '        Fact = 1\n'
             '    Else\n'
             '        Fact = Num * Fact(Num - 1)\n'
             '    End If\n'
-            'End Function\n')
-    interpreter = build_interp(code)
-    result = interpreter.execute_function("fact", [5], True)
-    expected = 120
-    assert result == expected
-
-
-def test_no_else() -> None:
-    code = ('Function Fact(num)\n'
+            'End Function\n'),
+        ('Function Fact(num)\n'
             '    Fact = 1\n'
             '    If Num > 1 Then\n'
             '        Fact = Num * Fact(Num - 1)\n'
             '    End If\n'
-             'End Function\n')
-    interpreter = build_interp(code)
-    result = interpreter.execute_function("fact", [5], True)
-    expected = 120
-    assert result == expected
-
-
-def test_while() -> None:
-    code = ('Function Fact(Num)\n'
+             'End Function\n'),
+        ('Function Fact(Num)\n'
            '    Fact = 1\n'
            '    While Num > 1\n'
            '        Fact = Num * Fact\n'
            '        Num = Num - 1\n'
            '    Wend\n'
-           'End Function\n')
-    interpreter = build_interp(code)
-    result = interpreter.execute_function("fact", [5], True)
-    expected = 120
-    assert result == expected
-
-
-def test_for() -> None:
-    code = ('Function Fact(Num)\n'
+           'End Function\n'),
+        ('Function Fact(Num)\n'
             '    Fact = 1\n'
             '    For I = 1 To Num\n'
             '        Fact = I * Fact\n'
             '    Next I\n'
-            'End Function\n')
+            'End Function\n'),
+    ])
+def test_factorial(code) -> None:
     interpreter = build_interp(code)
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
