@@ -86,8 +86,8 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = Array(1, 2)', [1, 2]),
     ])
 def test_function(input: str, expected: Any) -> None:
-    code = ('Function hello()\n')
-            '    ' + input + '\n')
+    code = ('Function hello()\n'
+            '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
     result = interpreter.execute_function("hello", [], True)
