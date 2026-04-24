@@ -84,7 +84,7 @@ class VbaVisitor(Visitor):
             stmt = ctx.explicitForStatement()
         n = stmt.forClause().boundVariableExpression().getText().lower()
         start = self.visit(stmt.forClause().startValue())
-        end = self.visit(stmt.forClause().endValue())
+        end = self.visit(stmt.forClause().endValue()) + 1
         step = 1
         if stmt.forClause().stepClause() is not None:
             step = self.visit(stmt.forClause().stepClause().stepIncrement())
