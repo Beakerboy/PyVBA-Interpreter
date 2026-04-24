@@ -71,6 +71,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.SingleLineIfStatementContext) -> None:
         stmt = ctx.getChild(0)
+        assert stmt is not None
         condition = self.visit(stmt.booleanExpression())
         if condition:
             if stmt.listOrLabel() is not None:
