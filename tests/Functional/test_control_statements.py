@@ -35,52 +35,37 @@ def build_interp(code: str) -> VbaVisitor:
 
 @pytest.mark.parametrize(
     "code", [
-        ('Function Fact(num)\n'
-         '    If Num = 1 Then\n'
+        ('    If Num = 1 Then\n'
          '        Fact = 1\n'
          '    Else\n'
          '        Fact = Num * Fact(Num - 1)\n'
-         '    End If\n'
-         'End Function\n'),
-        ('Function Fact(num)\n'
-         '    Fact = 1\n'
+         '    End If\n'),
+        ('    Fact = 1\n'
          '    If Num > 1 Then\n'
          '        Fact = Num * Fact(Num - 1)\n'
-         '    End If\n'
-         'End Function\n'),
-        ('Function Fact(num)\n'
-         '    If Num = 1 Then Fact = 1 Else Fact = Num * Fact(Num - 1)\n'
-         'End Function\n'),
-        ('Function Fact(num)\n'
-         '    Fact = 1\n'
-         '    If Num > 1 Then Fact = Num * Fact(Num - 1)\n'
-         'End Function\n'),
-        ('Function Fact(num)\n'
-         '    Fact = 1\n'
-         '    If Num <= 1 Then Else Fact = Num * Fact(Num - 1)\n'
-         'End Function\n'),
-        ('Function Fact(Num)\n'
-         '    Fact = 1\n'
+         '    End If\n'),
+        ('    If Num = 1 Then Fact = 1 Else Fact = Num * Fact(Num - 1)\n'),
+        ('    Fact = 1\n'
+         '    If Num > 1 Then Fact = Num * Fact(Num - 1)\n'),
+        ('    Fact = 1\n'
+         '    If Num <= 1 Then Else Fact = Num * Fact(Num - 1)\n'),
+        ('    Fact = 1\n'
          '    While Num > 1\n'
          '        Fact = Num * Fact\n'
          '        Num = Num - 1\n'
-         '    Wend\n'
-         'End Function\n'),
-        ('Function Fact(Num)\n'
-         '    Fact = 1\n'
+         '    Wend\n'),
+        ('    Fact = 1\n'
          '    For I = 1 To Num\n'
          '        Fact = I * Fact\n'
-         '    Next I\n'
-         'End Function\n'),
-        ('Function Fact(Num)\n'
-         '    Fact = 1\n'
+         '    Next I\n'),
+        ('    Fact = 1\n'
          '    For I = 1 To Num + 2\n'
          '        Fact = I * Fact\n'
          '        If I = Num Then Exit For\n'
-         '    Next I\n'
-         'End Function\n'),
+         '    Next I\n'),
     ])
 def test_factorial(code: str) -> None:
+    code = 'Function Fact(Num)\n' + code + 'End Function\n'
     interpreter = build_interp(code)
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
