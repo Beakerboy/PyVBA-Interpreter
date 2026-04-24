@@ -4,6 +4,7 @@ from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
+from .Exceptions.exit_for_exception import ExitForException
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -95,7 +96,10 @@ class VbaVisitor(Visitor):
         for i in range(start, stop, step):
             current_env[n] = i
             if stmt.statementBlock() is not None:
-                self.visit(stmt.statementBlock())
+                try:
+                    self.visit(stmt.statementBlock())
+                except ExitForException:
+                    break
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -149,6 +153,11 @@ class VbaVisitor(Visitor):
             return left % right
         else:  # op == '\\':
             return left // right
+
+    def visitExitForStatement(                                     # noqa: N802
+            self: T,
+            ctx: Parser.ExitForStatementContext) -> None:
+        raise ExitForException()
 
     def visitUnaryMinusExpression(                                 # noqa: N802
             self: T,
