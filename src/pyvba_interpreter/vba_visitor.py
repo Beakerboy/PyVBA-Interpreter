@@ -69,7 +69,7 @@ class VbaVisitor(Visitor):
 
     def visitSingleLineIfStatement(                                # noqa: N802
             self: T,
-            ctx: Parser.SingleLineIfStatement) -> None:
+            ctx: Parser.SingleLineIfStatementContext) -> None:
         stmt = ctx.getChild(0)
         condition = self.visit(stmt.booleanExpression())
         if condition:
