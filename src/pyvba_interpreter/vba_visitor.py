@@ -75,6 +75,11 @@ class VbaVisitor(Visitor):
                 self.visit(ctx.statementBlock())
             condition = self.visit(ctx.booleanExpression())
 
+    def visitForStatement(                                         # noqa: N802
+            self: T,
+            ctx: Parser.ForStatementContext) -> None:
+        pass
+
     def visitArgumentList(                                         # noqa: N802
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
