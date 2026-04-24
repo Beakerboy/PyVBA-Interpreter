@@ -7,7 +7,7 @@ from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
 
 
-def test_factorial() -> None:
+def build_interp(code: str) -> VbaVisitor
     file_path = 'tests/files/test.bas'
     try:
         os.remove(file_path)
@@ -15,14 +15,7 @@ def test_factorial() -> None:
         # File did not exist; ignore the error
         pass
     with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "Factorial"\n')
-        file.write('Function Fact(num)\n')
-        file.write('    If Num = 1 Then\n')
-        file.write('        Fact = 1\n')
-        file.write('    Else\n')
-        file.write('        Fact = Num * Fact(Num - 1)\n')
-        file.write('    End If\n')
-        file.write('End Function\n')
+        file.write(code)
     input_stream = FileStream(file_path)
     lexer = Lexer(input_stream)
     ts = CommonTokenStream(lexer)
@@ -32,98 +25,62 @@ def test_factorial() -> None:
     listener = VbaListener(table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
+    return VbaVisitor(table)
+
+
+def test_factorial() -> None:
+    code = ('Attribute VB_NAME = "Factorial"\n'
+            'Function Fact(num)\n'
+            '    If Num = 1 Then\n'
+            '        Fact = 1\n'
+            '    Else\n'
+            '        Fact = Num * Fact(Num - 1)\n'
+            '    End If\n'
+            'End Function\n')
+    interpreter = build_interp(code)
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
     assert result == expected
 
 
 def test_no_else() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "Factorial"\n')
-        file.write('Function Fact(num)\n')
-        file.write('    Fact = 1\n')
-        file.write('    If Num > 1 Then\n')
-        file.write('        Fact = Num * Fact(Num - 1)\n')
-        file.write('    End If\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
+    code = ('Attribute VB_NAME = "Factorial"\n'
+            'Function Fact(num)\n'
+            '    Fact = 1\n'
+            '    If Num > 1 Then\n'
+            '        Fact = Num * Fact(Num - 1)\n'
+            '    End If\n'
+             'End Function\n')
+    interpreter = build_interp(code)
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
     assert result == expected
 
 
 def test_while() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "Factorial"\n')
-        file.write('Function Fact(Num)\n')
-        file.write('    Fact = 1\n')
-        file.write('    While Num > 1\n')
-        file.write('        Fact = Num * Fact\n')
-        file.write('        Num = Num - 1\n')
-        file.write('    Wend\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
+   code = ('Attribute VB_NAME = "Factorial"\n'
+           'Function Fact(Num)\n'
+           '    Fact = 1\n'
+           '    While Num > 1\n'
+           '        Fact = Num * Fact\n'
+           '        Num = Num - 1\n'
+           '    Wend\n'
+           'End Function\n')
+    interpreter = build_interp(code)
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
     assert result == expected
 
 
 def test_for() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "Factorial"\n')
-        file.write('Function Fact(Num)\n')
-        file.write('    Fact = 1\n')
-        file.write('    For I = 1 To Num\n')
-        file.write('        Fact = I * Fact\n')
-        file.write('    Next I\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
+    code = ('Attribute VB_NAME = "Factorial"\n'
+            'Function Fact(Num)\n'
+            '    Fact = 1\n'
+            '    For I = 1 To Num\n'
+            '        Fact = I * Fact\n'
+            '    Next I\n'
+            'End Function\n')
+    interpreter = build_interp(code)
     result = interpreter.execute_function("fact", [5], True)
     expected = 120
     assert result == expected
