@@ -82,7 +82,7 @@ def test_factorial(code: str) -> None:
          '    For I = 1 To Num + 2\n'
          '        Fact = I * Fact\n'
          '        If I = Num Then Bar\n'
-         '    Next I\n',
+         '    Next I\n'
          'End Function\n'
          'Function Bar()\n'
          '    Exit For\n'
