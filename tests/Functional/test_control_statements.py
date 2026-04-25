@@ -87,7 +87,7 @@ def test_factorial(code: str) -> None:
          'Function Bar()\n'
          '    Exit For\n'
          'End Function\n'),
-        
+    ])
 def test_exit_sub_exception(code: str) -> None:
     interpreter = build_interp(code)
     with pytest.raises(ExitForException):
