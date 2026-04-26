@@ -19,6 +19,7 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.env_stack: list[dict[str, Any]] = []
+        self.raise_for_except = True
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -110,13 +111,17 @@ class VbaVisitor(Visitor):
         if clause.stepClause() is not None:
             step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
+        self.raise_for_except = False
         for i in range(start, stop, step):
             current_env[n] = i
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
-                except ExitForException:
-                    break
+                except ExitForException e:
+                    if self.raise_for_except:
+                        raise e
+                    else:
+                        break
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -320,7 +325,11 @@ class VbaVisitor(Visitor):
             self.env_stack.append(current_env)
             ctx = mod_def["handle"]
             if ctx is not None:
-                self.visitChildren(ctx)
+                try:
+                    self.visitChildren(ctx)
+                except ExitForException e:
+                    self.raise_for_except = True
+                    raise e
             output = current_env[command]
             self.env_stack.pop()
             return output
