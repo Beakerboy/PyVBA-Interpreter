@@ -117,7 +117,7 @@ class VbaVisitor(Visitor):
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
-                except ExitForException e:
+                except ExitForException as e:
                     if self.raise_for_except:
                         raise e
                     else:
@@ -327,7 +327,7 @@ class VbaVisitor(Visitor):
             if ctx is not None:
                 try:
                     self.visitChildren(ctx)
-                except ExitForException e:
+                except ExitForException as e:
                     self.raise_for_except = True
                     raise e
             output = current_env[command]
