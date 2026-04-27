@@ -10,6 +10,7 @@ from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
 )
 
+
 def build_interp(code: str) -> VbaVisitor:
     code = 'Attribute VB_NAME = "Factorial"\n' + code
     file_path = 'tests/files/test.bas'
