@@ -46,7 +46,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.DoStatementContext) -> None:
         condition = ctx.conditionClause()
         if ctx.conditionClause(2) is not None:
-            raise VbaCompileError("Loop without Do")
+            raise VbaCompileException("Loop without Do")
         type = ctx.getChild(2).getChild(0).getChild(0).getText().lower()
         if condition is None:
             pass
@@ -56,7 +56,7 @@ class VbaVisitor(Visitor):
                 condition = self.visit(clause.booleanExpression())
             else:
                 clause = condition.untilClause()
-                condition =  not self.visit(clause.booleanExpression())
+                condition = not self.visit(clause.booleanExpression())
             while condition:
                 if ctx.statementBlock() is not None:
                     try:
@@ -69,12 +69,6 @@ class VbaVisitor(Visitor):
                     )
             else:
                 pass
-        
-        if ctx.statementBlock() is not None:
-            try:
-                self.visit(stmt.statementBlock())
-            except ExitDoException:
-                break
 
     def visitCallStatement(                                        # noqa: N802
             self: T,
