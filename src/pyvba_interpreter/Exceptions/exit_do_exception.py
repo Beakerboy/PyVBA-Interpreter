@@ -8,4 +8,5 @@ T = TypeVar('T', bound='ExitDoException')
 class ExitDoException(VbaCompileException):
 
     def __init__(self: T) -> None:
-        super().__init__("Exit Do not within Do...Loop")
+        self.msg = "Exit Do not within Do...Loop"
+        super().__init__(self.msg)
