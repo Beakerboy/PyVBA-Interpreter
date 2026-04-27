@@ -51,7 +51,7 @@ class VbaVisitor(Visitor):
         if condition is None:
             pass
         elif type == "while" or type == "until":
-            if type = "while":
+            if type == "while":
                 clause = condition.whileClause()
                 condition = self.visit(clause.booleanExpression())
             else:
