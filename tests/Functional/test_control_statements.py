@@ -122,4 +122,4 @@ def test_do_exception(code: str) -> None:
     interpreter = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
         interpreter.execute_function("fact", [5], True)
-    assert str(e.value) == "Compile error:\nLoop withou Do"
+    assert str(e.value) == "Compile error:\nLoop without Do"
