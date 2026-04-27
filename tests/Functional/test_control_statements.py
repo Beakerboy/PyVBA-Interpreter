@@ -106,3 +106,19 @@ def test_exit_sub_exception(code: str) -> None:
     with pytest.raises(VbaCompileException) as e:
         interpreter.execute_function("fact", [5], True)
     assert str(e.value) == "Compile error:\nExit For not within For...Next"
+
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Fact(Num)\n'
+         '    I = 1\n'
+         '    Do While I <= Num\n'
+         '        Fact = Fact * I\n'
+         '        I = I + 1\n'
+         '    Loop Until I = Num\n',
+         'End Function\n'),
+    ])
+def test_do_exception(code: str) -> None:
+    interpreter = build_interp(code)
+    with pytest.raises(VbaCompileException) as e:
+        interpreter.execute_function("fact", [5], True)
+    assert str(e.value) == "Compile error:\nLoop withou Do"
