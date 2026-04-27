@@ -41,6 +41,29 @@ class VbaVisitor(Visitor):
         value = self.visit(ctx.expression())
         current_env[var_name] = value
 
+    def visitCallStatement(                                        # noqa: N802
+            self: T,
+            ctx: Parser.CallStatementContext) -> None:
+        command = ''
+        # Either CALL or simpleNameExpression
+        first_child = ctx.getChild(0)
+        assert first_child is not None
+        if first_child.getText().lower() == "call":
+            # If no arguments, then it's just a simple name expression
+            if ctx.simpleNameExpression() is not None:
+                command = ctx.simpleNameExpression().getText().lower()
+                self.execute_function(command, [], False)
+            elif ctx.indexExpression() is not None:
+                self.visit(ctx.indexExpression())
+            else:
+                raise Exception("Unsupported")
+        else:
+            command = first_child.getText().lower()
+            args = []
+            if ctx.argumentList() is not None:
+                args = self.visit(ctx.argumentList())
+            self.execute_function(command, args, False)
+
     def visitDoStatement(                                          # noqa: N802
             self: T,
             ctx: Parser.DoStatementContext) -> None:
@@ -69,29 +92,6 @@ class VbaVisitor(Visitor):
                     )
             else:
                 pass
-
-    def visitCallStatement(                                        # noqa: N802
-            self: T,
-            ctx: Parser.CallStatementContext) -> None:
-        command = ''
-        # Either CALL or simpleNameExpression
-        first_child = ctx.getChild(0)
-        assert first_child is not None
-        if first_child.getText().lower() == "call":
-            # If no arguments, then it's just a simple name expression
-            if ctx.simpleNameExpression() is not None:
-                command = ctx.simpleNameExpression().getText().lower()
-                self.execute_function(command, [], False)
-            elif ctx.indexExpression() is not None:
-                self.visit(ctx.indexExpression())
-            else:
-                raise Exception("Unsupported")
-        else:
-            command = first_child.getText().lower()
-            args = []
-            if ctx.argumentList() is not None:
-                args = self.visit(ctx.argumentList())
-            self.execute_function(command, args, False)
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
