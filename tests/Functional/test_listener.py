@@ -1,8 +1,13 @@
+import os
+import pytest
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.symbol_table import SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
+from pyvba_interpreter.Exceptions.vba_compile_exception import (
+    VbaCompileException
+)
 
 
 def test_interpreter() -> None:
@@ -18,7 +23,7 @@ def test_interpreter() -> None:
     assert len(table.definitions) == 1
 
 
-def test_exception() -> VbaVisitor:
+def test_exception() -> None:
     code = ('Attribute VB_NAME = "FooModule"\n'
             'Function Hello()\n'
             '    Hello = 0\n'
