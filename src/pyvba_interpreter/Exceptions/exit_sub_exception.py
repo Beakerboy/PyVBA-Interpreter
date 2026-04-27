@@ -2,11 +2,11 @@ from .vba_compile_exception import VbaCompileException
 from typing import TypeVar
 
 
-T = TypeVar('T', bound='ExitForException')
+T = TypeVar('T', bound='ExitSubException')
 
 
-class ExitForException(VbaCompileException):
+class ExitSubException(VbaCompileException):
 
     def __init__(self: T) -> None:
-        self.msg = "Exit For not within For...Next"
+        self.msg = "Exit Sub not allowed in Function or Property"
         super().__init__(self.msg)

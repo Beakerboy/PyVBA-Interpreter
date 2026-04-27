@@ -4,7 +4,11 @@ from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
+from .Exceptions.exit_do_exception import ExitDoException
 from .Exceptions.exit_for_exception import ExitForException
+from .Exceptions.exit_function_exception import ExitFunctionException
+from .Exceptions.exit_property_exception import ExitPropertyException
+from .Exceptions.exit_sub_exception import ExitSubException
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -15,6 +19,10 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.env_stack: list[dict[str, Any]] = []
+        self.raise_do_except = True
+        self.raise_for_except = True
+        self.raise_function_except = True
+        self.raise_sub_except = True
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -55,6 +63,43 @@ class VbaVisitor(Visitor):
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
             self.execute_function(command, args, False)
+
+    def visitDoStatement(                                          # noqa: N802
+            self: T,
+            ctx: Parser.DoStatementContext) -> None:
+        condition = True
+        run_while = False
+        if ctx.conditionClause(0) is not None:
+            if ctx.conditionClause(1) is not None:
+                raise VbaCompileException("Loop without Do")
+            cond_clau = ctx.conditionClause(0)
+            cond = self.visit(cond_clau.getChild(0).booleanExpression())
+            condition = cond == (cond_clau.whileClause() is not None)
+            run_while = True
+        elif ctx.conditionClause(1) is not None:
+            cond_clau = ctx.conditionClause(1)
+            run_while = True
+        else:
+            while True:
+                if ctx.statementBlock() is not None:
+                    try:
+                        self.visit(ctx.statementBlock())
+                    except ExitDoException:
+                        break
+
+        if run_while:
+            if cond_clau.whileClause() is not None:
+                type = "while"
+            else:
+                type = "until"
+            while condition:
+                if ctx.statementBlock() is not None:
+                    try:
+                        self.visit(ctx.statementBlock())
+                    except ExitDoException:
+                        break
+                cond = self.visit(cond_clau.getChild(0).booleanExpression())
+                condition = cond == (type == "while")
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
@@ -106,6 +151,7 @@ class VbaVisitor(Visitor):
         if clause.stepClause() is not None:
             step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
+        self.raise_for_except = False
         for i in range(start, stop, step):
             current_env[n] = i
             if stmt.statementBlock() is not None:
@@ -167,10 +213,30 @@ class VbaVisitor(Visitor):
         else:  # op == '\\':
             return left // right
 
+    def visitExitDoStatement(                                      # noqa: N802
+            self: T,
+            ctx: Parser.ExitDoStatementContext) -> None:
+        raise ExitDoException()
+
     def visitExitForStatement(                                     # noqa: N802
             self: T,
             ctx: Parser.ExitForStatementContext) -> None:
         raise ExitForException()
+
+    def visitExitFunctionStatement(                                # noqa: N802
+            self: T,
+            ctx: Parser.ExitFunctionStatementContext) -> None:
+        raise ExitFunctionException()
+
+    def visitExitPropertyStatement(                                # noqa: N802
+            self: T,
+            ctx: Parser.ExitPropertyStatementContext) -> None:
+        raise ExitPropertyException()
+
+    def visitExitSubStatement(                                     # noqa: N802
+            self: T,
+            ctx: Parser.ExitSubStatementContext) -> None:
+        raise ExitSubException()
 
     def visitUnaryMinusExpression(                                 # noqa: N802
             self: T,
@@ -296,7 +362,34 @@ class VbaVisitor(Visitor):
             self.env_stack.append(current_env)
             ctx = mod_def["handle"]
             if ctx is not None:
-                self.visitChildren(ctx)
+                if mod_def["type"] == "sub":
+                    self.raise_sub_except = False
+                else:
+                    self.raise_function_except = False
+                try:
+                    self.visitChildren(ctx)
+                except ExitDoException as e:
+                    raise VbaCompileException(e.msg)
+                except ExitForException as e:
+                    raise VbaCompileException(e.msg)
+                except ExitFunctionException as e:
+                    if (
+                            mod_def["type"] == "sub" or
+                            mod_def["type"] == "property"
+                    ):
+                        raise VbaCompileException(e.msg)
+                except ExitPropertyException as e:
+                    if (
+                            mod_def["type"] == "function" or
+                            mod_def["type"] == "sub"
+                    ):
+                        raise VbaCompileException(e.msg)
+                except ExitSubException as e:
+                    if (
+                            mod_def["type"] == "function" or
+                            mod_def["type"] == "property"
+                    ):
+                        raise VbaCompileException(e.msg)
             output = current_env[command]
             self.env_stack.pop()
             return output
