@@ -331,13 +331,18 @@ class VbaVisitor(Visitor):
                     self.raise_function_except = False
                 try:
                     self.visitChildren(ctx)
+                except ExitDoException as e:
+                    raise VbaCompileException(e.msg)
                 except ExitForException as e:
                     raise VbaCompileException(e.msg)
                 except ExitFunctionException as e:
-                    if mod_def["type"] == "sub":
+                    if mod_def["type"] == "sub" or mod_def["type"] == "property":
                         raise VbaCompileException(e.msg)
+                except ExitPropertyException as e:
+                    if mod_def["type"] == "function" or if mod_def["type"] == "sub"
+                    raise VbaCompileException(e.msg)
                 except ExitSubException as e:
-                    if mod_def["type"] == "function":
+                    if mod_def["type"] == "function" or mod_def["type"] == "property":
                         raise VbaCompileException(e.msg)
             output = current_env[command]
             self.env_stack.pop()
