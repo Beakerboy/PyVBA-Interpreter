@@ -19,7 +19,10 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.env_stack: list[dict[str, Any]] = []
+        self.raise_do_except = True
         self.raise_for_except = True
+        self.raise_function_except = True
+        self.raise_sub_except = True
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -325,13 +328,23 @@ class VbaVisitor(Visitor):
             self.env_stack.append(current_env)
             ctx = mod_def["handle"]
             if ctx is not None:
+                if mod_def["type"] == "sub":
+                    self.raise_sub_except = False
+                else:
+                    self.raise_function_except = False
                 try:
                     self.visitChildren(ctx)
                 except ExitForException as e:
                     self.raise_for_except = True
                     raise e
-                except ExitFunctionException:
-                    pass
+                except ExitFunctionException as e
+                    if mod_def["type"] == "sub" or self.raise_function_except
+                        self.raise_function_except = True
+                        raise e
+                except ExitSubException as e
+                    if mod_def["type"] == "function" or self.raise_sub_except
+                        self.raise_sub_except = True
+                        raise e
             output = current_env[command]
             self.env_stack.pop()
             return output
