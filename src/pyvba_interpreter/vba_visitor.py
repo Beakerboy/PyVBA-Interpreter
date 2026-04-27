@@ -330,6 +330,8 @@ class VbaVisitor(Visitor):
                 except ExitForException as e:
                     self.raise_for_except = True
                     raise e
+                except ExitFunctionException:
+                    pass
             output = current_env[command]
             self.env_stack.pop()
             return output
