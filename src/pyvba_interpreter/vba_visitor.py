@@ -47,7 +47,7 @@ class VbaVisitor(Visitor):
         condition = ctx.conditionClause()
         if ctx.conditionClause(2) is not None:
             raise VbaCompileError("Loop without Do")
-        type = ctx.getChild(3).getText().lower()
+        type = ctx.getChild(2).getChild(0).getChild(0).getText().lower()
         if condition is None:
             pass
         elif type == "while" or type == "until":
