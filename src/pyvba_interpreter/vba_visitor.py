@@ -80,7 +80,7 @@ class VbaVisitor(Visitor):
                 type = "until"
             condition = cond == (type == "while")
             run_while = True
-            
+
         elif ctx.conditionClause(1) is not None:
             cond_clau = ctx.conditionClause(1)
             run_while = True
