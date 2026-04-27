@@ -46,6 +46,6 @@ def test_two_files(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
-    result = interpreter.execute_function("foo", [], True)
+    result = visitor.execute_function("foo", [], True)
     expected = 42
     assert result == expected
