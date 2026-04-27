@@ -121,10 +121,7 @@ class VbaVisitor(Visitor):
                 try:
                     self.visit(stmt.statementBlock())
                 except ExitForException as e:
-                    if self.raise_for_except:
-                        raise e
-                    else:
-                        break
+                    break
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -335,16 +332,13 @@ class VbaVisitor(Visitor):
                 try:
                     self.visitChildren(ctx)
                 except ExitForException as e:
-                    self.raise_for_except = True
-                    raise e
+                    raise VbaCompileException(e.msg)
                 except ExitFunctionException as e:
-                    if mod_def["type"] == "sub" or self.raise_function_except:
-                        self.raise_function_except = True
-                        raise e
+                    if mod_def["type"] == "sub":
+                        raise VbaCompileException(e.msg)
                 except ExitSubException as e:
-                    if mod_def["type"] == "function" or self.raise_sub_except:
-                        self.raise_sub_except = True
-                        raise e
+                    if mod_def["type"] == "function":
+                        raise VbaCompileException(e.msg)
             output = current_env[command]
             self.env_stack.pop()
             return output
