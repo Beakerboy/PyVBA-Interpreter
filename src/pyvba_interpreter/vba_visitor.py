@@ -49,7 +49,7 @@ class VbaVisitor(Visitor):
             raise VbaCompileError("Loop without Do")
         type = ctx.getChild(3).getText().lower()
         if condition is None:
-            # Do Loop
+            pass
         elif type == "while" or type == "until":
             if type = "while":
                 clause = condition.whileClause()
@@ -68,7 +68,7 @@ class VbaVisitor(Visitor):
                         (type == "while")
                     )
             else:
-                # Do While Loop
+                pass
         
         if ctx.statementBlock() is not None:
             try:
