@@ -74,11 +74,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Loop without Do")
             cond_clau = ctx.conditionClause(0)
             cond = self.visit(cond_clau.getChild(0).booleanExpression())
-            if cond_clau.whileClause() is not None:
-                type = "while"
-            else:
-                type = "until"
-            condition = cond == (type == "while")
+            condition = cond == (cond_clau.whileClause() is not None)
             run_while = True
         elif ctx.conditionClause(1) is not None:
             cond_clau = ctx.conditionClause(1)
@@ -92,6 +88,10 @@ class VbaVisitor(Visitor):
                         break
 
         if run_while:
+            if cond_clau.whileClause() is not None:
+                type = "while"
+            else:
+                type = "until"
             while condition:
                 if ctx.statementBlock() is not None:
                     try:
