@@ -16,3 +16,31 @@ def test_interpreter() -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     assert len(table.definitions) == 1
+
+
+def test_exception() -> VbaVisitor:
+    code = ('Attribute VB_NAME = "FooModule"\n'
+            'Function Hello()\n'
+            '    Hello = 0\n'
+            'End Function\n'
+            'Sub Hello()\n'
+            'End Sub\n')
+    file_path = 'tests/files/Foo.bas'
+    try:
+        os.remove(file_path)
+    except FileNotFoundError:
+        # File did not exist; ignore the error
+        pass
+    with open(file_path, "w", newline='\r\n') as file:
+        file.write(code)
+    table = SymbolTable()
+    input_stream = FileStream(file_path)
+    lexer = Lexer(input_stream)
+    ts = CommonTokenStream(lexer)
+    vbaparser = Parser(ts)
+    tree = vbaparser.module()
+    listener = VbaListener(table)
+    walker = ParseTreeWalker()
+    with pytest.raises(VbaCompileException) as e:
+        walker.walk(listener, tree)
+    assert str(e.value) == ""
