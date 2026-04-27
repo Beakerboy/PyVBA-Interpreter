@@ -8,4 +8,5 @@ T = TypeVar('T', bound='ExitSubException')
 class ExitSubException(VbaCompileException):
 
     def __init__(self: T) -> None:
-        super().__init__("Exit Sub not allowed in Function or Property")
+        self.msg = "Exit Sub not allowed in Function or Property"
+        super().__init__(self.msg)
