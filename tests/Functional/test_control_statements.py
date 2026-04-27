@@ -107,6 +107,7 @@ def test_exit_sub_exception(code: str) -> None:
         interpreter.execute_function("fact", [5], True)
     assert str(e.value) == "Compile error:\nExit For not within For...Next"
 
+
 @pytest.mark.parametrize(
     "code", [
         ('Function Fact(Num)\n'
