@@ -83,3 +83,6 @@ We are working toward full compliance with the [VBA Language Specification](http
 
 ## How it Works
 The interpreter uses **ANTLR4** to parse VBA syntax into an Abstract Syntax Tree (AST). The Python backend then traverses the tree, managing a call stack to handle variable scoping and function execution.
+
+## Differences from MS-VBA
+* While...Loop triggers a parsing error instead of a compile error
