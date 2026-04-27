@@ -10,6 +10,7 @@ class ParamDefinition(TypedDict):
 
 class FunctionDefinition(TypedDict):
     type: str
+    module: str
     handle: Parser.ProcedureBodyContext | None
     params: list[ParamDefinition]
 
