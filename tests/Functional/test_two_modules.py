@@ -39,7 +39,7 @@ def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
          'End Function\n',
          'Function Bar()\n'
          '    Bar = 42\n'
-         'End Function\n'),        
+         'End Function\n'),
     ])
 def test_two_files(code1: str, code2: str) -> None:
     table = SymbolTable()
