@@ -12,6 +12,12 @@ T = TypeVar('T', bound='VbaListener')
 class VbaListener(Listener):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
+        self.module_name = ""
+
+    def enterProceduralModuleHeader(                               # noqa: N802
+            self: T,
+            ctx: Parser.ProceduralModuleHeaderContext) -> None:
+        self.module_name = ctx.ctx.STRINGLITERAL().getText()[1:-1]
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
@@ -23,6 +29,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
             "type": "function",
+            "module": self.module_name,
             "handle": ctx.procedureBody(),
             "params": params
         }
@@ -37,6 +44,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
             "type": "sub",
+            "module": self.module_name,
             "handle": ctx.procedureBody(),
             "params": params
         }
