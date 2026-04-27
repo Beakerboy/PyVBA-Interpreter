@@ -2,7 +2,7 @@ from typing import TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import ParamDefinition, SymbolTable
+from .symbol_table import FunctionType, ParamDefinition, SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
 
 
