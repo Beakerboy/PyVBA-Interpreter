@@ -3,6 +3,7 @@ from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import ParamDefinition, SymbolTable
+from .Exceptions.vba_compile_exception import VbaCompileException
 
 
 T = TypeVar('T', bound='VbaListener')
@@ -16,6 +17,8 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText().lower()
+        if self.table.definitions[name] is not None:
+            raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
@@ -28,6 +31,8 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText().lower()
+        if self.table.definitions[name] is not None:
+            raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name] = {
