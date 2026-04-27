@@ -338,11 +338,11 @@ class VbaVisitor(Visitor):
                     self.raise_for_except = True
                     raise e
                 except ExitFunctionException as e:
-                    if mod_def["type"] == "sub" or self.raise_function_except
+                    if mod_def["type"] == "sub" or self.raise_function_except:
                         self.raise_function_except = True
                         raise e
                 except ExitSubException as e:
-                    if mod_def["type"] == "function" or self.raise_sub_except
+                    if mod_def["type"] == "function" or self.raise_sub_except:
                         self.raise_sub_except = True
                         raise e
             output = current_env[command]
