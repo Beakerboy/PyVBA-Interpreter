@@ -10,6 +10,3 @@ class VbaCompileException(VbaException):
     def __init__(self: T, msg: str) -> None:
         self.msg = msg
         super().__init__("Compile error:\n" + msg)
-
-    def __str__(self: T) -> str:
-        return "Compile error:\n" + self.msg
