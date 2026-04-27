@@ -50,7 +50,7 @@ class VbaVisitor(Visitor):
         type = ctx.getChild(3).getText().lower()
         if condition is None:
             # Do Loop
-        elif if type == "while" or type == "until":
+        elif type == "while" or type == "until":
             if type = "while":
                 clause = condition.whileClause()
                 condition = self.visit(clause.booleanExpression())
