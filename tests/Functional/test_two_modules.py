@@ -37,6 +37,24 @@ def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
          'Function Bar()\n'
          '    Bar = 42\n'
          'End Function\n'),
+        ('Function Foo()\n'
+         '    Foo = Bar()\n'
+         'End Function\n'
+         'Function Bar()\n'
+         '    Bar = 42\n'
+         'End Function\n',
+         'Function Bar()\n'
+         '    Bar = 24\n'
+         'End Function\n'),
+        ('Function Foo()\n'
+         '    Foo = BarModule.Bar()\n'
+         'End Function\n'
+         'Function Bar()\n'
+         '    Bar = 24\n'
+         'End Function\n',
+         'Function Bar()\n'
+         '    Bar = 42\n'
+         'End Function\n'),
     ])
 def test_two_files(code1: str, code2: str) -> None:
     table = SymbolTable()
