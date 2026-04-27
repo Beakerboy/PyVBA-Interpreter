@@ -68,16 +68,30 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.DoStatementContext) -> None:
         condition = True
+        run_while = False
         if ctx.conditionClause(0) is not None:
             if ctx.conditionClause(1) is not None:
                 raise VbaCompileException("Loop without Do")
-            cond_clau = ctx.conditionClause(1)
+            cond_clau = ctx.conditionClause(0)
             cond = self.visit(cond_clau.getChild(0).booleanExpression())
             if cond_clau.whileClause() is not None:
                 type = "while"
             else:
                 type = "until"
             condition = cond == (type == "while")
+            run_while = True
+            
+        elif ctx.conditionClause(1) is not None:
+            cond_clau = ctx.conditionClause(1)
+            run_While = True
+        else:
+            while True:
+                if ctx.statementBlock() is not None:
+                    try:
+                        self.visit(ctx.statementBlock())
+                    except ExitDoException:
+                        break
+        if run_while:
             while condition:
                 if ctx.statementBlock() is not None:
                     try:
@@ -86,16 +100,6 @@ class VbaVisitor(Visitor):
                         break
                 cond = self.visit(cond_clau.getChild(0).booleanExpression())
                 condition = cond == (type == "while")
-        elif ctx.conditionClause(2) is not None:
-            cond_clau = ctx.conditionClause(2)
-        else:
-            while True:
-                if ctx.statementBlock() is not None:
-                    try:
-                        self.visit(ctx.statementBlock())
-                    except ExitDoException:
-                        break
-
     def visitIfStatement(                                          # noqa: N802
             self: T,
             ctx: Parser.IfStatementContext) -> None:
