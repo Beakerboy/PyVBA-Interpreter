@@ -84,6 +84,9 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 1 + 1', 2),
         ('hello = Array(1)', [1]),
         ('hello = Array(1, 2)', [1, 2]),
+        ('hello = 1\n'
+         'Exit Function\n'
+         'hello = 2\n', 1),
     ])
 def test_function(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
