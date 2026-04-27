@@ -67,37 +67,27 @@ class VbaVisitor(Visitor):
     def visitDoStatement(                                          # noqa: N802
             self: T,
             ctx: Parser.DoStatementContext) -> None:
-        condition = ctx.conditionClause()
-        if ctx.conditionClause(2) is not None:
-            raise VbaCompileException("Loop without Do")
-        child2 = ctx.getChild(2)
-        assert child2 is not None
-        child2_0 = child2.getChild(0)
-        assert child2_0 is not None
-        child2_0_0 = = child2_0.getChild(0)
-        assert is not None:
-        type = child2_0_0.getText().lower()
-        if condition is None:
-            pass
-        elif type == "while" or type == "until":
-            if type == "while":
-                clause = condition.whileClause()
-                condition = self.visit(clause.booleanExpression())
+        condition = True
+        if ctx.conditionClause(1) is not None:
+            if ctx.conditionClause(2) is not None:
+                raise VbaCompileException("Loop without Do")
+            cond_clau = ctx.conditionClause(1)
+            cond = self.visit(cond_clau.getChild(0).booleanExpression())
+            if cond_clau.whileClause() is not None:
+                type = "while"
             else:
-                clause = condition.untilClause()
-                condition = not self.visit(clause.booleanExpression())
+                type = "until"
+            condition = cond == (type = "while")
             while condition:
                 if ctx.statementBlock() is not None:
                     try:
                         self.visit(ctx.statementBlock())
                     except ExitDoException:
                         break
-                    condition = (
-                        self.visit(clause.booleanExpression()) ==
-                        (type == "while")
-                    )
-            else:
-                pass
+                cond = self.visit(cond_clau.getChild(0).booleanExpression())
+                condition = cond == (type = "while")
+        elif ctx.conditionClause(2) is not None:
+            cond_clau = ctx.conditionClause(2)
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
