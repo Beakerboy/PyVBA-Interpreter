@@ -17,7 +17,7 @@ class VbaListener(Listener):
     def enterProceduralModuleHeader(                               # noqa: N802
             self: T,
             ctx: Parser.ProceduralModuleHeaderContext) -> None:
-        self.module_name = ctx.ctx.STRINGLITERAL().getText()[1:-1]
+        self.module_name = ctx.STRINGLITERAL().getText()[1:-1]
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
