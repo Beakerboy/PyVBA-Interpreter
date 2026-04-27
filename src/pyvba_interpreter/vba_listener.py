@@ -22,12 +22,12 @@ class VbaListener(Listener):
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
-        name = ctx.functionName().getText().lower()
-        if name in self.table.definitions:
+        name = ctx.functionName().getText()
+        if name.lower() in self.table.definitions:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[name] = {
+        self.table.definitions[name.lower()] = {
             "type": "function",
             "module": self.module_name,
             "handle": ctx.procedureBody(),
@@ -37,12 +37,12 @@ class VbaListener(Listener):
     def enterSubroutineDeclaration(                                # noqa: N802
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
-        name = ctx.subroutineName().getText().lower()
-        if name in self.table.definitions:
+        name = ctx.subroutineName().getText()
+        if name.lower() in self.table.definitions:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[name] = {
+        self.table.definitions[name.lower()] = {
             "type": "sub",
             "module": self.module_name,
             "handle": ctx.procedureBody(),
