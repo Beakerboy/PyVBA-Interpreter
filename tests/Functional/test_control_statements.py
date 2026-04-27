@@ -70,7 +70,7 @@ def test_factorial(code: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "code, ex", [
+    "code", [
         ('Function Fact(Num)\n'
          '    Exit For\n'
          'End Function\n'),
@@ -87,7 +87,7 @@ def test_factorial(code: str) -> None:
          '    Exit For\n'
          'End Function\n'),
     ])
-def test_exit_sub_exception(code: str, ex: Exception) -> None:
+def test_exit_sub_exception(code: str) -> None:
     interpreter = build_interp(code)
     with pytest.raises(Exception) as e:
         interpreter.execute_function("fact", [5], True)
