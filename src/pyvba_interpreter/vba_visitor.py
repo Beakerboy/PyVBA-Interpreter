@@ -83,7 +83,7 @@ class VbaVisitor(Visitor):
             
         elif ctx.conditionClause(1) is not None:
             cond_clau = ctx.conditionClause(1)
-            run_While = True
+            run_while = True
         else:
             while True:
                 if ctx.statementBlock() is not None:
