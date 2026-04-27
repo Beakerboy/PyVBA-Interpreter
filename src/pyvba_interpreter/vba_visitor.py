@@ -41,6 +41,41 @@ class VbaVisitor(Visitor):
         value = self.visit(ctx.expression())
         current_env[var_name] = value
 
+    def visitDoStatement(                                          # noqa: N802
+            self: T,
+            ctx: Parser.DoStatementContext) -> None:
+        condition = ctx.conditionClause()
+        if ctx.conditionClause(2) is not None:
+            raise VbaCompileError("Loop without Do")
+        type = ctx.getChild(3).getText().lower()
+        if condition is None:
+            # Do Loop
+        elif if type == "while" or type == "until":
+            if type = "while":
+                clause = condition.whileClause()
+                condition = self.visit(clause.booleanExpression())
+            else:
+                clause = condition.untilClause()
+                condition =  not self.visit(clause.booleanExpression())
+            while condition:
+                if ctx.statementBlock() is not None:
+                    try:
+                        self.visit(ctx.statementBlock())
+                    except ExitDoException:
+                        break
+                    condition = (
+                        self.visit(clause.booleanExpression()) ==
+                        (type == "while")
+                    )
+            else:
+                # Do While Loop
+        
+        if ctx.statementBlock() is not None:
+            try:
+                self.visit(stmt.statementBlock())
+            except ExitDoException:
+                break
+
     def visitCallStatement(                                        # noqa: N802
             self: T,
             ctx: Parser.CallStatementContext) -> None:
