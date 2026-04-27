@@ -94,4 +94,4 @@ def test_exit_sub_exception(code: str) -> None:
     interpreter = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
         interpreter.execute_function("fact", [5], True)
-    assert str(e) == "Compile error:\nExit For not within For...Next"
+    assert str(e.value) == "Compile error:\nExit For not within For...Next"
