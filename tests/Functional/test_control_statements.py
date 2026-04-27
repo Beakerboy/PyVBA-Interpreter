@@ -115,7 +115,7 @@ def test_exit_sub_exception(code: str) -> None:
          '    Do While I <= Num\n'
          '        Fact = Fact * I\n'
          '        I = I + 1\n'
-         '    Loop Until I = Num\n',
+         '    Loop Until I = Num\n'
          'End Function\n'),
     ])
 def test_do_exception(code: str) -> None:
