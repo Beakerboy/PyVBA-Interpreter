@@ -28,7 +28,7 @@ class VbaListener(Listener):
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name.lower()] = {
-            "type": "function",
+            "type": FunctionType.FUNCTION,
             "module": self.module_name,
             "handle": ctx.procedureBody(),
             "params": params
@@ -43,7 +43,7 @@ class VbaListener(Listener):
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[name.lower()] = {
-            "type": "sub",
+            "type": FunctionType.SUB,
             "module": self.module_name,
             "handle": ctx.procedureBody(),
             "params": params
