@@ -48,4 +48,4 @@ def test_exception() -> None:
     walker = ParseTreeWalker()
     with pytest.raises(VbaCompileException) as e:
         walker.walk(listener, tree)
-    assert str(e.value) == ""
+    assert str(e.value) == "Ambiguous name detected: Hello"
