@@ -7,7 +7,8 @@ class FunctionType(Enum):
     FUNCTION = 0
     SUB = 1
     PROPERTY = 2
-    
+
+
 class ParamDefinition(TypedDict):
     name: str
     optional: bool
