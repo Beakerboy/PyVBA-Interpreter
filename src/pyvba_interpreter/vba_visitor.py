@@ -120,7 +120,7 @@ class VbaVisitor(Visitor):
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
-                except ExitForException as e:
+                except ExitForException:
                     break
 
     def visitArgumentList(                                         # noqa: N802
