@@ -77,7 +77,7 @@ class VbaVisitor(Visitor):
                 type = "while"
             else:
                 type = "until"
-            condition = cond == (type = "while")
+            condition = cond == (type == "while")
             while condition:
                 if ctx.statementBlock() is not None:
                     try:
@@ -85,7 +85,7 @@ class VbaVisitor(Visitor):
                     except ExitDoException:
                         break
                 cond = self.visit(cond_clau.getChild(0).booleanExpression())
-                condition = cond == (type = "while")
+                condition = cond == (type == "while")
         elif ctx.conditionClause(2) is not None:
             cond_clau = ctx.conditionClause(2)
 
