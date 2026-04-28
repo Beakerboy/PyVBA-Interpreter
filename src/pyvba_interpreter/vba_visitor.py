@@ -358,17 +358,17 @@ class VbaVisitor(Visitor):
         current_env = {
             command: None
         }
-        i = 0
-        for param in defn["params"]:
-            if not param["optional"]:
-                current_env[param["name"]] = args[i]
-            else:
-                if len(args) > i:
-                    current_env[param["name"]] = args[i]
-            i += 1
-        self.env_stack.append(current_env)
         ctx = defn["handle"]
         if isinstance(ctx, ParserRuleContext):
+            i = 0
+            for param in defn["params"]:
+                if not param["optional"]:
+                    current_env[param["name"]] = args[i]
+                else:
+                    if len(args) > i:
+                        current_env[param["name"]] = args[i]
+                i += 1
+            self.env_stack.append(current_env)
             if defn["type"] == FunctionType.FUNCTION:
                 current_env[command] = None
             try:
