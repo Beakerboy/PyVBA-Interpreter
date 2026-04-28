@@ -67,11 +67,11 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    interpreter.table.library_definitions["vba"] = {"msgbox": {
+    interpreter.table.library_definitions["vba"] = {"interaction": {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox"),
         "module": "vba"
-    }}
+    }}}
     interpreter.execute_function("hello", [])
     mock_print.assert_called_with(expected)
 
@@ -155,11 +155,11 @@ def test_override(mock_print: str) -> None:
             'Function MsgBox(temp)\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {"msgbox": {
+    visitor.table.library_definitions["vba"] = {"interaction": {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox"),
         "module": "vba"
-    }}
+    }}}
     visitor.execute_function("hello", [])
     mock_print.assert_not_called()
 
