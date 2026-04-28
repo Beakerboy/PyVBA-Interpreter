@@ -417,7 +417,7 @@ class VbaVisitor(Visitor):
         for key, mod in self.table.definitions.items():
             if command in mod:
                 return mod[command]
-        for key, mod in self.table.library_definitions.items():
-            if command in mod:
-                return mod[command]
+        for key, lib_mod in self.table.library_definitions.items():
+            if command in lib_mod:
+                return lib_mod[command]
         raise VbaCompileException("Sub or Function not defined")
