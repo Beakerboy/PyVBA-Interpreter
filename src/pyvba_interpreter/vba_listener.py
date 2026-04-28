@@ -20,7 +20,9 @@ class VbaListener(Listener):
             ctx: Parser.ProceduralModuleHeaderContext) -> None:
         self.module_name = ctx.STRINGLITERAL().getText()[1:-1]
         if self.module_name.lower() == "vba":
-            raise VbaException("Name conflicts with existing module, project, or object library")
+            raise VbaException(
+                "Name conflicts with existing module, project, or object "
+                "library")
         self.table.definitions[self.module_name.lower()] = {}
 
     def enterFunctionDeclaration(                                  # noqa: N802
