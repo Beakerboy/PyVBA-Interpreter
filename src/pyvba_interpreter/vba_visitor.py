@@ -330,9 +330,7 @@ class VbaVisitor(Visitor):
             command = l_express.getText().lower()
         args: list[Any] = []
         if ctx.argumentList() is not None:
-            arg_ctx = ctx.argumentList()
-            assert arg_ctx is not None
-            args = self.visit(arg_ctx)
+            args = self.visit(ctx.argumentList())
         return self.execute_function(command, args, module, no_sub)
 
     def execute_function(self: T, command: str,
