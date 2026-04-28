@@ -361,7 +361,6 @@ class VbaVisitor(Visitor):
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
             i = 0
-            assert "params" in defn
             for param in defn["params"]:
                 if not param["optional"]:
                     current_env[param["name"]] = args[i]
