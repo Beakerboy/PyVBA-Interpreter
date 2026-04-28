@@ -83,4 +83,4 @@ def test_member_not_found(code1: str, code2: str) -> None:
     visitor = VbaVisitor(table)
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("foo", [])
-    assert str(e.value) == "Compile Error:\nMethod or data member not found"
+    assert str(e.value) == "Compile error:\nMethod or data member not found"
