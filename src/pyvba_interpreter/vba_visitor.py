@@ -322,10 +322,10 @@ class VbaVisitor(Visitor):
         module = ""
         l_express = ctx.lExpression()
         if (
-                hasattr(type(l_express), "memberAccessExpress") and
-                l_express.memberAccessExpress() is not None
+                hasattr(type(ctx), "memberAccessExpress") and
+                ctx.memberAccessExpress() is not None
         ):
-            express = l_express.memberAccessExpress()
+            express = ctx.memberAccessExpress()
             command = express.unrestrictedName().getText().lower()
             module = express.lExpression().getText().lower()
         else:
