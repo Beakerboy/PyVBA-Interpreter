@@ -84,3 +84,20 @@ def test_member_not_found(code1: str, code2: str) -> None:
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("foo", [])
     assert str(e.value) == "Compile error:\nMethod or data member not found"
+
+
+@pytest.mark.parametrize(
+    "code1, code2", [
+        ('Function Foo()\n'
+         '    Foo = Bar()\n'
+         'End Function\n',
+         ''),
+    ])
+def test_member_not_found(code1: str, code2: str) -> None:
+    table = SymbolTable()
+    build_interp("FooModule", code1, table)
+    build_interp("Bar", code2, table)
+    visitor = VbaVisitor(table)
+    with pytest.raises(VbaCompileException) as e:
+        visitor.execute_function("foo", [])
+    assert str(e.value) == "Compile error:\nExpected variable or procedure, not module"
