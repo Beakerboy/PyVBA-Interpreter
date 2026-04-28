@@ -107,8 +107,8 @@ def test_function_arguments(
     code = ('Function hello(' + arg_list + ')\n'
             '    ' + input + '\n'
             'End Function\n')
-    interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", args)
+    visitor = build_interp(code)
+    result = visitor.execute_function("hello", args)
     assert result == expected
 
 
@@ -116,10 +116,9 @@ def test_function_not_defined() -> None:
     code = ('Function Foo()\n'
             '    Bar\n'
             'End Function\n')
-    interpreter = build_interp(code)
-    ctx = interpreter.table.definitions["hello"]["handle"]
+    visitor = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
-        interpreter.visit(ctx)
+        visitor.execute_function("foo", [])
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
 
@@ -142,10 +141,9 @@ def test_use_sub_as_function(code: str) -> None:
             'End Function\n'
             'Sub Bar()\n'
             'End Sub\n')
-    interpreter = build_interp(code)
-    ctx = interpreter.table.definitions["hello"]["handle"]
+    visitor = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
-        interpreter.visit(ctx)
+        visitor.execute_function("foo", [])
     assert str(e.value) == "Compile error:\nExpected Function or variable"
 
 
