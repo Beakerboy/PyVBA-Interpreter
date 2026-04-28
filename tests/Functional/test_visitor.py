@@ -71,7 +71,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }}
-    interpreter.execute_function("hello", [], True)
+    interpreter.execute_function("hello", [])
     mock_print.assert_called_with(expected)
 
 
@@ -93,7 +93,7 @@ def test_function(input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", [], True)
+    result = interpreter.execute_function("hello", [])
     assert result == expected
 
 
@@ -107,7 +107,7 @@ def test_function_arguments(
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", args, True)
+    result = interpreter.execute_function("hello", args)
     assert result == expected
 
 
@@ -160,7 +160,7 @@ def test_override(mock_print: str) -> None:
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }
-    interpreter.execute_function("hello", [], True)
+    interpreter.execute_function("hello", [])
     mock_print.assert_not_called()
 
 
@@ -174,7 +174,7 @@ def test_missing_argument() -> None:
         "handle": getattr(Interaction, "MsgBox")
     }
     with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("hello", [], True)
+        interpreter.execute_function("hello", [])
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
@@ -188,5 +188,5 @@ def test_two_functions() -> None:
             'End Function\n')
     file_path = 'tests/files/test.bas'
     visitor = build_interp(code)
-    result = visitor.execute_function("hello", [], True)
+    result = visitor.execute_function("hello", [])
     assert result == 2
