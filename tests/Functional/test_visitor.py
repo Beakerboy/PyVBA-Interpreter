@@ -122,7 +122,20 @@ def test_function_not_defined() -> None:
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
 
-def test_function_not_defined() -> None:
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Foo()\n'
+         '    Foo = Bar()\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+         '    Foo = Bar\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+    ])
+def test_use_sub_as_function(code) -> None:
     code = ('Function Foo()\n'
             '    Foo = Bar()\n'
             'End Function\n'
@@ -228,33 +241,3 @@ def test_two_functions() -> None:
     interpreter = VbaVisitor(table)
     result = interpreter.execute_function("hello", [], True)
     assert result == 2
-
-
-def futuretest_use_sub_as_function() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    Foo = Hello1\n')
-        file.write('End Function\n')
-        file.write('Sub Hello1()\n')
-        file.write('End Sub\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    assert len(table.definitions) == 2
-    interpreter = VbaVisitor(table)
-    with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("hello", [], True)
-    assert str(e.value) == "Unexpected Function or variable"
