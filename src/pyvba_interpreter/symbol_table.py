@@ -23,10 +23,7 @@ class FunctionDefinition(TypedDict):
 
 
 class LibraryDefinition(FunctionDefinition):
-    type: FunctionType
-    module: str
     handle: Callable
-    params: list[ParamDefinition]
 
 
 T = TypeVar('T', bound='SymbolTable')
