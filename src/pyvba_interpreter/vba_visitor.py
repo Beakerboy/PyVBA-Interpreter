@@ -367,7 +367,7 @@ class VbaVisitor(Visitor):
         self.env_stack.append(current_env)
         ctx = defn["handle"]
         if isinstance(ctx, ParserRuleContext):
-            if defn["type"] == FuntionType.FUNCTION:
+            if defn["type"] == FunctionType.FUNCTION:
                 current_env[command] = None
             try:
                 self.visitChildren(ctx)
