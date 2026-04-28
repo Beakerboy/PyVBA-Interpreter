@@ -172,7 +172,7 @@ def test_missing_argument() -> None:
     table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
-    }
+    }}
     with pytest.raises(VbaCompileException) as e:
         interpreter.execute_function("hello", [])
     assert str(e.value) == "Compile error:\nArgument not optional"
