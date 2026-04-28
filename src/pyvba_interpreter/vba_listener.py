@@ -2,7 +2,9 @@ from typing import TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import ParamDefinition, SymbolTable
+from .symbol_table import FunctionType, ParamDefinition, SymbolTable
+from .Exceptions.vba_compile_exception import VbaCompileException
+from .Exceptions.vba_exception import VbaException
 
 
 T = TypeVar('T', bound='VbaListener')
@@ -11,15 +13,29 @@ T = TypeVar('T', bound='VbaListener')
 class VbaListener(Listener):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
+        self.module_name = ""
+
+    def enterProceduralModuleHeader(                               # noqa: N802
+            self: T,
+            ctx: Parser.ProceduralModuleHeaderContext) -> None:
+        self.module_name = ctx.STRINGLITERAL().getText()[1:-1]
+        if self.module_name.lower() == "vba":
+            raise VbaException(
+                "Name conflicts with existing module, project, or object "
+                "library")
+        self.table.definitions[self.module_name.lower()] = {}
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
-        name = ctx.functionName().getText().lower()
+        name = ctx.functionName().getText()
+        if name.lower() in self.table.definitions[self.module_name.lower()]:
+            raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[name] = {
-            "type": "function",
+        self.table.definitions[self.module_name.lower()][name.lower()] = {
+            "type": FunctionType.FUNCTION,
+            "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
             "params": params
         }
@@ -27,11 +43,14 @@ class VbaListener(Listener):
     def enterSubroutineDeclaration(                                # noqa: N802
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
-        name = ctx.subroutineName().getText().lower()
+        name = ctx.subroutineName().getText()
+        if name.lower() in self.table.definitions[self.module_name.lower()]:
+            raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[name] = {
-            "type": "sub",
+        self.table.definitions[self.module_name.lower()][name.lower()] = {
+            "type": FunctionType.SUB,
+            "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
             "params": params
         }

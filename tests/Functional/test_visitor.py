@@ -4,7 +4,7 @@ from vba_stdlib.interaction import Interaction
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
-from pyvba_interpreter.symbol_table import SymbolTable
+from pyvba_interpreter.symbol_table import FunctionType, SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
@@ -67,11 +67,12 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    interpreter.table.library_definitions["msgbox"] = {
-        "type": "builtin",
-        "handle": getattr(Interaction, "MsgBox")
-    }
-    interpreter.execute_function("hello", [], True)
+    interpreter.table.library_definitions["vba"] = {"msgbox": {
+        "type": FunctionType.FUNCTION,
+        "handle": getattr(Interaction, "MsgBox"),
+        "module": "vba"
+    }}
+    interpreter.execute_function("hello", [])
     mock_print.assert_called_with(expected)
 
 
@@ -93,7 +94,7 @@ def test_function(input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", [], True)
+    result = interpreter.execute_function("hello", [])
     assert result == expected
 
 
@@ -106,141 +107,86 @@ def test_function_arguments(
     code = ('Function hello(' + arg_list + ')\n'
             '    ' + input + '\n'
             'End Function\n')
-    interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", args, True)
+    visitor = build_interp(code)
+    result = visitor.execute_function("hello", args)
     assert result == expected
 
 
 def test_function_not_defined() -> None:
-    code = ('Function hello()\n'
-            '    Hello1\n'
+    code = ('Function Foo()\n'
+            '    Bar\n'
             'End Function\n')
-    interpreter = build_interp(code)
-    ctx = interpreter.table.definitions["hello"]["handle"]
-    with pytest.raises(VbaCompileException):
-        interpreter.visit(ctx)
+    visitor = build_interp(code)
+    with pytest.raises(VbaCompileException) as e:
+        visitor.execute_function("foo", [])
+    assert str(e.value) == "Compile error:\nSub or Function not defined"
+
+
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Foo()\n'
+         '    Foo = Bar()\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+         '    Foo = Bar\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+    ])
+def test_use_sub_as_function(code: str) -> None:
+    code = ('Function Foo()\n'
+            '    Foo = Bar()\n'
+            'End Function\n'
+            'Sub Bar()\n'
+            'End Sub\n')
+    visitor = build_interp(code)
+    with pytest.raises(VbaCompileException) as e:
+        visitor.execute_function("foo", [])
+    assert str(e.value) == "Compile error:\nExpected Function or variable"
 
 
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    MsgBox "HelloWorld"\n')
-        file.write('End Function\n')
-        file.write('Function MsgBox(temp)\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    assert len(table.definitions) == 2
-    interpreter = VbaVisitor(table)
-    table.library_definitions["msgbox"] = {
-        "type": "builtin",
-        "handle": getattr(Interaction, "MsgBox")
-    }
-    interpreter.execute_function("hello", [], True)
+    code = ('Function hello()\n'
+            '     MsgBox "HelloWorld"\n'
+            'End Function\n'
+            'Function MsgBox(temp)\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    visitor.table.library_definitions["vba"] = {"msgbox": {
+        "type": FunctionType.FUNCTION,
+        "handle": getattr(Interaction, "MsgBox"),
+        "module": "vba"
+    }}
+    visitor.execute_function("hello", [])
     mock_print.assert_not_called()
 
 
 def test_missing_argument() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    MsgBox\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
-    table.library_definitions["msgbox"] = {
-        "type": "builtin",
-        "handle": getattr(Interaction, "MsgBox")
-    }
+    code = ('Function hello()\n'
+            '    MsgBox\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    visitor.table.library_definitions["vba"] = {"msgbox": {
+        "type": FunctionType.FUNCTION,
+        "handle": getattr(Interaction, "MsgBox"),
+        "module": "vba"
+    }}
     with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("hello", [], True)
+        visitor.execute_function("hello", [])
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
 def test_two_functions() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    hello = Hello1()\n')
-        file.write('End Function\n')
-        file.write('Function Hello1()\n')
-        file.write('    Hello = 1\n')
-        file.write('    Hello1 = Hello + 1()\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
-    result = interpreter.execute_function("hello", [], True)
+    code = ('Function hello()\n'
+            '    hello = Hello1()\n'
+            'End Function\n'
+            'Function Hello1()\n'
+            '    Hello = 1\n'
+            '    Hello1 = Hello + 1()\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    result = visitor.execute_function("hello", [])
     assert result == 2
-
-
-def futuretest_use_sub_as_function() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    Foo = Hello1\n')
-        file.write('End Function\n')
-        file.write('Sub Hello1()\n')
-        file.write('End Sub\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    assert len(table.definitions) == 2
-    interpreter = VbaVisitor(table)
-    with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("hello", [], True)
-    assert str(e.value) == "Unexpected Function or variable"

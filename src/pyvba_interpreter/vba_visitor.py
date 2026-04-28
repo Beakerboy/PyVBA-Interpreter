@@ -2,13 +2,16 @@ from typing import Any, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import SymbolTable
+from .symbol_table import (
+    FunctionDefinition, FunctionType, LibraryDefinition, SymbolTable
+)
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
 from .Exceptions.exit_for_exception import ExitForException
 from .Exceptions.exit_function_exception import ExitFunctionException
 from .Exceptions.exit_property_exception import ExitPropertyException
 from .Exceptions.exit_sub_exception import ExitSubException
+from .Exceptions.vba_exception import VbaException
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -19,10 +22,7 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.env_stack: list[dict[str, Any]] = []
-        self.raise_do_except = True
-        self.raise_for_except = True
-        self.raise_function_except = True
-        self.raise_sub_except = True
+        self.module = ""
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -52,7 +52,7 @@ class VbaVisitor(Visitor):
             # If no arguments, then it's just a simple name expression
             if ctx.simpleNameExpression() is not None:
                 command = ctx.simpleNameExpression().getText().lower()
-                self.execute_function(command, [], False)
+                self.execute_function(command, [], "", False)
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
             else:
@@ -62,7 +62,7 @@ class VbaVisitor(Visitor):
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
-            self.execute_function(command, args, False)
+            self.execute_function(command, args, "", False)
 
     def visitDoStatement(                                          # noqa: N802
             self: T,
@@ -319,77 +319,116 @@ class VbaVisitor(Visitor):
                 Parser.IndexExpressionContext
             ),
             no_sub: bool = False) -> Any:
-        command_child = ctx.getChild(0)
-        assert command_child is not None
-        command = command_child.getText().lower()
-        args = []
+        module = ""
+        l_express = ctx.lExpression()
+        if (
+                hasattr(type(l_express), "unrestrictedName")
+        ):
+            command = l_express.unrestrictedName().getText().lower()
+            module = l_express.lExpression().getText().lower()
+        else:
+            command = l_express.getText().lower()
+        args: list[Any] = []
         if ctx.argumentList() is not None:
-            args = self.visit(ctx.argumentList())
-        return self.execute_function(command, args, no_sub)
+            args = self.visitArgumentList(ctx.argumentList())
+        return self.execute_function(command, args, module, no_sub)
 
     def execute_function(self: T, command: str,
-                         args: list, no_sub: bool) -> Any:
+                         args: list[Any], module: str = "",
+                         no_sub: bool = True) -> Any:
         command = command.lower()
         if command == "array":
             return args
-        if (
-            command not in self.table.definitions and
-            command not in self.table.library_definitions
-        ):
-            raise VbaCompileException("Sub or Function not defined")
-        if command not in self.table.definitions:
-            lib_def = self.table.library_definitions[command]
-            if no_sub and lib_def["type"] == "sub":
-                raise VbaCompileException("Unexpected Function or variable")
+        mod_defn: dict[str, FunctionDefinition] | dict[str, LibraryDefinition]
+        if module != "":
+            if module in self.table.definitions:
+                mod_defn = self.table.definitions[module]
+            elif module in self.table.definitions:
+                mod_defn = self.table.library_definitions[module]
+            else:
+                raise VbaException()
+            if command in mod_defn:
+                defn = mod_defn[command]
+            else:
+                raise VbaCompileException("Method or data member not found")
+            previous_module = self.module
+            self.module = module
+        else:
+            defn = self._find_function_in_definition(command, self.module)
+            module = defn["module"]
+            previous_module = self.module
+            self.module = module
+
+        if no_sub and defn["type"] == FunctionType.SUB:
+            raise VbaCompileException("Expected Function or variable")
+        ctx = defn["handle"]
+        if isinstance(ctx, Parser.ProcedureBodyContext):
+            current_env = {}
+            i = 0
+            for param in defn["params"]:
+                if not param["optional"]:
+                    current_env[param["name"]] = args[i]
+                else:
+                    if len(args) > i:
+                        current_env[param["name"]] = args[i]
+                i += 1
+            self.env_stack.append(current_env)
+            if defn["type"] == FunctionType.FUNCTION:
+                current_env[command] = None
             try:
-                output = lib_def["handle"](*args)
+                self.visitChildren(ctx)
+            except ExitDoException as e:
+                raise VbaCompileException(e.msg)
+            except ExitForException as e:
+                raise VbaCompileException(e.msg)
+            except ExitFunctionException as e:
+                if (
+                        defn["type"] == FunctionType.SUB or
+                        defn["type"] == FunctionType.PROPERTY
+                ):
+                    raise VbaCompileException(e.msg)
+            except ExitPropertyException as e:
+                if (
+                        defn["type"] == FunctionType.FUNCTION or
+                        defn["type"] == FunctionType.SUB
+                ):
+                    raise VbaCompileException(e.msg)
+            except ExitSubException as e:
+                if (
+                        defn["type"] == FunctionType.FUNCTION or
+                        defn["type"] == FunctionType.PROPERTY
+                ):
+                    raise VbaCompileException(e.msg)
+            output = current_env[command]
+            self.env_stack.pop()
+            self.module = previous_module
+        elif ctx is not None:
+            try:
+                output = ctx(*args)
             except Exception as e:
                 if str(e) != "":
                     raise VbaCompileException("Argument not optional")
-            return output
         else:
-            mod_def = self.table.definitions[command]
-            if no_sub and mod_def["type"] == "sub":
-                raise VbaCompileException("Unexpected Function or variable")
-            current_env = {
-                command: None
-            }
-            i = 0
-            for param in mod_def["params"]:
-                if not param["optional"]:
-                    current_env[param["name"]] = args[i]
-                    i += 1
-            self.env_stack.append(current_env)
-            ctx = mod_def["handle"]
-            if ctx is not None:
-                if mod_def["type"] == "sub":
-                    self.raise_sub_except = False
-                else:
-                    self.raise_function_except = False
-                try:
-                    self.visitChildren(ctx)
-                except ExitDoException as e:
-                    raise VbaCompileException(e.msg)
-                except ExitForException as e:
-                    raise VbaCompileException(e.msg)
-                except ExitFunctionException as e:
-                    if (
-                            mod_def["type"] == "sub" or
-                            mod_def["type"] == "property"
-                    ):
-                        raise VbaCompileException(e.msg)
-                except ExitPropertyException as e:
-                    if (
-                            mod_def["type"] == "function" or
-                            mod_def["type"] == "sub"
-                    ):
-                        raise VbaCompileException(e.msg)
-                except ExitSubException as e:
-                    if (
-                            mod_def["type"] == "function" or
-                            mod_def["type"] == "property"
-                    ):
-                        raise VbaCompileException(e.msg)
-            output = current_env[command]
-            self.env_stack.pop()
+            output = None
+        if defn["type"] == FunctionType.FUNCTION:
             return output
+
+    def _find_function_in_definition(
+            self: T, command: str, cur_module: str
+    ) -> FunctionDefinition | LibraryDefinition:
+        if cur_module != "" and command in self.table.definitions[cur_module]:
+            return self.table.definitions[cur_module][command]
+        for key, mod in self.table.definitions.items():
+            if command in mod:
+                return mod[command]
+        for key, lib_mod in self.table.library_definitions.items():
+            if command in lib_mod:
+                return lib_mod[command]
+        if command in self.table.definitions:
+            msg = "Expected variable or procedure, not module"
+            raise VbaCompileException(msg)
+            # Need one more level, project, module, function.
+            msg = "Expected variable or procedure, not project"
+            raise VbaCompileException(msg)
+
+        raise VbaCompileException("Sub or Function not defined")
