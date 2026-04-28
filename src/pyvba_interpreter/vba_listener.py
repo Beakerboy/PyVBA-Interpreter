@@ -29,7 +29,7 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText()
-        if name.lower() in self.table.definitions:
+        if name.lower() in self.table.definitions[self.module_name.lower()]:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
@@ -44,7 +44,7 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText()
-        if name.lower() in self.table.definitions:
+        if name.lower() in self.table.definitions[self.module_name.lower()]:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
