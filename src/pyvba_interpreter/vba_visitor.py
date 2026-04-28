@@ -402,7 +402,8 @@ class VbaVisitor(Visitor):
             except Exception as e:
                 if str(e) != "":
                     raise VbaCompileException("Argument not optional")
-
+        else:
+            output = None
         if defn["type"] == FunctionType.FUNCTION:
             return output
 
