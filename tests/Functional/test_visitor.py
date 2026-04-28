@@ -150,10 +150,10 @@ def test_use_sub_as_function(code) -> None:
 
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
-    code = ('Function hello()\n')
-            '     "HelloWorld"\n')
-            'End Function\n')
-            'Function MsgBox(temp)\n')
+    code = ('Function hello()\n'
+            '     "HelloWorld"\n'
+            'End Function\n'
+            'Function MsgBox(temp)\n'
             'End Function\n')
     visitor = build_interp(code)
     table.library_definitions["vba"] = {"msgbox": {
