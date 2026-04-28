@@ -2,7 +2,7 @@ from typing import Any, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import SymbolTable
+from .symbol_table import FunctionType, SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
 from .Exceptions.exit_for_exception import ExitForException
@@ -339,7 +339,7 @@ class VbaVisitor(Visitor):
             raise VbaCompileException("Sub or Function not defined")
         if command not in self.table.definitions:
             lib_def = self.table.library_definitions[command]
-            if no_sub and lib_def["type"] == "sub":
+            if no_sub and lib_def["type"] == FunctionType.SUB:
                 raise VbaCompileException("Unexpected Function or variable")
             try:
                 output = lib_def["handle"](*args)
@@ -349,7 +349,7 @@ class VbaVisitor(Visitor):
             return output
         else:
             mod_def = self.table.definitions[command]
-            if no_sub and mod_def["type"] == "sub":
+            if no_sub and mod_def["type"] == FunctionType.SUB:
                 raise VbaCompileException("Unexpected Function or variable")
             current_env = {
                 command: None
@@ -362,7 +362,7 @@ class VbaVisitor(Visitor):
             self.env_stack.append(current_env)
             ctx = mod_def["handle"]
             if ctx is not None:
-                if mod_def["type"] == "sub":
+                if mod_def["type"] == FunctionType.SUB:
                     self.raise_sub_except = False
                 else:
                     self.raise_function_except = False
@@ -374,20 +374,20 @@ class VbaVisitor(Visitor):
                     raise VbaCompileException(e.msg)
                 except ExitFunctionException as e:
                     if (
-                            mod_def["type"] == "sub" or
-                            mod_def["type"] == "property"
+                            mod_def["type"] == FunctionType.SUB or
+                            mod_def["type"] == FunctionType.PROPERTY
                     ):
                         raise VbaCompileException(e.msg)
                 except ExitPropertyException as e:
                     if (
-                            mod_def["type"] == "function" or
-                            mod_def["type"] == "sub"
+                            mod_def["type"] == FunctionType.FUNCTION or
+                            mod_def["type"] == FunctionType.SUB
                     ):
                         raise VbaCompileException(e.msg)
                 except ExitSubException as e:
                     if (
-                            mod_def["type"] == "function" or
-                            mod_def["type"] == "property"
+                            mod_def["type"] == FunctionType.FUNCTION or
+                            mod_def["type"] == FunctionType.PROPERTY
                     ):
                         raise VbaCompileException(e.msg)
             output = current_env[command]
