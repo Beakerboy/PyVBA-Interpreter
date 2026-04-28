@@ -319,13 +319,19 @@ class VbaVisitor(Visitor):
                 Parser.IndexExpressionContext
             ),
             no_sub: bool = False) -> Any:
-        command_child = ctx.getChild(0)
-        assert command_child is not None
-        command = command_child.getText().lower()
+        module = ""
+        if ctx.memberAccessExpress() is not None:
+            express = ctx.memberAccessExpress()
+            command = express.unrestrictedName().getText().lower()
+            module = express.lExpression().getText().lower()
+        else:
+            command_child = ctx.getChild(0)
+            assert command_child is not None
+            command = command_child.getText().lower()
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
-        return self.execute_function(command, args, "", no_sub)
+        return self.execute_function(command, args, module, no_sub)
 
     def execute_function(self: T, command: str,
                          args: list, module: str = "",
