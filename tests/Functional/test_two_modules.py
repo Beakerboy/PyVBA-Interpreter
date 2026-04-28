@@ -6,6 +6,9 @@ from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.symbol_table import SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
+from pyvba_interpreter.Exceptions.vba_compile_exception import (
+    VbaCompileException
+)
 
 
 def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
