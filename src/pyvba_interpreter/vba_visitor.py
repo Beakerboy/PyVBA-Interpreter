@@ -354,7 +354,7 @@ class VbaVisitor(Visitor):
             self.module = module
 
         if no_sub and defn["type"] == FunctionType.SUB:
-            raise VbaCompileException("Unexpected Function or variable")
+            raise VbaCompileException("Expected Function or variable")
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
             current_env = {}
