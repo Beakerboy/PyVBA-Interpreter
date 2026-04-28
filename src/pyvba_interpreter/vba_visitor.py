@@ -404,7 +404,6 @@ class VbaVisitor(Visitor):
                     raise VbaCompileException("Argument not optional")
 
         if defn["type"] == FunctionType.FUNCTION:
-            output = current_env[command]
             return output
 
     def _find_function_in_definition(
