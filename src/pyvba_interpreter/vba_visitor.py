@@ -406,9 +406,9 @@ class VbaVisitor(Visitor):
             output = current_env[command]
             return output
 
-    def _find_function_in_definition(self: T, command: str,
-                                     cur_module: str
-                                    ) -> FunctionDefinition | LibraryDefinition:
+    def _find_function_in_definition(
+            self: T, command: str, cur_module: str
+    ) -> FunctionDefinition | LibraryDefinition:
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module][command]
         for key, mod in self.table.definitions.items():
