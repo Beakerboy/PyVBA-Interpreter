@@ -407,7 +407,7 @@ class VbaVisitor(Visitor):
             output = current_env[command]
             return output
 
-    def _find_function_in_definition(command: str, cur_module: str) -> str:
+    def _find_function_in_definition(self: T, command: str, cur_module: str) -> str:
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module][command]
         for mod in self.table.definitions:
@@ -417,6 +417,3 @@ class VbaVisitor(Visitor):
             if command in mod:
                 return mod[command]
         raise VbaCompileException("Sub or Function not defined")
-            
-        
-        
