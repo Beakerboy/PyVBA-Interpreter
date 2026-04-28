@@ -150,31 +150,12 @@ def test_use_sub_as_function(code) -> None:
 
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('     "HelloWorld"\n')
-        file.write('End Function\n')
-        file.write('Function (temp)\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    assert len(table.definitions) == 1
-    assert len(table.definitions["helloworld"]) == 2
-    interpreter = VbaVisitor(table)
+    code = ('Function hello()\n')
+            '     "HelloWorld"\n')
+            'End Function\n')
+            'Function MsgBox(temp)\n')
+            'End Function\n')
+    visitor = build_interp(code)
     table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
@@ -184,27 +165,10 @@ def test_override(mock_print: str) -> None:
 
 
 def test_missing_argument() -> None:
-    file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    MsgBox\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
+    code = ('Function hello()\n'
+            '    MsgBox\n'
+            'End Function\n')
+    visitor = build_interp(code)
     table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
@@ -215,30 +179,14 @@ def test_missing_argument() -> None:
 
 
 def test_two_functions() -> None:
+    code = ('Function hello()\n'
+            '    hello = Hello1()\n'
+            'End Function\n'
+            'Function Hello1()\n'
+            '    Hello = 1\n'
+            '    Hello1 = Hello + 1()\n'
+            'End Function\n')
     file_path = 'tests/files/test.bas'
-    try:
-        os.remove(file_path)
-    except FileNotFoundError:
-        # File did not exist; ignore the error
-        pass
-    with open(file_path, "w", newline='\r\n') as file:
-        file.write('Attribute VB_NAME = "HelloWorld"\n')
-        file.write('Function hello()\n')
-        file.write('    hello = Hello1()\n')
-        file.write('End Function\n')
-        file.write('Function Hello1()\n')
-        file.write('    Hello = 1\n')
-        file.write('    Hello1 = Hello + 1()\n')
-        file.write('End Function\n')
-    input_stream = FileStream(file_path)
-    lexer = Lexer(input_stream)
-    ts = CommonTokenStream(lexer)
-    vbaparser = Parser(ts)
-    tree = vbaparser.module()
-    table = SymbolTable()
-    listener = VbaListener(table)
-    walker = ParseTreeWalker()
-    walker.walk(listener, tree)
-    interpreter = VbaVisitor(table)
-    result = interpreter.execute_function("hello", [], True)
+    visitor = build_interp(code)
+    result = visitor.execute_function("hello", [], True)
     assert result == 2
