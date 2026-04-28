@@ -329,9 +329,7 @@ class VbaVisitor(Visitor):
             command = express.unrestrictedName().getText().lower()
             module = express.lExpression().getText().lower()
         else:
-            command_child = ctx.getChild(0)
-            assert command_child is not None
-            command = command_child.getText().lower()
+            command = l_express.getText().lower()
         args: list[Any] = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
