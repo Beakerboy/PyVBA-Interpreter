@@ -335,7 +335,7 @@ class VbaVisitor(Visitor):
                     module = defn.module
                     break
         if module == "":
-            for def in self.table.library_definitions:
+            for defn in self.table.library_definitions:
                 if command in defn:
                     module = defn.module
                     break
