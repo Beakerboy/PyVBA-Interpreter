@@ -336,7 +336,6 @@ class VbaVisitor(Visitor):
                 mod_defn = self.table.definitions[module]
             elif module in self.table.definitions:
                 mod_defn = self.table.library_definitions[module]
-                mod_defn = self.table.library_definitions[module]
             else:
                 raise VbaException()
             if command in mod_defn:
