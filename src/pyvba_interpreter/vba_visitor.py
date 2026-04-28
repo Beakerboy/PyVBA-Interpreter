@@ -325,7 +325,8 @@ class VbaVisitor(Visitor):
         return self.execute_function(command, args, no_sub)
 
     def execute_function(self: T, command: str,
-                         args: list, module: str = "", no_sub: bool = True) -> Any:
+                         args: list, module: str = "",
+                         no_sub: bool = True) -> Any:
         command = command.lower()
         if command == "array":
             return args
@@ -341,7 +342,7 @@ class VbaVisitor(Visitor):
                     break
         if module == "":
             raise VbaCompileException("Sub or Function not defined")
-        
+
         previous_module = self.module
         self.module = module
         if command not in self.table.definitions:
@@ -399,4 +400,5 @@ class VbaVisitor(Visitor):
                         raise VbaCompileException(e.msg)
             output = current_env[command]
             self.env_stack.pop()
+            self.module = previous_module
             return output
