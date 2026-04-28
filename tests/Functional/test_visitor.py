@@ -159,7 +159,7 @@ def test_override(mock_print: str) -> None:
     table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
-    }
+    }}
     interpreter.execute_function("hello", [])
     mock_print.assert_not_called()
 
