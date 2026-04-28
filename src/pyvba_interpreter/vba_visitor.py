@@ -330,14 +330,14 @@ class VbaVisitor(Visitor):
         if command == "array":
             return args
         if module == "":
-            for def in self.table.definitions:
-                if command in def:
-                    module = def.module
+            for defn in self.table.definitions:
+                if command in defn:
+                    module = defn.module
                     break
         if module == "":
             for def in self.table.library_definitions:
-                if command in def:
-                    module = def.module
+                if command in defn:
+                    module = defn.module
                     break
         if module == "":
             raise VbaCompileException("Sub or Function not defined")
