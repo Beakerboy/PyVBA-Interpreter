@@ -27,7 +27,7 @@ class FunctionDefinition(FunctionBase):
 
 class LibraryDefinition(FunctionBase):
     handle: Callable
-
+    params: list[ParamDefinition]
 
 T = TypeVar('T', bound='SymbolTable')
 
