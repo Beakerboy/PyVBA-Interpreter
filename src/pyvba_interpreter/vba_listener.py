@@ -30,7 +30,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[self.module_name.lower()][name.lower()] = {
             "type": FunctionType.FUNCTION,
-            "module": self.module_name.lower()
+            "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
             "params": params
         }
@@ -45,7 +45,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         self.table.definitions[self.module_name.lower()][name.lower()] = {
             "type": FunctionType.SUB,
-            "module": self.module_name.lower()
+            "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
             "params": params
         }
