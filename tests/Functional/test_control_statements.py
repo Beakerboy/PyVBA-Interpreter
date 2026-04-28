@@ -78,7 +78,7 @@ def build_interp(code: str) -> VbaVisitor:
 def test_factorial(code: str) -> None:
     code = 'Function Fact(Num)\n' + code + 'End Function\n'
     interpreter = build_interp(code)
-    result = interpreter.execute_function("fact", [5], True)
+    result = interpreter.execute_function("fact", [5])
     expected = 120
     assert result == expected
 
@@ -104,7 +104,7 @@ def test_factorial(code: str) -> None:
 def test_exit_sub_exception(code: str) -> None:
     interpreter = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("fact", [5], True)
+        interpreter.execute_function("fact", [5])
     assert str(e.value) == "Compile error:\nExit For not within For...Next"
 
 
@@ -121,5 +121,5 @@ def test_exit_sub_exception(code: str) -> None:
 def test_do_exception(code: str) -> None:
     interpreter = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("fact", [5], True)
+        interpreter.execute_function("fact", [5])
     assert str(e.value) == "Compile error:\nLoop without Do"
