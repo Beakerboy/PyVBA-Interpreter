@@ -334,10 +334,12 @@ class VbaVisitor(Visitor):
                 if command in def:
                     module = def.module
                     break
+        if module == "":
             for def in self.table.library_definitions:
                 if command in def:
                     module = def.module
                     break
+        if module == "":
             raise VbaCompileException("Sub or Function not defined")
         
         previous_module = self.module
