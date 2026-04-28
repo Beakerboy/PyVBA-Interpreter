@@ -419,8 +419,10 @@ class VbaVisitor(Visitor):
             if command in lib_mod:
                 return lib_mod[command]
         if command in self.table.definitions:
-            raise VbaCompileException("Expected variable or procedure, not module")
+            msg = "Expected variable or procedure, not module"
+            raise VbaCompileException(msg)
             # Need one more level, project, module, function.
-            raise VbaCompileException("Expected variable or procedure, not project")
+            msg = "Expected variable or procedure, not project"
+            raise VbaCompileException(msg)
 
         raise VbaCompileException("Sub or Function not defined")
