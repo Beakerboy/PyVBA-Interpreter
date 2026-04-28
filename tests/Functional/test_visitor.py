@@ -121,6 +121,7 @@ def test_function_not_defined() -> None:
         interpreter.visit(ctx)
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
+
 def test_function_not_defined() -> None:
     code = ('Function Foo()\n'
             '    Foo = Bar()\n'
@@ -132,6 +133,7 @@ def test_function_not_defined() -> None:
     with pytest.raises(VbaCompileException) as e:
         interpreter.visit(ctx)
     assert str(e.value) == "Compile error:\nExpected Function or variable"
+
 
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
