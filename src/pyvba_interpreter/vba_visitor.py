@@ -357,6 +357,7 @@ class VbaVisitor(Visitor):
             raise VbaCompileException("Unexpected Function or variable")
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
+            current_env = {}
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
