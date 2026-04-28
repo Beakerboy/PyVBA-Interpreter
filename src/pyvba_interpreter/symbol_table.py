@@ -18,13 +18,15 @@ class ParamDefinition(TypedDict):
 class FunctionDefinition(TypedDict):
     type: FunctionType
     module: str
-    handle: Parser.ProcedureBodyContext | None
+    handle: Parser.ProcedureBodyContext | None | Callable
     params: list[ParamDefinition]
 
 
-class LibraryDefinition(TypedDict):
-    type: str
+class LibraryDefinition(FunctionDefinition):
+    type: FunctionType
+    module: str
     handle: Callable
+    params: list[ParamDefinition]
 
 
 T = TypeVar('T', bound='SymbolTable')
