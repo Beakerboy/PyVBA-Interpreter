@@ -9,6 +9,7 @@ from .Exceptions.exit_for_exception import ExitForException
 from .Exceptions.exit_function_exception import ExitFunctionException
 from .Exceptions.exit_property_exception import ExitPropertyException
 from .Exceptions.exit_sub_exception import ExitSubException
+from .Exceptions.vba_exception import VbaException
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -330,75 +331,92 @@ class VbaVisitor(Visitor):
         command = command.lower()
         if command == "array":
             return args
-        if module == "":
-            for defn in self.table.definitions:
-                if command in defn:
-                    module = defn.module
-                    break
-        if module == "":
-            for defn in self.table.library_definitions:
-                if command in defn:
-                    module = defn.module
-                    break
-        if module == "":
-            raise VbaCompileException("Sub or Function not defined")
+        if module != "":
+            if module in self.table.definitions:
+                mod_defn = self.table.definitions[module]
+            elif module in self.table.definitions:
+                mod_defn = self.table.library_definitions[module]
+                mod_defn = self.table.library_definitions[module]
+            else:
+                raise VbaException()
+            if command in mod_defn:
+                defn = mod_defn[command]
+            else:
+                raise VbaCompileException("Method or data member not found")
+            previous_module = self.module
+            self.module = module
+        else:
+            defn = _find_function_in_definition(command, self.module)
+            module = defn["module"]
+            previous_module = self.module
+            self.module = module
 
-        previous_module = self.module
-        self.module = module
-        if command not in self.table.definitions:
-            lib_def = self.table.library_definitions[command]
-            if no_sub and lib_def["type"] == FunctionType.SUB:
-                raise VbaCompileException("Unexpected Function or variable")
+        if no_sub and defn["type"] == FunctionType.SUB:
+            raise VbaCompileException("Unexpected Function or variable")
+        current_env = {
+            command: None
+        }
+        i = 0
+        for param in defn["params"]:
+            if not param["optional"]:
+                current_env[param["name"]] = args[i]
+            else:
+                if len(args) > i:
+                    current_env[param["name"]] = args[i]
+            i += 1
+        self.env_stack.append(current_env)
+        ctx = defn["handle"]
+        if isinstance(ctx, ParserRuleContext):
+            if defn["type"] == FuntionType.FUNCTION:
+                current_env[command] = None
             try:
-                output = lib_def["handle"](*args)
+                self.visitChildren(ctx)
+            except ExitDoException as e:
+                raise VbaCompileException(e.msg)
+            except ExitForException as e:
+                raise VbaCompileException(e.msg)
+            except ExitFunctionException as e:
+                if (
+                        mod_def["type"] == FunctionType.SUB or
+                        mod_def["type"] == FunctionType.PROPERTY
+                ):
+                    raise VbaCompileException(e.msg)
+            except ExitPropertyException as e:
+                if (
+                        mod_def["type"] == FunctionType.FUNCTION or
+                        mod_def["type"] == FunctionType.SUB
+                ):
+                    raise VbaCompileException(e.msg)
+            except ExitSubException as e:
+                if (
+                        mod_def["type"] == FunctionType.FUNCTION or
+                        mod_def["type"] == FunctionType.PROPERTY
+                ):
+                    raise VbaCompileException(e.msg)
+        elif ctx is not None:
+            try:
+                output = ctx(*args)
             except Exception as e:
                 if str(e) != "":
                     raise VbaCompileException("Argument not optional")
-            return output
-        else:
-            mod_def = self.table.definitions[command]
-            if no_sub and mod_def["type"] == FunctionType.SUB:
-                raise VbaCompileException("Unexpected Function or variable")
-            current_env = {
-                command: None
-            }
-            i = 0
-            for param in mod_def["params"]:
-                if not param["optional"]:
-                    current_env[param["name"]] = args[i]
-                    i += 1
-            self.env_stack.append(current_env)
-            ctx = mod_def["handle"]
-            if ctx is not None:
-                if mod_def["type"] == FunctionType.SUB:
-                    self.raise_sub_except = False
-                else:
-                    self.raise_function_except = False
-                try:
-                    self.visitChildren(ctx)
-                except ExitDoException as e:
-                    raise VbaCompileException(e.msg)
-                except ExitForException as e:
-                    raise VbaCompileException(e.msg)
-                except ExitFunctionException as e:
-                    if (
-                            mod_def["type"] == FunctionType.SUB or
-                            mod_def["type"] == FunctionType.PROPERTY
-                    ):
-                        raise VbaCompileException(e.msg)
-                except ExitPropertyException as e:
-                    if (
-                            mod_def["type"] == FunctionType.FUNCTION or
-                            mod_def["type"] == FunctionType.SUB
-                    ):
-                        raise VbaCompileException(e.msg)
-                except ExitSubException as e:
-                    if (
-                            mod_def["type"] == FunctionType.FUNCTION or
-                            mod_def["type"] == FunctionType.PROPERTY
-                    ):
-                        raise VbaCompileException(e.msg)
+
+        output = current_env[command]
+        self.env_stack.pop()
+        self.module = previous_module
+        if defn["type"] == FuntionType.FUNCTION
             output = current_env[command]
-            self.env_stack.pop()
-            self.module = previous_module
             return output
+
+    def _find_function_in_definition(command: str, cur_module: str) -> str:
+        if cur_module != "" and command in self.table.definitions[cur_module]:
+            return self.table.definitions[cur_module][command]
+        for mod in self.table.definitions:
+            if command in mod:
+                return mod[command]
+        for mod in self.table.library_definitions:
+            if command in mod:
+                return mod[command]
+        raise VbaCompileException("Sub or Function not defined")
+            
+        
+        
