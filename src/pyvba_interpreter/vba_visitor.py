@@ -19,10 +19,7 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.env_stack: list[dict[str, Any]] = []
-        self.raise_do_except = True
-        self.raise_for_except = True
-        self.raise_function_except = True
-        self.raise_sub_except = True
+        self.module = ""
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -328,15 +325,23 @@ class VbaVisitor(Visitor):
         return self.execute_function(command, args, no_sub)
 
     def execute_function(self: T, command: str,
-                         args: list, no_sub: bool) -> Any:
+                         args: list, module: str = "", no_sub: bool) -> Any:
         command = command.lower()
         if command == "array":
             return args
-        if (
-            command not in self.table.definitions and
-            command not in self.table.library_definitions
-        ):
+        if module == "":
+            for def in self.table.definitions:
+                if command in def:
+                    module = def.module
+                    break
+            for def in self.table.library_definitions:
+                if command in def:
+                    module = def.module
+                    break
             raise VbaCompileException("Sub or Function not defined")
+        
+        previous_module = self.module
+        self.module = module
         if command not in self.table.definitions:
             lib_def = self.table.library_definitions[command]
             if no_sub and lib_def["type"] == FunctionType.SUB:
