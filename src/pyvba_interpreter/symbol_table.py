@@ -32,6 +32,7 @@ T = TypeVar('T', bound='SymbolTable')
 
 class SymbolTable:
     def __init__(self: T) -> None:
-        # Maps name -> the actual ParseTree node for that sub/function
-        self.definitions: dict[str, FunctionDefinition] = {}
+        # Maps module name -> function name -> the actual ParseTree node
+        # for that sub/function
+        self.definitions: dict[str, dict[str, FunctionDefinition]] = {}
         self.library_definitions: dict[str, LibraryDefinition] = {}
