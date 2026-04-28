@@ -67,10 +67,10 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    interpreter.table.library_definitions["msgbox"] = {
+    interpreter.table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
-    }
+    }}
     interpreter.execute_function("hello", [], True)
     mock_print.assert_called_with(expected)
 
@@ -159,9 +159,9 @@ def test_override(mock_print: str) -> None:
     with open(file_path, "w", newline='\r\n') as file:
         file.write('Attribute VB_NAME = "HelloWorld"\n')
         file.write('Function hello()\n')
-        file.write('    MsgBox "HelloWorld"\n')
+        file.write('     "HelloWorld"\n')
         file.write('End Function\n')
-        file.write('Function MsgBox(temp)\n')
+        file.write('Function (temp)\n')
         file.write('End Function\n')
     input_stream = FileStream(file_path)
     lexer = Lexer(input_stream)
@@ -175,7 +175,7 @@ def test_override(mock_print: str) -> None:
     assert len(table.definitions) == 1
     assert len(table.definitions["helloworld"]) == 2
     interpreter = VbaVisitor(table)
-    table.library_definitions["msgbox"] = {
+    table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }
@@ -205,7 +205,7 @@ def test_missing_argument() -> None:
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
-    table.library_definitions["msgbox"] = {
+    table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }
