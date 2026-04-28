@@ -333,6 +333,7 @@ class VbaVisitor(Visitor):
         command = command.lower()
         if command == "array":
             return args
+        mod_defn: dict[str, FunctionDefinition | LibraryDefinition]
         if module != "":
             if module in self.table.definitions:
                 mod_defn = self.table.definitions[module]
