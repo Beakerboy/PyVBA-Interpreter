@@ -331,7 +331,7 @@ class VbaVisitor(Visitor):
         args: list[Any] = []
         if ctx.argumentList() is not None:
             arg_ctx = ctx.argumentList()
-            assert arg_ctx is not None:
+            assert arg_ctx is not None
             args = self.visit(arg_ctx)
         return self.execute_function(command, args, module, no_sub)
 
