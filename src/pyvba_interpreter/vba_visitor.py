@@ -403,7 +403,7 @@ class VbaVisitor(Visitor):
         output = current_env[command]
         self.env_stack.pop()
         self.module = previous_module
-        if defn["type"] == FuntionType.FUNCTION
+        if defn["type"] == FuntionType.FUNCTION:
             output = current_env[command]
             return output
 
