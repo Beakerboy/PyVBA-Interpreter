@@ -69,7 +69,8 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter = build_interp(code)
     interpreter.table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox")
+        "handle": getattr(Interaction, "MsgBox"),
+        "module": "vba"
     }}
     interpreter.execute_function("hello", [])
     mock_print.assert_called_with(expected)
