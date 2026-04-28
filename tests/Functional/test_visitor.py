@@ -159,7 +159,8 @@ def test_override(mock_print: str) -> None:
     visitor = build_interp(code)
     visitor.table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox")
+        "handle": getattr(Interaction, "MsgBox"),
+        "module": "vba"
     }}
     visitor.execute_function("hello", [])
     mock_print.assert_not_called()
@@ -172,7 +173,8 @@ def test_missing_argument() -> None:
     visitor = build_interp(code)
     visitor.table.library_definitions["vba"] = {"msgbox": {
         "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox")
+        "handle": getattr(Interaction, "MsgBox"),
+        "module": "vba"
     }}
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("hello", [])
