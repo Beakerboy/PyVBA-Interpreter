@@ -139,8 +139,8 @@ def test_use_sub_as_function(code: str) -> None:
     code = ('Function Foo()\n'
             '    Foo = Bar()\n'
             'End Function\n'
-           'Sub Bar()\n'
-           'End Sub\n')
+            'Sub Bar()\n'
+            'End Sub\n')
     interpreter = build_interp(code)
     ctx = interpreter.table.definitions["hello"]["handle"]
     with pytest.raises(VbaCompileException) as e:
