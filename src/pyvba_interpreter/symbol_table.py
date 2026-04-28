@@ -15,14 +15,17 @@ class ParamDefinition(TypedDict):
     default: Any
 
 
-class FunctionDefinition(TypedDict):
+class FunctionBase(TypedDict):
     type: FunctionType
     module: str
-    handle: Parser.ProcedureBodyContext | None | Callable
+
+
+class FunctionDefinition(FunctionBase):
+    handle: Parser.ProcedureBodyContext | None
     params: list[ParamDefinition]
 
 
-class LibraryDefinition(FunctionDefinition):
+class LibraryDefinition(FunctionBase):
     handle: Callable
 
 
