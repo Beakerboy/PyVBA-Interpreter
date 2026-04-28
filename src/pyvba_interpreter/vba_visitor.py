@@ -329,7 +329,7 @@ class VbaVisitor(Visitor):
             command_child = ctx.getChild(0)
             assert command_child is not None
             command = command_child.getText().lower()
-        args = []
+        args: list[Any] = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
         return self.execute_function(command, args, module, no_sub)
