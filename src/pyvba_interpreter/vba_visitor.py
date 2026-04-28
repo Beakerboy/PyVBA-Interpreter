@@ -2,7 +2,7 @@ from typing import Any, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import FunctionType, SymbolTable
+from .symbol_table import FunctionDefinition, FunctionType, SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
 from .Exceptions.exit_for_exception import ExitForException
@@ -408,7 +408,7 @@ class VbaVisitor(Visitor):
             return output
 
     def _find_function_in_definition(self: T, command: str,
-                                     cur_module: str) -> str:
+                                     cur_module: str) -> FunctionDefinition:
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module][command]
         for key, mod in self.table.definitions.items():
