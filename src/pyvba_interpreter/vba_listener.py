@@ -4,6 +4,7 @@ from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import FunctionType, ParamDefinition, SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
+from .Exceptions.vba_exception import VbaException
 
 
 T = TypeVar('T', bound='VbaListener')
@@ -18,6 +19,8 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.ProceduralModuleHeaderContext) -> None:
         self.module_name = ctx.STRINGLITERAL().getText()[1:-1]
+        if self.module_name.lower() == "vba":
+            raise VbaException("Name conflicts with existing module, project, or object library")
         self.table.definitions[self.module_name.lower()] = {}
 
     def enterFunctionDeclaration(                                  # noqa: N802
