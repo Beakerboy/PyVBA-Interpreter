@@ -78,6 +78,6 @@ def test_member_not_found(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
-    with pytest.raises(VbaCompileException) as e
+    with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("foo", [])
     assert str(e.value) == "Compile Error:\nMethod or data member not found"
