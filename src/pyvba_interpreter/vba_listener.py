@@ -18,6 +18,7 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.ProceduralModuleHeaderContext) -> None:
         self.module_name = ctx.STRINGLITERAL().getText()[1:-1]
+        self.table.definitions[self.module_name.lower()] = {}
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
@@ -27,9 +28,9 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[name.lower()] = {
+        self.table.definitions[self.module_name.lower()][name.lower()] = {
             "type": FunctionType.FUNCTION,
-            "module": self.module_name,
+            "module": self.module_name.lower()
             "handle": ctx.procedureBody(),
             "params": params
         }
@@ -42,9 +43,9 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[name.lower()] = {
+        self.table.definitions[self.module_name.lower()][name.lower()] = {
             "type": FunctionType.SUB,
-            "module": self.module_name,
+            "module": self.module_name.lower()
             "handle": ctx.procedureBody(),
             "params": params
         }
