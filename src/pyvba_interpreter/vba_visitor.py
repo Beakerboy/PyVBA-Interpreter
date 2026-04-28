@@ -1,7 +1,5 @@
 from typing import Any, TypeVar
-from antlr4_vba.vbaParser import (
-    ParserRuleContext, ProcedureBodyContext, vbaParser as Parser
-)
+from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import (
@@ -361,7 +359,7 @@ class VbaVisitor(Visitor):
             command: None
         }
         ctx = defn["handle"]
-        if isinstance(ctx, ProcedureBodyContext):
+        if isinstance(ctx, Parser.ProcedureBodyContext):
             i = 0
             assert "params" in defn
             for param in defn["params"]:
