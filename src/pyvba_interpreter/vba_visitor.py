@@ -355,9 +355,6 @@ class VbaVisitor(Visitor):
 
         if no_sub and defn["type"] == FunctionType.SUB:
             raise VbaCompileException("Unexpected Function or variable")
-        current_env = {
-            command: None
-        }
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
             i = 0
@@ -395,6 +392,9 @@ class VbaVisitor(Visitor):
                         defn["type"] == FunctionType.PROPERTY
                 ):
                     raise VbaCompileException(e.msg)
+            output = current_env[command]
+            self.env_stack.pop()
+            self.module = previous_module
         elif ctx is not None:
             try:
                 output = ctx(*args)
@@ -402,9 +402,6 @@ class VbaVisitor(Visitor):
                 if str(e) != "":
                     raise VbaCompileException("Argument not optional")
 
-        output = current_env[command]
-        self.env_stack.pop()
-        self.module = previous_module
         if defn["type"] == FunctionType.FUNCTION:
             output = current_env[command]
             return output
