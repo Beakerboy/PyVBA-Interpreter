@@ -172,10 +172,11 @@ def test_override(mock_print: str) -> None:
     listener = VbaListener(table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
-    assert len(table.definitions) == 2
+    assert len(table.definitions) == 1
+    assert len(table.definitions["helloworld"]) == 2
     interpreter = VbaVisitor(table)
     table.library_definitions["msgbox"] = {
-        "type": "builtin",
+        "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }
     interpreter.execute_function("hello", [], True)
@@ -205,7 +206,7 @@ def test_missing_argument() -> None:
     walker.walk(listener, tree)
     interpreter = VbaVisitor(table)
     table.library_definitions["msgbox"] = {
-        "type": "builtin",
+        "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }
     with pytest.raises(VbaCompileException) as e:
