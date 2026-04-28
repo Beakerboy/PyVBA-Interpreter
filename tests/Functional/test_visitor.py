@@ -4,7 +4,7 @@ from vba_stdlib.interaction import Interaction
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
-from pyvba_interpreter.symbol_table import SymbolTable
+from pyvba_interpreter.symbol_table import FunctionType, SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
@@ -68,7 +68,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             'End Function\n')
     interpreter = build_interp(code)
     interpreter.table.library_definitions["msgbox"] = {
-        "type": "builtin",
+        "type": FunctionType.FUNCTION,
         "handle": getattr(Interaction, "MsgBox")
     }
     interpreter.execute_function("hello", [], True)
