@@ -336,7 +336,7 @@ class VbaVisitor(Visitor):
         return self.execute_function(command, args, module, no_sub)
 
     def execute_function(self: T, command: str,
-                         args: list, module: str = "",
+                         args: list[Any], module: str = "",
                          no_sub: bool = True) -> Any:
         command = command.lower()
         if command == "array":
