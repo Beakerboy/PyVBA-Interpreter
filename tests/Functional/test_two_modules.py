@@ -100,5 +100,5 @@ def test_call_module_name(code1: str, code2: str) -> None:
     visitor = VbaVisitor(table)
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("foo", [])
-    assert str(e.value) == ("Compile error:\nExpected variable or "
-                            "procedure, not module")
+    expected = "Compile error:\nExpected variable or procedure, not module"
+    assert str(e.value) == expected
