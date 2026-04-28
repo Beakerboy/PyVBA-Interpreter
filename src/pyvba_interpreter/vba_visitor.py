@@ -320,7 +320,8 @@ class VbaVisitor(Visitor):
             ),
             no_sub: bool = False) -> Any:
         module = ""
-        if ctx.getChild(0).memberAccessExpress() is not None:
+        l_express = ctx.getChild(0)
+        if l_express.memberAccessExpress() is not None:
             express = ctx.getChild(0).memberAccessExpress()
             command = express.unrestrictedName().getText().lower()
             module = express.lExpression().getText().lower()
