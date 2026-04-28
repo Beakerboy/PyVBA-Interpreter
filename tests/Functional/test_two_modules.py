@@ -73,7 +73,7 @@ def test_two_files(code1: str, code2: str) -> None:
          'End Function\n',
          ''),
     ])
-def test_two_files(code1: str, code2: str) -> None:
+def test_member_not_found(code1: str, code2: str) -> None:
     table = SymbolTable()
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
