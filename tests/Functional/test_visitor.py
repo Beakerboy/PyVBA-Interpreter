@@ -112,14 +112,26 @@ def test_function_arguments(
 
 
 def test_function_not_defined() -> None:
-    code = ('Function hello()\n'
-            '    Hello1\n'
+    code = ('Function Foo()\n'
+            '    Bar\n'
             'End Function\n')
     interpreter = build_interp(code)
     ctx = interpreter.table.definitions["hello"]["handle"]
-    with pytest.raises(VbaCompileException):
+    with pytest.raises(VbaCompileException) as e:
         interpreter.visit(ctx)
+    assert str(e.value) == "Compile error:\nSub or Function not defined"
 
+def test_function_not_defined() -> None:
+    code = ('Function Foo()\n'
+            '    Foo = Bar()\n'
+            'End Function\n'
+           'Sub Bar()\n'
+           'End Sub\n')
+    interpreter = build_interp(code)
+    ctx = interpreter.table.definitions["hello"]["handle"]
+    with pytest.raises(VbaCompileException) as e:
+        interpreter.visit(ctx)
+    assert str(e.value) == "Compile error:\nExpected Function or variable"
 
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
