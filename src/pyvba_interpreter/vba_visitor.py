@@ -327,7 +327,7 @@ class VbaVisitor(Visitor):
         args = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
-        return self.execute_function(command, args, no_sub)
+        return self.execute_function(command, args, "", no_sub)
 
     def execute_function(self: T, command: str,
                          args: list, module: str = "",
