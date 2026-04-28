@@ -346,7 +346,7 @@ class VbaVisitor(Visitor):
             previous_module = self.module
             self.module = module
         else:
-            defn = _find_function_in_definition(command, self.module)
+            defn = self._find_function_in_definition(command, self.module)
             module = defn["module"]
             previous_module = self.module
             self.module = module
@@ -377,20 +377,20 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(e.msg)
             except ExitFunctionException as e:
                 if (
-                        mod_def["type"] == FunctionType.SUB or
-                        mod_def["type"] == FunctionType.PROPERTY
+                        defn["type"] == FunctionType.SUB or
+                        defn["type"] == FunctionType.PROPERTY
                 ):
                     raise VbaCompileException(e.msg)
             except ExitPropertyException as e:
                 if (
-                        mod_def["type"] == FunctionType.FUNCTION or
-                        mod_def["type"] == FunctionType.SUB
+                        defn["type"] == FunctionType.FUNCTION or
+                        defn["type"] == FunctionType.SUB
                 ):
                     raise VbaCompileException(e.msg)
             except ExitSubException as e:
                 if (
-                        mod_def["type"] == FunctionType.FUNCTION or
-                        mod_def["type"] == FunctionType.PROPERTY
+                        defn["type"] == FunctionType.FUNCTION or
+                        defn["type"] == FunctionType.PROPERTY
                 ):
                     raise VbaCompileException(e.msg)
         elif ctx is not None:
@@ -403,11 +403,12 @@ class VbaVisitor(Visitor):
         output = current_env[command]
         self.env_stack.pop()
         self.module = previous_module
-        if defn["type"] == FuntionType.FUNCTION:
+        if defn["type"] == FunctionType.FUNCTION:
             output = current_env[command]
             return output
 
-    def _find_function_in_definition(self: T, command: str, cur_module: str) -> str:
+    def _find_function_in_definition(self: T, command: str,
+                                     cur_module: str) -> str:
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module][command]
         for mod in self.table.definitions:
