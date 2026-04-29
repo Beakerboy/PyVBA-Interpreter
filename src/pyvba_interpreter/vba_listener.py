@@ -25,7 +25,9 @@ class VbaListener(Listener):
             raise VbaException(
                 "Name conflicts with existing module, project, or object "
                 "library")
-        self.table.definitions[self.project_name.lower()][self.module_name.lower()] = {}
+        proj = self.project_name.lower()
+        mod = self.module_name.lower()
+        self.table.definitions[proj][mod] = {}
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
