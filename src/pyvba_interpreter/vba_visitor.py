@@ -21,6 +21,11 @@ class VbaVisitor(Visitor):
 
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
+
+        # Instead of a list, this could probably be chaged to just
+        # a dictionary of the current scope. The previous scope could
+        # be retained like done with context. In theory this could
+        # help with debugging.
         self.env_stack: list[dict[str, Any]] = []
 
         # The current project, module, and function context
