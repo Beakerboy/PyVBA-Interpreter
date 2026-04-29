@@ -335,7 +335,7 @@ class VbaVisitor(Visitor):
                 hasattr(type(l_express), "unrestrictedName")
         ):
             command = l_express.unrestrictedName().getText().lower()
-            module = self.visitLExpress(l_express)
+            module = self.visitLExpress(l_express)["name"]
         else:
             command = l_express.getText().lower()
         args: list[Any] = []
@@ -353,7 +353,9 @@ class VbaVisitor(Visitor):
         if self._function_in_project(name):
             return self._find_function_in_definition(name, self.context[1])
         if name in self.table.definitions:
-            return self.table.definitions[name]
+            record = self.table.definitions[name]
+            record["name"] = name
+            return record
 
     def execute_function(self: T, command: str,
                          args: list[Any], module: str = "",
