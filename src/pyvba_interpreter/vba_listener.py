@@ -32,7 +32,8 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText()
-        if name.lower() in self.table.definitions[self.module_name.lower()]:
+        funcs = self.table.definitions[self.module_name.lower()]["functions"]
+        if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
