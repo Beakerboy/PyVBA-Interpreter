@@ -158,15 +158,17 @@ def test_missing_argument() -> None:
 
 
 def test_two_functions() -> None:
-    code = ('Function hello()\n'
-            '    hello = Hello1()\n'
+    """
+    Test that one function can pass its result to another.
+    """
+    code = ('Function Foo()\n'
+            '    Foo = Bar()\n'
             'End Function\n'
-            'Function Hello1()\n'
-            '    Hello = 1\n'
-            '    Hello1 = Hello + 1()\n'
+            'Function Bar()\n'
+            '    Bar = 2\n'
             'End Function\n')
     visitor = build_interp(code)
-    result = visitor.execute_function("hello", [])
+    result = visitor.execute_function("foo", [])
     assert result == 2
 
 
