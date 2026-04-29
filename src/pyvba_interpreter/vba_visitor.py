@@ -440,10 +440,10 @@ class VbaVisitor(Visitor):
             return self.table.definitions[cur_module]["functions"][command]
         for key, mod in self.table.definitions.items():
             if command in mod:
-                return mod[command]
+                return mod["functions"][command]
         for key, lib_mod in self.table.library_definitions.items():
             if command in lib_mod:
-                return lib_mod[command]
+                return lib_mod["functions"][command]
         if command in self.table.definitions:
             msg = "Expected variable or procedure, not module"
             raise VbaCompileException(msg)
