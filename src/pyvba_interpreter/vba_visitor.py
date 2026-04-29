@@ -3,8 +3,8 @@ from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import (
-    FunctionDefinition, FunctionType, LibraryDefinition, ModuleDefinition,
-    SymbolTable
+    FunctionDefinition, FunctionType, LibModuleDefinition, LibraryDefinition,
+    ModuleDefinition, SymbolTable
 )
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
@@ -360,7 +360,7 @@ class VbaVisitor(Visitor):
         command = command.lower()
         if command == "array":
             return args
-        mod_defn: ModuleDefinition | dict[str, LibraryDefinition]
+        mod_defn: ModuleDefinition | LibModuleDefinition
         if module != "":
             if module in self.table.definitions:
                 mod_defn = self.table.definitions[module]
