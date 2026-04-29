@@ -42,5 +42,5 @@ class SymbolTable:
     def __init__(self: T) -> None:
         # Maps module name -> function name -> the actual ParseTree node
         # for that sub/function
-        self.definitions: ModuleDefinition = {}
+        self.definitions: dict[str, ModuleDefinition] = {}
         self.library_definitions: dict[str, dict[str, LibraryDefinition]] = {}
