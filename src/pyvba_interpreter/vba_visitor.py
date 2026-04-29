@@ -356,6 +356,12 @@ class VbaVisitor(Visitor):
             record = self.table.definitions[name]
             record["name"] = name
             return record
+        if name in self.table.library_definitions:
+            lib_record = self.table.definitions[name]
+            lib_record["name"] = name
+            return lib_record
+        else:
+            raise Exception()
 
     def execute_function(self: T, command: str,
                          args: list[Any], module: str = "",
