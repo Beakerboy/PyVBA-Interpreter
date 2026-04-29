@@ -40,4 +40,4 @@ class SymbolTable:
         # Maps module name -> function name -> the actual ParseTree node
         # for that sub/function
         self.definitions: dict[str, [dict[str, dict[str, FunctionDefinition]]] = {}
-        self.library_definitions: dict[str, [dict[str, dict[str, LibraryDefinition]]] = {}
+        self.library_definitions: dict[str, dict[str, dict[str, LibraryDefinition]]] = {}
