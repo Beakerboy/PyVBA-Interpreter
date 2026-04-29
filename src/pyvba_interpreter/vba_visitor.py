@@ -438,7 +438,7 @@ class VbaVisitor(Visitor):
         raise VbaCompileException("Sub or Function not defined")
 
     def _function_in_module(self: T, module: str, function: str) -> bool:
-        return function in self.table.definitions[module)
+        return function in self.table.definitions[module]
 
     def _function_in_project(self: T, function: str) -> bool:
         for key, mod in self.table.definitions.items()
