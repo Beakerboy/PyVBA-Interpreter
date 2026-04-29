@@ -152,11 +152,16 @@ def test_missing_argument() -> None:
             '    MsgBox\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {"msgbox": {
-        "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox"),
-        "module": "vba"
-    }}
+    interpreter.table.library_definitions["vba"] = {
+        "type": FunctionType.MODULE,
+        "functions": {
+            "msgbox": {
+                "type": FunctionType.FUNCTION,
+                "handle": getattr(Interaction, "MsgBox"),
+                "module": "vba"
+            }
+        }
+    }
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("hello", [])
     assert str(e.value) == "Compile error:\nArgument not optional"
