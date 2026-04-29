@@ -216,5 +216,5 @@ def test_func_as_variable() -> None:
             'Function Bar()\n'
             'End Function\n')
     visitor = build_interp(code)
-    with pytest.raises(VbaException) as e:
+    with pytest.raises(VbaException):
         visitor.execute_function("foo", [])
