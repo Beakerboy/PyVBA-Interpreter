@@ -42,6 +42,6 @@ class SymbolTable:
         self.definitions: dict[
             str, dict[str, dict[str, FunctionDefinition]]
         ] = {}
-        self.library_definitions: dict [
+        self.library_definitions: dict[
             str, dict[str, dict[str, LibraryDefinition]]
         ] = {}
