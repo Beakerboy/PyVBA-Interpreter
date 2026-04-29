@@ -3,7 +3,8 @@ from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import (
-    FunctionDefinition, FunctionType, LibraryDefinition, SymbolTable
+    FunctionDefinition, FunctionType, LibraryDefinition, ModuleDefinition
+    SymbolTable
 )
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
@@ -359,7 +360,7 @@ class VbaVisitor(Visitor):
         command = command.lower()
         if command == "array":
             return args
-        mod_defn: dict[str, FunctionDefinition] | dict[str, LibraryDefinition]
+        mod_defn: ModuleDefinition | dict[str, LibraryDefinition]
         if module != "":
             if module in self.table.definitions:
                 mod_defn = self.table.definitions[module]
@@ -367,8 +368,8 @@ class VbaVisitor(Visitor):
                 mod_defn = self.table.library_definitions[module]
             else:
                 raise VbaException()
-            if command in mod_defn:
-                defn = mod_defn[command]
+            if command in mod_defn["functions"]:
+                defn = mod_defn["functions"][command]
             else:
                 raise VbaCompileException("Method or data member not found")
         else:
