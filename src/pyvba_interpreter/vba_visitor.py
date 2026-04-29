@@ -54,6 +54,8 @@ class VbaVisitor(Visitor):
                 else:
                     raise VbaException()
         value = self.visit(ctx.expression())
+        if isinstance(value, dict):
+            raise VbaCompileException("Expected Function or variable")
         current_env[var_name] = value
 
     def visitCallStatement(                                        # noqa: N802
@@ -192,16 +194,6 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
-
-    def visitAmbiguousIdentifier(                                  # noqa: N802
-            self: T,
-            ctx: Parser.AmbiguousIdentifierContext) -> Any:
-        current_env = self.env_stack[-1]
-        name = ctx.getText().lower()
-        if name in current_env:
-            return current_env[name]
-        if self._function_in_project(name):
-            return self._find_function_in_definition(name, self.context[1])
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
@@ -351,6 +343,16 @@ class VbaVisitor(Visitor):
             args = self.visitArgumentList(ctx.argumentList())
         return self.execute_function(command, args, module, no_sub)
 
+    def visitAmbiguousIdentifier(                                  # noqa: N802
+            self: T,
+            ctx: Parser.AmbiguousIdentifierContext) -> Any:
+        current_env = self.env_stack[-1]
+        name = ctx.getText().lower()
+        if name in current_env:
+            return current_env[name]
+        if self._function_in_project(name):
+            return self._find_function_in_definition(name, self.context[1])
+
     def execute_function(self: T, command: str,
                          args: list[Any], module: str = "",
                          no_sub: bool = True) -> Any:
@@ -435,10 +437,10 @@ class VbaVisitor(Visitor):
     ) -> FunctionDefinition | LibraryDefinition:
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module]["functions"][command]
-        for key, mod in self.table.definitions.items():
+        for _, mod in self.table.definitions.items():
             if command in mod["functions"]:
                 return mod["functions"][command]
-        for key, lib_mod in self.table.library_definitions.items():
+        for _, lib_mod in self.table.library_definitions.items():
             if command in lib_mod["functions"]:
                 return lib_mod["functions"][command]
         if command in self.table.definitions:
