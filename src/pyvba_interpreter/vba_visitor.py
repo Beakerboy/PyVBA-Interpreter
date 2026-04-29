@@ -3,7 +3,7 @@ from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import (
-    FunctionDefinition, FunctionType, LibraryDefinition, ModuleDefinition
+    FunctionDefinition, FunctionType, LibraryDefinition, ModuleDefinition,
     SymbolTable
 )
 from .Exceptions.vba_compile_exception import VbaCompileException
