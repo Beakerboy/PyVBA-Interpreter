@@ -356,10 +356,9 @@ class VbaVisitor(Visitor):
             record = self.table.definitions[name]
             return record
         if name in self.table.library_definitions:
-            lib_record = self.table.definitions[name]
+            lib_record = self.table.library_definitions[name]
             return lib_record
-        else:
-            raise VbaCompileException("Method or data member not found")
+        raise VbaCompileException("Method or data member not found")
 
     def execute_function(self: T, command: str,
                          args: list[Any], module: str = "",
