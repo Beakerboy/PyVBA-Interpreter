@@ -57,6 +57,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             'End Function\n')
     interpreter = build_interp(code)
     interpreter.table.library_definitions["vba"] = {
+        "name": "vba",
         "type": FunctionType.MODULE,
         "functions": {
             "msgbox": {
@@ -151,6 +152,7 @@ def test_missing_argument() -> None:
             'End Function\n')
     visitor = build_interp(code)
     visitor.table.library_definitions["vba"] = {
+        "name": "vba",
         "type": FunctionType.MODULE,
         "functions": {
             "msgbox": {
