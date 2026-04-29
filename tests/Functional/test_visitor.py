@@ -10,6 +10,9 @@ from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
 )
+from pyvba_interpreter.Exceptions.vba_exception import (
+    VbaException
+)
 from typing import Any
 from unittest.mock import patch
 
@@ -191,7 +194,8 @@ def test_two_functions() -> None:
     result = visitor.execute_function("hello", [])
     assert result == 2
 
-def test_missing_argument() -> None:
+
+def test_sub_as_variable() -> None:
     code = ('Function Foo()\n'
             '    Bar = 1\n'
             '    Foo = Bar\n'
@@ -200,5 +204,17 @@ def test_missing_argument() -> None:
             'End Sub\n')
     visitor = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("hfoo", [])
+        visitor.execute_function("foo", [])
     assert str(e.value) == "Compile error:\nExpected Function or variable"
+
+
+def test_func_as_variable() -> None:
+    code = ('Function Foo()\n'
+            '    Bar = 1\n'
+            '    Foo = Bar\n'
+            'End Function\n'
+            'Function Bar()\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    with pytest.raises(VbaException) as e:
+        visitor.execute_function("foo", [])
