@@ -190,3 +190,15 @@ def test_two_functions() -> None:
     visitor = build_interp(code)
     result = visitor.execute_function("hello", [])
     assert result == 2
+
+def test_missing_argument() -> None:
+    code = ('Function Foo()\n'
+            '    Bar = 1\n'
+            '    Foo = Bar\n
+            'End Function\n'
+            'Sub Bar()\n'
+            'End Sub\n')
+    visitor = build_interp(code)
+    with pytest.raises(VbaCompileException) as e:
+        visitor.execute_function("hfoo", [])
+    assert str(e.value) == "Compile error:\nExpected Function or variable"
