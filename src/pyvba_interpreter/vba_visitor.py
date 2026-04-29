@@ -361,7 +361,7 @@ class VbaVisitor(Visitor):
             lib_record["name"] = name
             return lib_record
         else:
-            raise Exception()
+            raise VbaCompileException("Method or data member not found")
 
     def execute_function(self: T, command: str,
                          args: list[Any], module: str = "",
