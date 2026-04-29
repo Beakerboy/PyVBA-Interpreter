@@ -44,11 +44,6 @@ def build_interp(code: str) -> VbaVisitor:
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
-        ('Call MsgBox(True And False)', "False"),
-        ('Call MsgBox(True Or False)', "True"),
-        ('Call MsgBox(True Xor False)', "True"),
-        ('Call MsgBox(True Imp False)', "False"),
-        ('Call MsgBox(True Eqv False)', "False"),
         ('Call MsgBox(1 < 2)', "True"),
         ('Call MsgBox(1 <= 2)', "True"),
         ('Call MsgBox(1 > 2)', "False"),
@@ -89,6 +84,11 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 2 ^ 2', 4),
         ('hello = True', True),
         ('hello = False', False),
+        ('hello = True And False', False),
+        ('hello = True Or False', True),
+        ('hello = True Xor False', True),
+        ('hello = True Imp False', False),
+        ('hello = True Eqv False', False),
         ('hello = Array(1)', [1]),
         ('hello = Array(1, 2)', [1, 2]),
         ('hello = 1\n'
