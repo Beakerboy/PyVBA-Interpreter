@@ -186,15 +186,15 @@ def test_two_functions() -> None:
          '    Bar = 2\n'
          'End Sub\n'),
         ('Function Foo()\n'
-          '    Foo = Bar()\n'
-          'End Function\n'
-          'Sub Bar()\n'
-          'End Sub\n'),
+         '    Foo = Bar()\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
         ('Function Foo()\n'
-          '    Foo = Bar\n'
-          'End Function\n'
-          'Sub Bar()\n'
-          'End Sub\n'),
+         '    Foo = Bar\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
     ])
 def test_sub_as_variable(code: str) -> None:
     visitor = build_interp(code)
