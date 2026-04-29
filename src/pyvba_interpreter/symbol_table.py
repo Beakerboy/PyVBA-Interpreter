@@ -7,6 +7,8 @@ class FunctionType(Enum):
     FUNCTION = 0
     SUB = 1
     PROPERTY = 2
+    PROJECT = 3
+    MODULE = 4
 
 
 class ParamDefinition(TypedDict):
