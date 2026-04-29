@@ -36,7 +36,8 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[self.module_name.lower()]["functions"][name.lower()] = {
+        self.table.definitions[self.module_name.lower()][
+                "functions"][name.lower()] = {
             "type": FunctionType.FUNCTION,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
@@ -51,7 +52,8 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[self.module_name.lower()]["functions"][name.lower()] = {
+        self.table.definitions[self.module_name.lower()][
+                "functions"][name.lower()] = {
             "type": FunctionType.SUB,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
