@@ -313,7 +313,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.MemberAccessExpressContext) -> Any:
         l_express = self.visit(ctx.lExpression())
         name = ctx.unrestrictedName().getText().lower()
-        if l_express["type"] == FuntionType.MODULE:
+        if l_express["type"] == FunctionType.MODULE:
             return l_express["function"][name]
 
     # Can be an Array() or a function call because expressions are assigned
