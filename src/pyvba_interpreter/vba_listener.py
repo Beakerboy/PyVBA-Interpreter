@@ -24,6 +24,7 @@ class VbaListener(Listener):
                 "Name conflicts with existing module, project, or object "
                 "library")
         self.table.definitions[self.module_name.lower()] = {
+            "name": self.module_name.lower()
             "type": FunctionType.MODULE,
             "functions": {}
         }
