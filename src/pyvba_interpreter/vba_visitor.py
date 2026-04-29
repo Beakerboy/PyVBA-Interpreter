@@ -195,8 +195,11 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.AmbiguousIdentifierContext) -> Any:
         current_env = self.env_stack[-1]
-        var_name = ctx.getText().lower()
-        return current_env[var_name]
+        name = ctx.getText().lower()
+        if name in current_env:
+            return current_env[var_name]
+        if self._function_in_project(name):
+            return self._find_function_in_definition(name, self.context[1])
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
