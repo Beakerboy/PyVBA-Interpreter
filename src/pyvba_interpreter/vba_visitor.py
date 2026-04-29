@@ -22,7 +22,6 @@ class VbaVisitor(Visitor):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.env_stack: list[dict[str, Any]] = []
-        self.module = ""
 
         # The current project, module, and function context
         self.context = ["vbaproject", "", ""]
