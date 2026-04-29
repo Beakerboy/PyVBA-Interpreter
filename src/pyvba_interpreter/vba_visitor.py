@@ -303,7 +303,7 @@ class VbaVisitor(Visitor):
             return not left or right
         else:  # op == "EQV":
             return left == right
-        
+
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
     def visitIndexExpress(                                       # noqa: N802
