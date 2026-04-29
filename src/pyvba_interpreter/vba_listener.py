@@ -23,7 +23,10 @@ class VbaListener(Listener):
             raise VbaException(
                 "Name conflicts with existing module, project, or object "
                 "library")
-        self.table.definitions[self.module_name.lower()] = {}
+        self.table.definitions[self.module_name.lower()] = {
+            "type": FunctionType.MODULE,
+            "functions" : {}
+        }
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
@@ -33,7 +36,7 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[self.module_name.lower()][name.lower()] = {
+        self.table.definitions[self.module_name.lower()]["functions"][name.lower()] = {
             "type": FunctionType.FUNCTION,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
@@ -48,7 +51,7 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[self.module_name.lower()][name.lower()] = {
+        self.table.definitions[self.module_name.lower()]["functions"][name.lower()] = {
             "type": FunctionType.SUB,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
