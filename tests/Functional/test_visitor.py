@@ -194,7 +194,7 @@ def test_two_functions() -> None:
 def test_missing_argument() -> None:
     code = ('Function Foo()\n'
             '    Bar = 1\n'
-            '    Foo = Bar\n
+            '    Foo = Bar\n'
             'End Function\n'
             'Sub Bar()\n'
             'End Sub\n')
