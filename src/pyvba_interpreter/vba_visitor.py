@@ -437,7 +437,7 @@ class VbaVisitor(Visitor):
             self: T, command: str, cur_module: str
     ) -> FunctionDefinition | LibraryDefinition:
         if cur_module != "" and command in self.table.definitions[cur_module]:
-            return self.table.definitions[cur_module][command]
+            return self.table.definitions[cur_module]["functions"][command]
         for key, mod in self.table.definitions.items():
             if command in mod:
                 return mod[command]
