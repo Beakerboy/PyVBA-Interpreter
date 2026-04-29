@@ -40,7 +40,7 @@ class VbaVisitor(Visitor):
         var_name = ctx.lExpression().getText().lower()
         if self._function_in_project(var_name):
             defn = self._find_function_in_definition(var_name, "")
-            if defn["type"] == FuntionType.SUB:
+            if defn["type"] == FunctionType.SUB:
                 raise VbaCompileException("Expected Function or variable")
             else:
                 raise VbaException()
@@ -445,5 +445,5 @@ class VbaVisitor(Visitor):
     def _function_in_project(self: T, function: str) -> bool:
         for key, mod in self.table.definitions.items():
             if function in mod:
-                return true
-        return false
+                return True
+        return False
