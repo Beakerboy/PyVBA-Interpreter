@@ -25,7 +25,7 @@ class VbaListener(Listener):
                 "library")
         self.table.definitions[self.module_name.lower()] = {
             "type": FunctionType.MODULE,
-            "functions" : {}
+            "functions": {}
         }
 
     def enterFunctionDeclaration(                                  # noqa: N802
