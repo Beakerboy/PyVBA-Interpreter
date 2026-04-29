@@ -368,7 +368,7 @@ class VbaVisitor(Visitor):
             else:
                 raise VbaCompileException("Method or data member not found")
         else:
-            defn = self._find_function_in_definition(command, self.context[2])
+            defn = self._find_function_in_definition(command, self.context[1])
             module = defn["module"]
         previous_context = self.context
         self.context[1] = module
