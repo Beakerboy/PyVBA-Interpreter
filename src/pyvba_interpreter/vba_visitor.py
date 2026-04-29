@@ -443,7 +443,7 @@ class VbaVisitor(Visitor):
         return function in self.table.definitions[module]
 
     def _function_in_project(self: T, function: str) -> bool:
-        for key, mod in self.table.definitions.items()
+        for key, mod in self.table.definitions.items():
             if function in mod:
                 return true
         return false
