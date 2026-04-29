@@ -197,7 +197,7 @@ class VbaVisitor(Visitor):
         current_env = self.env_stack[-1]
         name = ctx.getText().lower()
         if name in current_env:
-            return current_env[var_name]
+            return current_env[name]
         if self._function_in_project(name):
             return self._find_function_in_definition(name, self.context[1])
 
