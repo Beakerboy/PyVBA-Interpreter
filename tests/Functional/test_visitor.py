@@ -152,7 +152,7 @@ def test_missing_argument() -> None:
             '    MsgBox\n'
             'End Function\n')
     visitor = build_interp(code)
-    interpreter.table.library_definitions["vba"] = {
+    visitor.table.library_definitions["vba"] = {
         "type": FunctionType.MODULE,
         "functions": {
             "msgbox": {
