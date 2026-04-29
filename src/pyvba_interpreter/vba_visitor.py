@@ -25,7 +25,7 @@ class VbaVisitor(Visitor):
         self.module = ""
 
         # The current project, module, and function context
-        self.context = ("vbaproject", "", "")
+        self.context = ["vbaproject", "", ""]
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
