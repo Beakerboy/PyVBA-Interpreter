@@ -354,11 +354,9 @@ class VbaVisitor(Visitor):
             return self._find_function_in_definition(name, self.context[1])
         if name in self.table.definitions:
             record = self.table.definitions[name]
-            record["name"] = name
             return record
         if name in self.table.library_definitions:
             lib_record = self.table.definitions[name]
-            lib_record["name"] = name
             return lib_record
         else:
             raise VbaCompileException("Method or data member not found")
