@@ -40,7 +40,7 @@ class VbaVisitor(Visitor):
         var_name = ctx.lExpression().getText().lower()
         if self._function_in_project(var_name):
             defn = self._find_function_in_definition(var_name, "")
-            if def["type"] == FuntionType.SUB:
+            if defn["type"] == FuntionType.SUB:
                 raise VbaCompileException("Expected Function or variable")
         value = self.visit(ctx.expression())
         current_env[var_name] = value
