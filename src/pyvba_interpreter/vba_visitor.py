@@ -38,6 +38,10 @@ class VbaVisitor(Visitor):
             ctx: Parser.LetStatementContext) -> None:
         current_env = self.env_stack[-1]
         var_name = ctx.lExpression().getText().lower()
+        if self._function_in_project(var_name):
+            defn = self._find_function_in_definition(var_name, "")
+            if def["type"] == FuntionType.SUB:
+                raise VbaCompileException("Expected Function or variable")
         value = self.visit(ctx.expression())
         current_env[var_name] = value
 
@@ -297,7 +301,7 @@ class VbaVisitor(Visitor):
             return not left or right
         else:  # op == "EQV":
             return left == right
-
+        
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
     def visitIndexExpress(                                       # noqa: N802
@@ -325,7 +329,7 @@ class VbaVisitor(Visitor):
                 hasattr(type(l_express), "unrestrictedName")
         ):
             command = l_express.unrestrictedName().getText().lower()
-            module = l_express.lExpression().getText().lower()
+            module = self.visit(l_express)
         else:
             command = l_express.getText().lower()
         args: list[Any] = []
@@ -432,3 +436,12 @@ class VbaVisitor(Visitor):
             raise VbaCompileException(msg)
 
         raise VbaCompileException("Sub or Function not defined")
+
+    def _function_in_module(self: T, module: str, function: str) -> bool:
+        return function in self.table.definitions[module)
+
+    def _function_in_project(self: T, function: str) -> bool:
+        for key, mod in self.table.definitions.items()
+            if function in mod:
+                return true
+        return false
