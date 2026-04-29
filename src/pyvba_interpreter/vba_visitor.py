@@ -341,7 +341,7 @@ class VbaVisitor(Visitor):
                 hasattr(type(l_express), "unrestrictedName")
         ):
             command = l_express.unrestrictedName().getText().lower()
-            module = self.visitLExpress(l_express)
+            module = self.visitLExpress(l_express)["module"]
         else:
             command = l_express.getText().lower()
         args: list[Any] = []
