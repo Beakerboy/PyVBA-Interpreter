@@ -32,8 +32,8 @@ def main() -> None:
 
     interpreter = VbaVisitor(table)
     interpreter.visit(tree)
-    if function_to_run in table.definitions:
-        target_node = table.definitions[function_to_run]
+    if function_to_run in table.definitions[module]["functions"]:
+        target_node = table.definitions[module]["functions"][function_to_run]
         interpreter.visitChildren(target_node)
     else:
         print("error:")
