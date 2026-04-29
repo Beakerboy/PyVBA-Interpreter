@@ -24,6 +24,9 @@ class VbaVisitor(Visitor):
         self.env_stack: list[dict[str, Any]] = []
         self.module = ""
 
+        # The current project, module, and function context 
+        self.context = ("vbaproject", "", "")
+
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
         i = 1
@@ -38,12 +41,16 @@ class VbaVisitor(Visitor):
             ctx: Parser.LetStatementContext) -> None:
         current_env = self.env_stack[-1]
         var_name = ctx.lExpression().getText().lower()
-        if self._function_in_project(var_name):
-            defn = self._find_function_in_definition(var_name, "")
-            if defn["type"] == FunctionType.SUB:
-                raise VbaCompileException("Expected Function or variable")
-            else:
-                raise VbaException()
+        if var_name not in current_env:
+            if (
+                    var_name != self.context[2] and
+                    self._function_in_project(var_name)
+            ):
+                defn = self._find_function_in_definition(var_name, "")
+                if defn["type"] == FunctionType.SUB:
+                    raise VbaCompileException("Expected Function or variable")
+                else:
+                    raise VbaException()
         value = self.visit(ctx.expression())
         current_env[var_name] = value
 
@@ -349,7 +356,7 @@ class VbaVisitor(Visitor):
         if module != "":
             if module in self.table.definitions:
                 mod_defn = self.table.definitions[module]
-            elif module in self.table.definitions:
+            elif module in self.table.library_definitions:
                 mod_defn = self.table.library_definitions[module]
             else:
                 raise VbaException()
@@ -357,13 +364,12 @@ class VbaVisitor(Visitor):
                 defn = mod_defn[command]
             else:
                 raise VbaCompileException("Method or data member not found")
-            previous_module = self.module
-            self.module = module
         else:
-            defn = self._find_function_in_definition(command, self.module)
+            defn = self._find_function_in_definition(command, self.context[2])
             module = defn["module"]
-            previous_module = self.module
-            self.module = module
+        previous_context = self.context
+        self.context[1] = module
+        self.context[2] = command
 
         if no_sub and defn["type"] == FunctionType.SUB:
             raise VbaCompileException("Expected Function or variable")
@@ -407,7 +413,7 @@ class VbaVisitor(Visitor):
                     raise VbaCompileException(e.msg)
             output = current_env[command]
             self.env_stack.pop()
-            self.module = previous_module
+            self.context = previous_context
         elif ctx is not None:
             try:
                 output = ctx(*args)
