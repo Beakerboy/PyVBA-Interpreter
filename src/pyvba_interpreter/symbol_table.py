@@ -33,11 +33,13 @@ class LibraryDefinition(FunctionBase):
 
 
 class ModuleDefinition(TypedDict):
+    name: str
     type: FunctionType
     functions: dict[str, FunctionDefinition]
 
 
 class LibModuleDefinition(TypedDict):
+    name: str
     type: FunctionType
     functions: dict[str, LibraryDefinition]
 
