@@ -10,6 +10,9 @@ from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
 )
+from pyvba_interpreter.Exceptions.vba_exception import (
+    VbaException
+)
 from typing import Any
 from unittest.mock import patch
 
@@ -41,20 +44,6 @@ def build_interp(code: str) -> VbaVisitor:
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
-        ('MsgBox 2', "2"),
-        ('MsgBox -2', "-2"),
-        ('Call MsgBox(2 ^ 2)', "4"),
-        ('Call MsgBox(6 * 4)', "24"),
-        ('Call MsgBox(10 / 2)', "5.0"),
-        ('Call MsgBox(4 + 6)', "10"),
-        ('Call MsgBox(6 - 1)', "5"),
-        ('Call MsgBox(10 Mod 3)', "1"),
-        ('Call MsgBox(10 \\ 3)', "3"),
-        ('Call MsgBox(True And False)', "False"),
-        ('Call MsgBox(True Or False)', "True"),
-        ('Call MsgBox(True Xor False)', "True"),
-        ('Call MsgBox(True Imp False)', "False"),
-        ('Call MsgBox(True Eqv False)', "False"),
         ('Call MsgBox(1 < 2)', "True"),
         ('Call MsgBox(1 <= 2)', "True"),
         ('Call MsgBox(1 > 2)', "False"),
@@ -67,11 +56,17 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    interpreter.table.library_definitions["vba"] = {"msgbox": {
-        "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox"),
-        "module": "vba"
-    }}
+    interpreter.table.library_definitions["vba"] = {
+        "name": "vba",
+        "type": FunctionType.MODULE,
+        "functions": {
+            "msgbox": {
+                "type": FunctionType.FUNCTION,
+                "handle": getattr(Interaction, "MsgBox"),
+                "module": "vba"
+            }
+        }
+    }
     interpreter.execute_function("hello", [])
     mock_print.assert_called_with(expected)
 
@@ -79,10 +74,22 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
 @pytest.mark.parametrize(
     "input, expected", [
         ('hello = 1', 1),
+        ('hello = -2', -2),
         ('hello = "1"', "1"),
         ('hello = 1 + 1', 2),
+        ('hello = 6 - 1', 5),
+        ('hello = 6 * 4', 24),
+        ('hello = 10 / 2', 5.0),
+        ('hello = 10 Mod 3', 1),
+        ('hello = 10 \\ 3', 3),
+        ('hello = 2 ^ 2', 4),
         ('hello = True', True),
         ('hello = False', False),
+        ('hello = True And False', False),
+        ('hello = True Or False', True),
+        ('hello = True Xor False', True),
+        ('hello = True Imp False', False),
+        ('hello = True Eqv False', False),
         ('hello = Array(1)', [1]),
         ('hello = Array(1, 2)', [1, 2]),
         ('hello = 1\n'
@@ -122,31 +129,6 @@ def test_function_not_defined() -> None:
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
 
-@pytest.mark.parametrize(
-    "code", [
-        ('Function Foo()\n'
-         '    Foo = Bar()\n'
-         'End Function\n'
-         'Sub Bar()\n'
-         'End Sub\n'),
-        ('Function Foo()\n'
-         '    Foo = Bar\n'
-         'End Function\n'
-         'Sub Bar()\n'
-         'End Sub\n'),
-    ])
-def test_use_sub_as_function(code: str) -> None:
-    code = ('Function Foo()\n'
-            '    Foo = Bar()\n'
-            'End Function\n'
-            'Sub Bar()\n'
-            'End Sub\n')
-    visitor = build_interp(code)
-    with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
-    assert str(e.value) == "Compile error:\nExpected Function or variable"
-
-
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
     code = ('Function hello()\n'
@@ -169,24 +151,77 @@ def test_missing_argument() -> None:
             '    MsgBox\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {"msgbox": {
-        "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox"),
-        "module": "vba"
-    }}
+    visitor.table.library_definitions["vba"] = {
+        "name": "vba",
+        "type": FunctionType.MODULE,
+        "functions": {
+            "msgbox": {
+                "type": FunctionType.FUNCTION,
+                "handle": getattr(Interaction, "MsgBox"),
+                "module": "vba"
+            }
+        }
+    }
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("hello", [])
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
 def test_two_functions() -> None:
-    code = ('Function hello()\n'
-            '    hello = Hello1()\n'
+    """
+    Test that one function can pass its result to another.
+    """
+    code = ('Function Foo()\n'
+            '    Foo = Bar()\n'
             'End Function\n'
-            'Function Hello1()\n'
-            '    Hello = 1\n'
-            '    Hello1 = Hello + 1()\n'
+            'Function Bar()\n'
+            '    Bar = 2\n'
             'End Function\n')
     visitor = build_interp(code)
-    result = visitor.execute_function("hello", [])
+    result = visitor.execute_function("foo", [])
     assert result == 2
+
+
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Foo()\n'
+         '    Bar = 1\n'
+         '    Foo = Bar\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+         '    Bar\n'
+         '    Foo = 2\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         '    Bar = 2\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+         '    Foo = Bar()\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+         '    Foo = Bar\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+    ])
+def test_sub_as_variable(code: str) -> None:
+    visitor = build_interp(code)
+    with pytest.raises(VbaCompileException) as e:
+        visitor.execute_function("foo", [])
+    assert str(e.value) == "Compile error:\nExpected Function or variable"
+
+
+def test_func_as_variable() -> None:
+    code = ('Function Foo()\n'
+            '    Bar = 1\n'
+            '    Foo = Bar\n'
+            'End Function\n'
+            'Function Bar()\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    with pytest.raises(VbaException):
+        visitor.execute_function("foo", [])

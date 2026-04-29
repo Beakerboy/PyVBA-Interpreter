@@ -23,17 +23,22 @@ class VbaListener(Listener):
             raise VbaException(
                 "Name conflicts with existing module, project, or object "
                 "library")
-        self.table.definitions[self.module_name.lower()] = {}
+        self.table.definitions[self.module_name.lower()] = {
+            "name": self.module_name.lower(),
+            "type": FunctionType.MODULE,
+            "functions": {}
+        }
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText()
-        if name.lower() in self.table.definitions[self.module_name.lower()]:
+        funcs = self.table.definitions[self.module_name.lower()]["functions"]
+        if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[self.module_name.lower()][name.lower()] = {
+        funcs[name.lower()] = {
             "type": FunctionType.FUNCTION,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
@@ -44,11 +49,12 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText()
-        if name.lower() in self.table.definitions[self.module_name.lower()]:
+        funcs = self.table.definitions[self.module_name.lower()]["functions"]
+        if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
-        self.table.definitions[self.module_name.lower()][name.lower()] = {
+        funcs[name.lower()] = {
             "type": FunctionType.SUB,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),

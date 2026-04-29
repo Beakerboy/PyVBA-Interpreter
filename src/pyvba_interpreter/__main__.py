@@ -15,8 +15,8 @@ def main() -> None:
     parser.add_argument("module",
                         help="The module that contains your code.")
     args = parser.parse_args()
-    path = Path(args.module).resolve()
     function_to_run = args.function
+    path = Path(args.module).resolve()
     if Path(path).exists():
         input_stream = FileStream(args.module)
         lexer = Lexer(input_stream)
@@ -32,8 +32,9 @@ def main() -> None:
 
     interpreter = VbaVisitor(table)
     interpreter.visit(tree)
-    if function_to_run in table.definitions:
-        target_node = table.definitions[function_to_run]
+    if function_to_run in table.definitions[args.module]["functions"]:
+        target_node = table.definitions[
+            args.module]["functions"][function_to_run]
         interpreter.visitChildren(target_node)
     else:
         print("error:")

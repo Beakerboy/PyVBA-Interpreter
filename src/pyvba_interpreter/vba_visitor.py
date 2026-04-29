@@ -3,7 +3,8 @@ from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_stdlib.literal_factory import literal_from_string
 from .symbol_table import (
-    FunctionDefinition, FunctionType, LibraryDefinition, SymbolTable
+    FunctionDefinition, FunctionType, LibModuleDefinition, LibraryDefinition,
+    ModuleDefinition, SymbolTable
 )
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
@@ -21,8 +22,15 @@ class VbaVisitor(Visitor):
 
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
+
+        # Instead of a list, this could probably be chaged to just
+        # a dictionary of the current scope. The previous scope could
+        # be retained like done with context. In theory this could
+        # help with debugging.
         self.env_stack: list[dict[str, Any]] = []
-        self.module = ""
+
+        # The current project, module, and function context
+        self.context = ["vbaproject", "", ""]
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -38,7 +46,16 @@ class VbaVisitor(Visitor):
             ctx: Parser.LetStatementContext) -> None:
         current_env = self.env_stack[-1]
         var_name = ctx.lExpression().getText().lower()
+        if var_name not in current_env:
+            if self._function_in_project(var_name):
+                defn = self._find_function_in_definition(var_name, "")
+                if defn["type"] == FunctionType.SUB:
+                    raise VbaCompileException("Expected Function or variable")
+                else:
+                    raise VbaException()
         value = self.visit(ctx.expression())
+        if isinstance(value, dict):
+            raise VbaCompileException("Expected Function or variable")
         current_env[var_name] = value
 
     def visitCallStatement(                                        # noqa: N802
@@ -177,13 +194,6 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
-
-    def visitAmbiguousIdentifier(                                  # noqa: N802
-            self: T,
-            ctx: Parser.AmbiguousIdentifierContext) -> Any:
-        current_env = self.env_stack[-1]
-        var_name = ctx.getText().lower()
-        return current_env[var_name]
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
@@ -325,7 +335,7 @@ class VbaVisitor(Visitor):
                 hasattr(type(l_express), "unrestrictedName")
         ):
             command = l_express.unrestrictedName().getText().lower()
-            module = l_express.lExpression().getText().lower()
+            module = self.visitLExpress(l_express.lExpression())["name"]
         else:
             command = l_express.getText().lower()
         args: list[Any] = []
@@ -333,31 +343,47 @@ class VbaVisitor(Visitor):
             args = self.visitArgumentList(ctx.argumentList())
         return self.execute_function(command, args, module, no_sub)
 
+    def visitAmbiguousIdentifier(                                  # noqa: N802
+            self: T,
+            ctx: Parser.AmbiguousIdentifierContext) -> Any:
+        current_env = self.env_stack[-1]
+        name = ctx.getText().lower()
+        if name in current_env:
+            return current_env[name]
+        if self._function_in_project(name):
+            return self._find_function_in_definition(name, self.context[1])
+        if name in self.table.definitions:
+            record = self.table.definitions[name]
+            return record
+        if name in self.table.library_definitions:
+            lib_record = self.table.library_definitions[name]
+            return lib_record
+        raise VbaCompileException("Method or data member not found")
+
     def execute_function(self: T, command: str,
                          args: list[Any], module: str = "",
                          no_sub: bool = True) -> Any:
         command = command.lower()
         if command == "array":
             return args
-        mod_defn: dict[str, FunctionDefinition] | dict[str, LibraryDefinition]
+        mod_defn: ModuleDefinition | LibModuleDefinition
         if module != "":
             if module in self.table.definitions:
                 mod_defn = self.table.definitions[module]
-            elif module in self.table.definitions:
+            elif module in self.table.library_definitions:
                 mod_defn = self.table.library_definitions[module]
             else:
                 raise VbaException()
-            if command in mod_defn:
-                defn = mod_defn[command]
+            if command in mod_defn["functions"]:
+                defn = mod_defn["functions"][command]
             else:
                 raise VbaCompileException("Method or data member not found")
-            previous_module = self.module
-            self.module = module
         else:
-            defn = self._find_function_in_definition(command, self.module)
+            defn = self._find_function_in_definition(command, self.context[1])
             module = defn["module"]
-            previous_module = self.module
-            self.module = module
+        previous_context = self.context
+        self.context[1] = module
+        self.context[2] = command
 
         if no_sub and defn["type"] == FunctionType.SUB:
             raise VbaCompileException("Expected Function or variable")
@@ -401,7 +427,7 @@ class VbaVisitor(Visitor):
                     raise VbaCompileException(e.msg)
             output = current_env[command]
             self.env_stack.pop()
-            self.module = previous_module
+            self.context = previous_context
         elif ctx is not None:
             try:
                 output = ctx(*args)
@@ -417,13 +443,13 @@ class VbaVisitor(Visitor):
             self: T, command: str, cur_module: str
     ) -> FunctionDefinition | LibraryDefinition:
         if cur_module != "" and command in self.table.definitions[cur_module]:
-            return self.table.definitions[cur_module][command]
-        for key, mod in self.table.definitions.items():
-            if command in mod:
-                return mod[command]
-        for key, lib_mod in self.table.library_definitions.items():
-            if command in lib_mod:
-                return lib_mod[command]
+            return self.table.definitions[cur_module]["functions"][command]
+        for _, mod in self.table.definitions.items():
+            if command in mod["functions"]:
+                return mod["functions"][command]
+        for _, lib_mod in self.table.library_definitions.items():
+            if command in lib_mod["functions"]:
+                return lib_mod["functions"][command]
         if command in self.table.definitions:
             msg = "Expected variable or procedure, not module"
             raise VbaCompileException(msg)
@@ -432,3 +458,12 @@ class VbaVisitor(Visitor):
             raise VbaCompileException(msg)
 
         raise VbaCompileException("Sub or Function not defined")
+
+    def _function_in_module(self: T, module: str, function: str) -> bool:
+        return function in self.table.definitions[module]
+
+    def _function_in_project(self: T, function: str) -> bool:
+        for key, mod in self.table.definitions.items():
+            if function in mod["functions"]:
+                return True
+        return False

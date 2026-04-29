@@ -4,9 +4,11 @@ from typing import Any, Callable, TypedDict, TypeVar
 
 
 class FunctionType(Enum):
-    FUNCTION = 0
-    SUB = 1
-    PROPERTY = 2
+    PROJECT = 0
+    MODULE = 1
+    FUNCTION = 2
+    SUB = 3
+    PROPERTY = 4
 
 
 class ParamDefinition(TypedDict):
@@ -30,6 +32,18 @@ class LibraryDefinition(FunctionBase):
     params: list[ParamDefinition]
 
 
+class ModuleDefinition(TypedDict):
+    name: str
+    type: FunctionType
+    functions: dict[str, FunctionDefinition]
+
+
+class LibModuleDefinition(TypedDict):
+    name: str
+    type: FunctionType
+    functions: dict[str, LibraryDefinition]
+
+
 T = TypeVar('T', bound='SymbolTable')
 
 
@@ -37,5 +51,5 @@ class SymbolTable:
     def __init__(self: T) -> None:
         # Maps module name -> function name -> the actual ParseTree node
         # for that sub/function
-        self.definitions: dict[str, dict[str, FunctionDefinition]] = {}
-        self.library_definitions: dict[str, dict[str, LibraryDefinition]] = {}
+        self.definitions: dict[str, ModuleDefinition] = {}
+        self.library_definitions: dict[str, LibModuleDefinition] = {}
