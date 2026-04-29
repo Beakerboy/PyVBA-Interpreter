@@ -11,9 +11,11 @@ T = TypeVar('T', bound='VbaListener')
 
 
 class VbaListener(Listener):
-    def __init__(self: T, table: SymbolTable) -> None:
+    def __init__(self: T, table: SymbolTable, project: str) -> None:
         self.table = table
         self.module_name = ""
+        self.project_name = project
+        self.table.definitions[self.project_name.lower()] = {}
 
     def enterProceduralModuleHeader(                               # noqa: N802
             self: T,
@@ -23,7 +25,7 @@ class VbaListener(Listener):
             raise VbaException(
                 "Name conflicts with existing module, project, or object "
                 "library")
-        self.table.definitions[self.module_name.lower()] = {}
+        self.table.definitions[self.project_name.lower()][self.module_name.lower()] = {}
 
     def enterFunctionDeclaration(                                  # noqa: N802
             self: T,
