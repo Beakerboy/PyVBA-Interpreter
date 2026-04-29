@@ -308,6 +308,14 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return left == right
 
+    def visitMemberAccessExpress(                                # noqa N802
+            self: T,
+            ctx: Parser.MemberAccessExpressContext) -> Any:
+        l_express = self.visit(ctx.lExpression())
+        name = command = ctx.unrestrictedName().getText().lower()
+        if l_express["type"] == FuntionType.MODULE:
+            return l_express["function"][name]
+
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
     def visitIndexExpress(                                       # noqa: N802
