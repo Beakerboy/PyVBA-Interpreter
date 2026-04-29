@@ -125,31 +125,6 @@ def test_function_not_defined() -> None:
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
 
-@pytest.mark.parametrize(
-    "code", [
-        ('Function Foo()\n'
-         '    Foo = Bar()\n'
-         'End Function\n'
-         'Sub Bar()\n'
-         'End Sub\n'),
-        ('Function Foo()\n'
-         '    Foo = Bar\n'
-         'End Function\n'
-         'Sub Bar()\n'
-         'End Sub\n'),
-    ])
-def test_use_sub_as_function(code: str) -> None:
-    code = ('Function Foo()\n'
-            '    Foo = Bar()\n'
-            'End Function\n'
-            'Sub Bar()\n'
-            'End Sub\n')
-    visitor = build_interp(code)
-    with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
-    assert str(e.value) == "Compile error:\nExpected Function or variable"
-
-
 @patch('builtins.print')
 def test_override(mock_print: str) -> None:
     code = ('Function hello()\n'
@@ -195,13 +170,33 @@ def test_two_functions() -> None:
     assert result == 2
 
 
-def test_sub_as_variable() -> None:
-    code = ('Function Foo()\n'
-            '    Bar = 1\n'
-            '    Foo = Bar\n'
-            'End Function\n'
-            'Sub Bar()\n'
-            'End Sub\n')
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Foo()\n'
+         '    Bar = 1\n'
+         '    Foo = Bar\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+         '    Bar\n'
+         '    Foo = 2\n'
+         'End Function\n'
+         'Sub Bar()\n'
+         '    Bar = 2\n'
+         'End Sub\n'),
+        ('Function Foo()\n'
+          '    Foo = Bar()\n'
+          'End Function\n'
+          'Sub Bar()\n'
+          'End Sub\n'),
+        ('Function Foo()\n'
+          '    Foo = Bar\n'
+          'End Function\n'
+          'Sub Bar()\n'
+          'End Sub\n'),
+    ])
+def test_sub_as_variable(code: str) -> None:
     visitor = build_interp(code)
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("foo", [])
