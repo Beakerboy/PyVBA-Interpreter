@@ -312,6 +312,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.MemberAccessExpressContext) -> Any:
         l_express = self.visit(ctx.lExpression())
+        assert l_express is not None
         name = ctx.unrestrictedName().getText().lower()
         if l_express["type"] == FunctionType.MODULE:
             return l_express["function"][name]
