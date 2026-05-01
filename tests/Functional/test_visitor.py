@@ -61,6 +61,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         "type": FunctionType.MODULE,
         "functions": {
             "msgbox": {
+                "name": "msgbox",
                 "type": FunctionType.FUNCTION,
                 "handle": getattr(Interaction, "MsgBox"),
                 "module": "vba"
@@ -156,6 +157,7 @@ def test_missing_argument() -> None:
         "type": FunctionType.MODULE,
         "functions": {
             "msgbox": {
+                "name": "msgbox",
                 "type": FunctionType.FUNCTION,
                 "handle": getattr(Interaction, "MsgBox"),
                 "module": "vba"
