@@ -200,6 +200,7 @@ class VbaVisitor(Visitor):
         An LExpression can still be undecided if it's a function or value. By
         The time it rolls up to expression, it's been evaluated.
         """
+        raise Exception()
         result = self.visitChildren(ctx)
         if isinstance(result, tuple):
             return result[1]
