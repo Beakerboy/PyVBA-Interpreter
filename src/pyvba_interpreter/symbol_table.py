@@ -23,11 +23,13 @@ class FunctionBase(TypedDict):
 
 
 class FunctionDefinition(FunctionBase):
+    name: str
     handle: Parser.ProcedureBodyContext | None
     params: list[ParamDefinition]
 
 
 class LibraryDefinition(FunctionBase):
+    name: str
     handle: Callable
     params: list[ParamDefinition]
 
