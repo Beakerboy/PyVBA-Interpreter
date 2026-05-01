@@ -322,8 +322,13 @@ class VbaVisitor(Visitor):
     def visitIndexExpress(                                       # noqa: N802
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
-        func = self.visit(ctx.lExpression())
-        return self._visit_shared_index_expression(ctx, True)
+        defn = self.visit(ctx.lExpression())
+        if defn["type"] == FunctionType.SUB:
+            raise VbaCompileException("Expected Function or variable")
+        args: list[Any] = []
+        if ctx.argumentList() is not None:
+            args = self.visitArgumentList(ctx.argumentList())
+        return self.run_function(defn, args)
 
     # Only used within implicit call statement.
     # Must be a Function or Sub
@@ -397,8 +402,11 @@ class VbaVisitor(Visitor):
         self.context[1] = module
         self.context[2] = command
 
-        if no_sub and defn["type"] == FunctionType.SUB:
-            raise VbaCompileException("Expected Function or variable")
+        return self.run_function(defn, args)
+
+    def run_function(self: T,
+                     defn: FunctionDefinition | LibraryDefinition,
+                     args: list[Any]) -> Any:
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
             current_env = {}
