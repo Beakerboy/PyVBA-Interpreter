@@ -326,6 +326,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.IndexExpressContext) -> Any:
         defn = self.visit(ctx.lExpression())
+        assert defn is not None
         if defn["type"] == FunctionType.SUB:
             raise VbaCompileException("Expected Function or variable")
         args: list[Any] = []
