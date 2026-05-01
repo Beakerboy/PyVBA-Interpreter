@@ -55,6 +55,8 @@ class VbaVisitor(Visitor):
                 else:
                     raise VbaException()
         value = self.visit(ctx.expression())
+        if isinstance(result, tuple):
+            value = value[1]
         if isinstance(value, dict):
             raise VbaCompileException("Expected Function or variable")
         current_env[var_name] = value
