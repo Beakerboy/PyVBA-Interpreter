@@ -412,11 +412,9 @@ class VbaVisitor(Visitor):
         if self._function_in_project(name):
             return self._find_function_in_definition(name, self.context[1])
         if name in self.table.definitions:
-            record = self.table.definitions[name]
-            return record
+            return self.table.definitions[name]
         if name in self.table.library_definitions:
-            lib_record = self.table.library_definitions[name]
-            return lib_record
+            return self.table.library_definitions[name]
         raise VbaCompileException("Method or data member not found")
 
     def execute_function(self: T, command: str,
