@@ -390,8 +390,10 @@ class VbaVisitor(Visitor):
         name = ctx.getText().lower()
         if name in current_env:
             if self._function_in_project(name):
-                return [self._find_function_in_definition(name, self.context[1]),
-                        current_env[name]]
+                return [
+                    self._find_function_in_definition(name, self.context[1]),
+                    current_env[name]
+                ]
             return current_env[name]
 
         if self._function_in_project(name):
