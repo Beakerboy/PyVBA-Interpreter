@@ -385,7 +385,7 @@ class VbaVisitor(Visitor):
         An indexExpression will choose the function, while a the letStatement
         would choose the value.
         """
-        
+
         current_env = self.env_stack[-1]
         name = ctx.getText().lower()
         if name in current_env:
@@ -393,7 +393,7 @@ class VbaVisitor(Visitor):
                 return [self._find_function_in_definition(name, self.context[1]),
                         current_env[name]]
             return current_env[name]
-            
+
         if self._function_in_project(name):
             return self._find_function_in_definition(name, self.context[1])
         if name in self.table.definitions:
