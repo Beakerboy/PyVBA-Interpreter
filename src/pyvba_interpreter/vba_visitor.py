@@ -192,6 +192,17 @@ class VbaVisitor(Visitor):
                     args += [self.visit(child)]
         return args
 
+    def visitExpression(                                           # noqa: N802
+            self: T,
+            ctx: Parser.ExpressionContext) -> Any:
+        """
+        as LExpression can still be undecided if it's a function or value. By
+        The time it rolls up to expression, it's been evaluated.
+        """
+        result = self.visitChildren(ctx)
+        if isinstance(result, tuple):
+            return result[1]
+
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
@@ -329,7 +340,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.IndexExpressContext) -> Any:
         defn = self.visit(ctx.lExpression())
         assert defn is not None
-        if isinstance(defn, list):
+        if isinstance(defn, tuple):
             defn = defn[0]
         if defn["type"] == FunctionType.SUB:
             raise VbaCompileException("Expected Function or variable")
@@ -390,10 +401,10 @@ class VbaVisitor(Visitor):
         name = ctx.getText().lower()
         if name in current_env:
             if self._function_in_project(name):
-                return [
+                return (
                     self._find_function_in_definition(name, self.context[1]),
                     current_env[name]
-                ]
+                )
             return current_env[name]
 
         if self._function_in_project(name):
