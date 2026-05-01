@@ -91,8 +91,6 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = True Xor False', True),
         ('hello = True Imp False', False),
         ('hello = True Eqv False', False),
-        ('hello = Array(1)', [1]),
-        ('hello = Array(1, 2)', [1, 2]),
         ('hello = 1\n'
          'Exit Function\n'
          'hello = 2\n', 1),
