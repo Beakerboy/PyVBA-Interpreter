@@ -310,7 +310,8 @@ class VbaVisitor(Visitor):
 
     def visitMemberAccessExpress(                                # noqa N802
             self: T,
-            ctx: Parser.MemberAccessExpressContext) -> Any:
+            ctx: Parser.MemberAccessExpressContext
+    ) -> FunctionDefinition | LibraryDefinition:
         l_express = self.visit(ctx.lExpression())
         assert l_express is not None
         name = ctx.unrestrictedName().getText().lower()
