@@ -405,8 +405,8 @@ class VbaVisitor(Visitor):
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
         previous_context = self.context
-        self.context[1] = module
-        self.context[2] = command
+        self.context[1] = defn["module"]
+        self.context[2] = defn["name"]
 
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
