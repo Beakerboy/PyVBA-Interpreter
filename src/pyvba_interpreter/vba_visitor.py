@@ -398,15 +398,16 @@ class VbaVisitor(Visitor):
         else:
             defn = self._find_function_in_definition(command, self.context[1])
             module = defn["module"]
-        previous_context = self.context
-        self.context[1] = module
-        self.context[2] = command
 
         return self.run_function(defn, args)
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
+        previous_context = self.context
+        self.context[1] = module
+        self.context[2] = command
+
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
             current_env = {}
