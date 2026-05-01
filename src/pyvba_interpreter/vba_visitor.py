@@ -383,7 +383,9 @@ class VbaVisitor(Visitor):
             command = l_express.getText().lower()
         args: list[Any] = []
         if ctx.argumentList() is not None:
-            args = self.visit(ctx.argumentList())
+            args_temp = self.visit(ctx.argumentList())
+            assert args_temp is not None
+            args = args_temp
         return self.execute_function(command, args, module, no_sub)
 
     def visitAmbiguousIdentifier(                                  # noqa: N802
