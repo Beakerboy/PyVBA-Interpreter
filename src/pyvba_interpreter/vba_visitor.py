@@ -193,18 +193,6 @@ class VbaVisitor(Visitor):
                     args += [self.visit(child)]
         return args
 
-    def visitExpression(                                           # noqa: N802
-            self: T,
-            ctx: Parser.ExpressionContext) -> Any:
-        """
-        An LExpression can still be undecided if it's a function or value. By
-        The time it rolls up to expression, it's been evaluated.
-        """
-        raise Exception()
-        result = self.visitChildren(ctx)
-        if isinstance(result, tuple):
-            return result[1]
-
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
@@ -216,11 +204,15 @@ class VbaVisitor(Visitor):
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
+        if isinstance(left, tuple):
+            left = left[1]
         assert left is not None
         last = ctx.getChildCount() - 1
         right_child = ctx.getChild(last)
         assert right_child is not None
         right = self.visit(right_child)
+        if isinstance(right, tuple):
+            right = right[1]
         assert right is not None
         op = self._get_op(ctx)
         if op == '*':
@@ -268,6 +260,8 @@ class VbaVisitor(Visitor):
             ctx: Parser.UnaryMinusExpressionContext) -> int | float:
         value = self.visit(ctx.expression())
         assert value is not None
+        if isinstance(value, tuple):
+            value = value[1]
         return -1 * value
 
     def visitRelationExpression(                                   # noqa: N802
@@ -277,10 +271,14 @@ class VbaVisitor(Visitor):
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
+        if isinstance(left, tuple):
+            left = left[1]
         last = ctx.getChildCount() - 1
         right_child = ctx.getChild(last)
         assert right_child is not None
         right = self.visit(right_child)
+        if isinstance(right, tuple):
+            right = right[1]
         assert left is not None
         assert right is not None
         op = self._get_op(ctx)
@@ -310,7 +308,11 @@ class VbaVisitor(Visitor):
         assert right_child is not None
         right = self.visit(right_child)
         assert left is not None
+        if isinstance(left, tuple):
+            left = left[1]
         assert right is not None
+        if isinstance(right, tuple):
+            right = right[1]
         op = self._get_op(ctx).upper()
         if op == "AND":
             return left and right
