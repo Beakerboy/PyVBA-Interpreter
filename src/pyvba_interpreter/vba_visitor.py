@@ -340,6 +340,8 @@ class VbaVisitor(Visitor):
             ),
             no_sub: bool = False) -> Any:
         module = ""
+        if hasattr(ctx, "memberAccessExpress"):
+            raise Exception()
         l_express = ctx.lExpression()
         if (
                 hasattr(type(l_express), "unrestrictedName")
