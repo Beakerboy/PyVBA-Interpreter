@@ -347,7 +347,7 @@ class VbaVisitor(Visitor):
             raise VbaCompileException(msg)
         args: list[Any] = []
         if ctx.argumentList() is not None:
-            args = self.visitArgumentList(ctx.argumentList())
+            args = self.visit(ctx.argumentList())
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
@@ -377,7 +377,7 @@ class VbaVisitor(Visitor):
             command = l_express.getText().lower()
         args: list[Any] = []
         if ctx.argumentList() is not None:
-            args = self.visitArgumentList(ctx.argumentList())
+            args = self.visit(ctx.argumentList())
         return self.execute_function(command, args, module, no_sub)
 
     def visitAmbiguousIdentifier(                                  # noqa: N802
