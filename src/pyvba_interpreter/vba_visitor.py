@@ -340,7 +340,7 @@ class VbaVisitor(Visitor):
             ),
             no_sub: bool = False) -> Any:
         module = ""
-        if hasattr(ctx, "memberAccessExpress"):
+        if hasattr(ctx.lExpression(), "memberAccessExpress"):
             raise Exception()
         l_express = ctx.lExpression()
         if (
