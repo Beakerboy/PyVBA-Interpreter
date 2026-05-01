@@ -54,8 +54,6 @@ class VbaVisitor(Visitor):
                 else:
                     raise VbaException()
         value = self.visit(ctx.expression())
-        if isinstance(value, list):
-            value = value[1]
         if isinstance(value, dict):
             raise VbaCompileException("Expected Function or variable")
         current_env[var_name] = value
@@ -196,7 +194,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ExpressionContext) -> Any:
         """
-        as LExpression can still be undecided if it's a function or value. By
+        An LExpression can still be undecided if it's a function or value. By
         The time it rolls up to expression, it's been evaluated.
         """
         result = self.visitChildren(ctx)
