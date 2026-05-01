@@ -421,7 +421,7 @@ class VbaVisitor(Visitor):
                 i += 1
             self.env_stack.append(current_env)
             if defn["type"] == FunctionType.FUNCTION:
-                current_env[command] = None
+                current_env[defn["name"]] = None
             try:
                 self.visitChildren(ctx)
             except ExitDoException as e:
@@ -446,7 +446,7 @@ class VbaVisitor(Visitor):
                         defn["type"] == FunctionType.PROPERTY
                 ):
                     raise VbaCompileException(e.msg)
-            output = current_env[command]
+            output = current_env[defn["name"]]
             self.env_stack.pop()
             self.context = previous_context
         elif ctx is not None:
