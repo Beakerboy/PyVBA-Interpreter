@@ -351,6 +351,10 @@ class VbaVisitor(Visitor):
         if defn["type"] == FunctionType.MODULE:
             msg = "Expected variable or procedure, not module"
             raise VbaCompileException(msg)
+        if defn["type"] == FunctionType.PROJECT:
+            msg = "Expected variable or procedure, not project"
+            raise VbaCompileException(msg)
+
         args: list[Any] = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
