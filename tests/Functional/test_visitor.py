@@ -33,7 +33,7 @@ def build_interp(code: str) -> VbaVisitor:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VbaListener(table)
+    listener = VbaListener(table, "vbaproject")
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     return VbaVisitor(table)
