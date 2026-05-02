@@ -535,7 +535,8 @@ class VbaVisitor(Visitor):
         return function in self.table.definitions[module]
 
     def _function_in_project(self: T, function: str) -> bool:
-        for key, mod in self.table.definitions.items():
+        project = self.table.definitions[self.context[0]]
+        for mod in project["modules"].values():
             if function in mod["functions"]:
                 return True
         return False
