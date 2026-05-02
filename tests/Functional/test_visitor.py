@@ -264,7 +264,7 @@ def test_func_as_variable() -> None:
     ])
 def test_call_module_name(code1: str) -> None:
     table = SymbolTable()
-    build_interp("FooModule", code1, table)
+    build_interp(code1)
     visitor = VbaVisitor(table)
     visitor.table.library_definitions["vba"] = {
         "name": "vba",
