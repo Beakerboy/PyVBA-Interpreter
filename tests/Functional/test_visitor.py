@@ -250,3 +250,33 @@ def test_func_as_variable() -> None:
     visitor = build_interp(code)
     with pytest.raises(VbaException):
         visitor.execute_function("foo", [])
+
+
+@pytest.mark.parametrize(
+    "code1, code2", [
+        ('Function Foo()\n'
+         '    Foo = VBA()\n'
+         'End Function\n'),
+    ])
+def test_call_module_name(code1: str, code2: str) -> None:
+    table = SymbolTable()
+    visitor.table.library_definitions["vba"] = {
+        "name": "vba",
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+    }}}}}
+    build_interp("FooModule", code1, table)
+    visitor = VbaVisitor(table)
+    with pytest.raises(VbaCompileException) as e:
+        visitor.execute_function("foo", [])
+    expected = "Compile error:\nExpected variable or procedure, not project"
+    assert str(e.value) == expected
