@@ -46,6 +46,18 @@ class LibModuleDefinition(TypedDict):
     functions: dict[str, LibraryDefinition]
 
 
+class ProjectDefinition(TypedDict):
+    name: str
+    type: FunctionType
+    modules: dict[str, ModuleDefinition]
+
+
+class LibProjectDefinition(TypedDict):
+    name: str
+    type: FunctionType
+    modules: dict[str, LibModuleDefinition]
+
+
 T = TypeVar('T', bound='SymbolTable')
 
 
@@ -53,5 +65,5 @@ class SymbolTable:
     def __init__(self: T) -> None:
         # Maps module name -> function name -> the actual ParseTree node
         # for that sub/function
-        self.definitions: dict[str, ModuleDefinition] = {}
-        self.library_definitions: dict[str, LibModuleDefinition] = {}
+        self.definitions: dict[str, ProjectDefinition] = {}
+        self.library_definitions: dict[str, LibProjectDefinition] = {}
