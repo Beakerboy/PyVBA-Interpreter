@@ -279,7 +279,11 @@ def test_call_module_name(code1: str, code2: str) -> None:
                         "type": FunctionType.FUNCTION,
                         "handle": getattr(Interaction, "MsgBox"),
                         "module": "interaction"
-    }}}}}
+                    }
+                }
+            }
+        }
+    }
     with pytest.raises(VbaCompileException) as e:
         visitor.execute_function("foo", [])
     expected = "Compile error:\nExpected variable or procedure, not project"
