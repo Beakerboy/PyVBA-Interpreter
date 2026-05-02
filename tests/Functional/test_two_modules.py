@@ -26,7 +26,7 @@ def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
     tree = vbaparser.module()
-    listener = VbaListener(table)
+    listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     return table
