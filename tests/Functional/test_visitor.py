@@ -43,7 +43,11 @@ def build_interp(code: str) -> VbaVisitor:
 @pytest.mark.parametrize(
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
+        ('Call VBA.MsgBox("Hello World")', "Hello World"),
+        ('Call VBA.Interaction.MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
+        ('VBA.MsgBox "Hello World"', "Hello World"),
+        ('VBA.Interaction.MsgBox "Hello World"', "Hello World"),
         ('Call MsgBox(1 < 2)', "True"),
         ('Call MsgBox(1 <= 2)', "True"),
         ('Call MsgBox(1 > 2)', "False"),
