@@ -78,7 +78,8 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             }
         }
     }
-    interpreter.execute_function("hello", [])
+    func = table["vbaproject"]["modules"]["helloworld"]["functions"]["hello"]
+    interpreter.run_function(func, [])
     mock_print.assert_called_with(expected)
 
 
