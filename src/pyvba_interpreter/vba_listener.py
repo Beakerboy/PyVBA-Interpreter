@@ -11,7 +11,7 @@ T = TypeVar('T', bound='VbaListener')
 
 
 class VbaListener(Listener):
-    def __init__(self: T, project:str, table: SymbolTable) -> None:
+    def __init__(self: T, project: str, table: SymbolTable) -> None:
         self.table = table
         self.module_name = ""
         self.project_name = project.lower()
