@@ -517,7 +517,7 @@ class VbaVisitor(Visitor):
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module]["functions"][command]
         for key, proj in self.table.definitions.items():
-            if key == command
+            if key == command:
                 msg = "Expected variable or procedure, not project"
                 raise VbaCompileException(msg)
             if command in proj["modules"]:
@@ -527,7 +527,7 @@ class VbaVisitor(Visitor):
                 if command in mod["functions"]:
                     return mod["functions"][command]
         for key, lib_proj in self.table.library_definitions.items():
-            if key == command
+            if key == command:
                 msg = "Expected variable or procedure, not project"
                 raise VbaCompileException(msg)
             if command in lib_proj["modules"]:
