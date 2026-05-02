@@ -533,13 +533,9 @@ class VbaVisitor(Visitor):
             if command in lib_proj["modules"]:
                 msg = "Expected variable or procedure, not module"
                 raise VbaCompileException(msg)
-            for lib_mod in lib_prod["modules"].values():
+            for lib_mod in lib_proj["modules"].values():
                 if command in lib_mod["functions"]:
                     return lib_mod["functions"][command]
-        
-            # Need one more level, project, module, function.
-            
-
         raise VbaCompileException("Sub or Function not defined")
 
     def _function_in_module(self: T, module: str, function: str) -> bool:
