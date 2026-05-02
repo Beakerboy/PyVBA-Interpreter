@@ -257,12 +257,12 @@ def test_func_as_variable() -> None:
 
 
 @pytest.mark.parametrize(
-    "code1, code2", [
+    "code1", [
         ('Function Foo()\n'
          '    Foo = VBA()\n'
          'End Function\n'),
     ])
-def test_call_module_name(code1: str, code2: str) -> None:
+def test_call_module_name(code1: str) -> None:
     table = SymbolTable()
     build_interp("FooModule", code1, table)
     visitor = VbaVisitor(table)
