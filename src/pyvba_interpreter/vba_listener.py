@@ -15,6 +15,7 @@ class VbaListener(Listener):
         self.table = table
         self.module_name = ""
         self.project_name = project.lower()
+        self.table.definitions[self.project_name] = {}
 
     def enterProceduralModuleHeader(                               # noqa: N802
             self: T,
