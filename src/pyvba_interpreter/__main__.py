@@ -28,7 +28,7 @@ def main() -> None:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VbaListener(table)
+    listener = VbaListener(project, table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
 
