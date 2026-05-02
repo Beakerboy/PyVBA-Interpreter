@@ -17,7 +17,7 @@ def test_interpreter() -> None:
     vbaparser = Parser(ts)
     tree = vbaparser.module()  # or module?
     table = SymbolTable()
-    listener = VbaListener(table)
+    listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     assert len(table.definitions) == 1
