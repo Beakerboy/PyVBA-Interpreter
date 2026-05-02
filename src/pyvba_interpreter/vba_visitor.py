@@ -514,7 +514,7 @@ class VbaVisitor(Visitor):
     def _find_function_in_definition(
             self: T, command: str, cur_module: str
     ) -> FunctionDefinition | LibraryDefinition:
-        for proj in self.table.definitions.values(): 
+        for proj in self.table.definitions.values():
             if cur_module != "" and command in proj["modules"][cur_module]:
                 return self.table.definitions[cur_module]["functions"][command]
         for key, proj in self.table.definitions.items():
