@@ -365,91 +365,20 @@ class VbaVisitor(Visitor):
     def visitIndexExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.IndexExpressionContext) -> None:
-        self._visit_shared_index_expression(ctx)
+        defn = self.visit(ctx.lExpression())
+        assert defn is not None
+        if isinstance(defn, tuple):
+            defn = defn[0]
+        if defn["type"] == FunctionType.MODULE:
+            msg = "Expected variable or procedure, not module"
+            raise VbaCompileException(msg)
+        if defn["type"] == FunctionType.PROJECT:
+            msg = "Expected variable or procedure, not project"
+            raise VbaCompileException(msg)
 
-    def _visit_shared_index_expression(
-            self: T,
-            ctx: (
-                Parser.IndexExpressContext |
-                Parser.IndexExpressionContext
-            ),
-            no_sub: bool = False) -> Any:
-        module = ""
-        if hasattr(ctx.lExpression(), "memberAccessExpress"):
-            raise Exception()
-        l_express = ctx.lExpression()
-        if (
-                hasattr(type(l_express), "unrestrictedName")
-        ):
-            command = l_express.unrestrictedName().getText().lower()
-            module = self.visitLExpress(l_express.lExpression())["name"]
-        else:
-            command = l_express.getText().lower()
         args: list[Any] = []
         if ctx.argumentList() is not None:
-            args_temp = self.visit(ctx.argumentList())
-            assert args_temp is not None
-            args = args_temp
-        return self.execute_function(command, args, module, no_sub)
-
-    def visitAmbiguousIdentifier(                                  # noqa: N802
-            self: T,
-            ctx: Parser.AmbiguousIdentifierContext) -> Any:
-        """
-        If a function is calling itself, there will be a function and a value
-        in the current scope. The let statement will need to decide if it wants
-        to use the value or call the function.
-        Function Foo(I)
-            Foo = 1
-            Bar = Foo
-            ' Versus
-            Baz = Foo(I - 1)
-        End Function
-
-        An indexExpression will choose the function, while a the letStatement
-        would choose the value.
-        """
-
-        current_env = self.env_stack[-1]
-        name = ctx.getText().lower()
-        if name in current_env:
-            if self._function_in_project(name):
-                return (
-                    self._find_function_in_definition(name, self.context[1]),
-                    current_env[name]
-                )
-            return current_env[name]
-
-        if self._function_in_project(name):
-            return self._find_function_in_definition(name, self.context[1])
-        if name in self.table.definitions:
-            return self.table.definitions[name]
-        if name in self.table.library_definitions:
-            return self.table.library_definitions[name]
-        raise VbaCompileException("Method or data member not found")
-
-    def execute_function(self: T, command: str,
-                         args: list[Any], module: str = "",
-                         no_sub: bool = True) -> Any:
-        command = command.lower()
-        if command == "array":
-            return args
-        mod_defn: ModuleDefinition | LibModuleDefinition
-        if module != "":
-            if module in self.table.definitions:
-                mod_defn = self.table.definitions[module]
-            elif module in self.table.library_definitions:
-                mod_defn = self.table.library_definitions[module]
-            else:
-                raise VbaException()
-            if command in mod_defn["functions"]:
-                defn = mod_defn["functions"][command]
-            else:
-                raise VbaCompileException("Method or data member not found")
-        else:
-            defn = self._find_function_in_definition(command, self.context[1])
-            module = defn["module"]
-
+            args = self.visit(ctx.argumentList())
         return self.run_function(defn, args)
 
     def run_function(self: T,
