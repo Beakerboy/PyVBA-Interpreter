@@ -516,18 +516,29 @@ class VbaVisitor(Visitor):
     ) -> FunctionDefinition | LibraryDefinition:
         if cur_module != "" and command in self.table.definitions[cur_module]:
             return self.table.definitions[cur_module]["functions"][command]
-        for mod in self.table.definitions.values():
-            if command in mod["functions"]:
-                return mod["functions"][command]
-        for lib_mod in self.table.library_definitions.values():
-            if command in lib_mod["functions"]:
-                return lib_mod["functions"][command]
-        if command in self.table.definitions:
-            msg = "Expected variable or procedure, not module"
-            raise VbaCompileException(msg)
+        for key, proj in self.table.definitions.items():
+            if key == command
+                msg = "Expected variable or procedure, not project"
+                raise VbaCompileException(msg)
+            if command in proj["modules"]:
+                msg = "Expected variable or procedure, not module"
+                raise VbaCompileException(msg)
+            for mod in proj["modules"].values():
+                if command in mod["functions"]:
+                    return mod["functions"][command]
+        for key, lib_proj in self.table.library_definitions.items():
+            if key == command
+                msg = "Expected variable or procedure, not project"
+                raise VbaCompileException(msg)
+            if command in lib_proj["modules"]:
+                msg = "Expected variable or procedure, not module"
+                raise VbaCompileException(msg)
+            for lib_mod in lib_prod["modules"].values():
+                if command in lib_mod["functions"]:
+                    return lib_mod["functions"][command]
+        
             # Need one more level, project, module, function.
-            msg = "Expected variable or procedure, not project"
-            raise VbaCompileException(msg)
+            
 
         raise VbaCompileException("Sub or Function not defined")
 
