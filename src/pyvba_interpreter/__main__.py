@@ -37,8 +37,7 @@ def main() -> None:
     project = table.definitions[args.project]
     module = project["modules"][args.module]
     if function_to_run in module["functions"]:
-        target_node = table.definitions[
-            args.module]["functions"][function_to_run]
+        target_node = module["functions"][function_to_run]
         interpreter.visitChildren(target_node)
     else:
         print("error:")
