@@ -58,13 +58,19 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter = build_interp(code)
     interpreter.table.library_definitions["vba"] = {
         "name": "vba",
-        "type": FunctionType.MODULE,
-        "functions": {
-            "msgbox": {
-                "name": "msgbox",
-                "type": FunctionType.FUNCTION,
-                "handle": getattr(Interaction, "MsgBox"),
-                "module": "vba"
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
             }
         }
     }
@@ -136,11 +142,24 @@ def test_override(mock_print: str) -> None:
             'Function MsgBox(temp)\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {"msgbox": {
-        "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox"),
-        "module": "vba"
-    }}
+    visitor.table.library_definitions["vba"] = {
+        "name": "vba",
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
+            }
+        }
+    }
     visitor.execute_function("hello", [])
     mock_print.assert_not_called()
 
@@ -152,13 +171,19 @@ def test_missing_argument() -> None:
     visitor = build_interp(code)
     visitor.table.library_definitions["vba"] = {
         "name": "vba",
-        "type": FunctionType.MODULE,
-        "functions": {
-            "msgbox": {
-                "name": "msgbox",
-                "type": FunctionType.FUNCTION,
-                "handle": getattr(Interaction, "MsgBox"),
-                "module": "vba"
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
             }
         }
     }
