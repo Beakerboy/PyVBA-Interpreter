@@ -14,6 +14,7 @@ class VbaListener(Listener):
     def __init__(self: T, table: SymbolTable) -> None:
         self.table = table
         self.module_name = ""
+        self.project_name = ""
 
     def enterProceduralModuleHeader(                               # noqa: N802
             self: T,
@@ -33,7 +34,9 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> None:
         name = ctx.functionName().getText()
-        funcs = self.table.definitions[self.module_name.lower()]["functions"]
+        mod_name = self.module_name.lower()
+        modules = self.table.definitions[self.project_name.lower()]["modules"]
+        funcs = modules[mod_name]["functions"]
         if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
