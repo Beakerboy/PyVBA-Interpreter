@@ -11,10 +11,10 @@ T = TypeVar('T', bound='VbaListener')
 
 
 class VbaListener(Listener):
-    def __init__(self: T, table: SymbolTable) -> None:
+    def __init__(self: T, project:str, table: SymbolTable) -> None:
         self.table = table
         self.module_name = ""
-        self.project_name = ""
+        self.project_name = project.lower()
 
     def enterProceduralModuleHeader(                               # noqa: N802
             self: T,
@@ -24,7 +24,8 @@ class VbaListener(Listener):
             raise VbaException(
                 "Name conflicts with existing module, project, or object "
                 "library")
-        self.table.definitions[self.module_name.lower()] = {
+        project = self.table.definitions[self.project_name]
+        project["modules"][self.module_name.lower()] = {
             "name": self.module_name.lower(),
             "type": FunctionType.MODULE,
             "functions": {}
@@ -53,7 +54,8 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText()
-        funcs = self.table.definitions[self.module_name.lower()]["functions"]
+        modules = self.table.definitions[self.project_name.lower()]["modules"]
+        funcs = modules[self.module_name.lower()]["functions"]
         if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
