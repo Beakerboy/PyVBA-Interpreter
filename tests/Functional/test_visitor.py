@@ -130,7 +130,7 @@ def test_function_arguments(
     visitor = build_interp(code)
     modules = visitor.table.library_definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
-    result = interpreter.run_function(func, [])
+    result = visitor.run_function(func, [])
     assert result == expected
 
 
