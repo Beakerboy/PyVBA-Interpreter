@@ -71,17 +71,17 @@ class VbaVisitor(Visitor):
             # If no arguments, then it's just a simple name expression
             if ctx.simpleNameExpression() is not None:
                 command = self.visit(ctx.simpleNameExpression())
-                self.execute_function(command, [])
+                self.run_function(command, [])
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
             else:
                 raise Exception("Unsupported")
         else:
-            command = first_child.getText().lower()
+            command = self.visit(first_child)
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
-            self.execute_function(command, args, "", False)
+            self.run_function(command, args)
 
     def visitDoStatement(                                          # noqa: N802
             self: T,
