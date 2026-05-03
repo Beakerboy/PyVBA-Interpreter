@@ -44,7 +44,7 @@ def test_exception() -> None:
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
     tree = vbaparser.module()
-    listener = VbaListener(table)
+    listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     with pytest.raises(VbaCompileException) as e:
         walker.walk(listener, tree)
