@@ -380,6 +380,23 @@ class VbaVisitor(Visitor):
             args = self.visit(ctx.argumentList())
         return self.run_function(defn, args)
 
+    def visitAmbiguousIdentifier(                                  # noqa: N802
+            self: T,
+            ctx: Parser.AmbiguousIdentifierContext) -> Any:
+        current_env = self.env_stack[-1]
+        name = ctx.getText().lower()
+        if name in current_env:
+            return current_env[name]
+        if self._function_in_project(name):
+            return self._find_function_in_definition(name, self.context[1])
+        if name in self.table.definitions:
+            record = self.table.definitions[name]
+            return record
+        if name in self.table.library_definitions:
+            lib_record = self.table.library_definitions[name]
+            return lib_record
+        raise VbaCompileException("Method or data member not found")
+
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
