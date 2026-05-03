@@ -140,7 +140,7 @@ def test_function_not_defined() -> None:
             'End Function\n')
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
-    func = modules["helloworld"]["functions"]["hello"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nSub or Function not defined"
