@@ -281,9 +281,7 @@ def test_func_as_variable() -> None:
          'End Function\n'),
     ])
 def test_call_module_name(code1: str) -> None:
-    table = SymbolTable()
-    build_interp(code1)
-    visitor = VbaVisitor(table)
+    visitor = build_interp(code1)
     visitor.table.library_definitions["vba"] = {
         "name": "vba",
         "type": FunctionType.PROJECT,
