@@ -64,7 +64,9 @@ def test_two_files(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
-    result = visitor.execute_function("foo", [])
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["foomodule"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
     expected = 42
     assert result == expected
 
@@ -81,8 +83,10 @@ def test_member_not_found(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["foomodule"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nMethod or data member not found"
 
 
@@ -98,7 +102,9 @@ def test_call_module_name(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("Bar", code2, table)
     visitor = VbaVisitor(table)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["foomodule"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     expected = "Compile error:\nExpected variable or procedure, not module"
     assert str(e.value) == expected
