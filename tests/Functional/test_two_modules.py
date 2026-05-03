@@ -11,7 +11,7 @@ from pyvba_interpreter.Exceptions.vba_compile_exception import (
 )
 
 
-def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
+def build_interp(name: str, code: str, table: SymbolTable) -> None:
     code = f'Attribute VB_NAME = "{name}"\n{code}'
     file_path = f'tests/files/{name}.bas'
     try:
@@ -29,7 +29,6 @@ def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
     listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
-    return table
 
 
 @pytest.mark.parametrize(
