@@ -271,7 +271,7 @@ def test_func_as_variable() -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaException):
-        visitor.execute_function(func, [])
+        visitor.run_function(func, [])
 
 
 @pytest.mark.parametrize(
