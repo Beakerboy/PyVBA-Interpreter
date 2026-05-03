@@ -70,8 +70,8 @@ class VbaVisitor(Visitor):
         if first_child.getText().lower() == "call":
             # If no arguments, then it's just a simple name expression
             if ctx.simpleNameExpression() is not None:
-                command = ctx.simpleNameExpression().getText().lower()
-                self.execute_function(command, [], "", False)
+                command = self.visit(ctx.simpleNameExpression())
+                self.execute_function(command, [])
             elif ctx.indexExpression() is not None:
                 self.visit(ctx.indexExpression())
             else:
