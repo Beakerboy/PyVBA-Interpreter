@@ -139,8 +139,10 @@ def test_function_not_defined() -> None:
             '    Bar\n'
             'End Function\n')
     visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
 
@@ -170,7 +172,9 @@ def test_override(mock_print: str) -> None:
             }
         }
     }
-    visitor.execute_function("hello", [])
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    visitor.run_function(func, [])
     mock_print.assert_not_called()
 
 
