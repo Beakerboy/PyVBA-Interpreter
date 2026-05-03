@@ -112,7 +112,9 @@ def test_function(input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", [])
+    modules = interpreter.table.library_definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
     assert result == expected
 
 
@@ -126,7 +128,9 @@ def test_function_arguments(
             '    ' + input + '\n'
             'End Function\n')
     visitor = build_interp(code)
-    result = visitor.execute_function("hello", args)
+    modules = interpreter.table.library_definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
     assert result == expected
 
 
@@ -209,7 +213,9 @@ def test_two_functions() -> None:
             '    Bar = 2\n'
             'End Function\n')
     visitor = build_interp(code)
-    result = visitor.execute_function("foo", [])
+    modules = interpreter.table.library_definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    result = interpreter.run_function(func, [])
     assert result == 2
 
 
