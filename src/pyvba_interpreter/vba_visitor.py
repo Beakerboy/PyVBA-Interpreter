@@ -518,7 +518,7 @@ class VbaVisitor(Visitor):
                 if function in mod["functions"]:
                     return True
         for libproject in self.table.library_definitions.values():
-            for mod in libproject["modules"].values():
-                if function in mod["functions"]:
+            for libmod in libproject["modules"].values():
+                if function in libmod["functions"]:
                     return True
         return False
