@@ -383,18 +383,37 @@ class VbaVisitor(Visitor):
     def visitAmbiguousIdentifier(                                  # noqa: N802
             self: T,
             ctx: Parser.AmbiguousIdentifierContext) -> Any:
+        """
+        If a function is calling itself, there will be a function and a value
+        in the current scope. The let statement will need to decide if it wants
+        to use the value or call the function.
+        Function Foo(I)
+            Foo = 1
+            Bar = Foo
+            ' Versus
+            Baz = Foo(I - 1)
+        End Function
+
+        An indexExpression will choose the function, while a the letStatement
+        would choose the value.
+        """
+
         current_env = self.env_stack[-1]
         name = ctx.getText().lower()
         if name in current_env:
+            if self._function_in_project(name):
+                return (
+                    self._find_function_in_definition(name, self.context[1]),
+                    current_env[name]
+                )
             return current_env[name]
+
         if self._function_in_project(name):
             return self._find_function_in_definition(name, self.context[1])
         if name in self.table.definitions:
-            record = self.table.definitions[name]
-            return record
+            return self.table.definitions[name]
         if name in self.table.library_definitions:
-            lib_record = self.table.library_definitions[name]
-            return lib_record
+            return self.table.library_definitions[name]
         raise VbaCompileException("Method or data member not found")
 
     def run_function(self: T,
