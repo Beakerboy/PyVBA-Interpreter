@@ -64,7 +64,7 @@ def test_two_files(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
-    modules = visitor.table.definitions["vbaproject"]["modules"]
+    modules = table.definitions["vbaproject"]["modules"]
     func = modules["foomodule"]["functions"]["foo"]
     result = visitor.run_function(func, [])
     expected = 42
@@ -83,7 +83,7 @@ def test_member_not_found(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
-    modules = visitor.table.definitions["vbaproject"]["modules"]
+    modules = table.definitions["vbaproject"]["modules"]
     func = modules["foomodule"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
@@ -102,7 +102,7 @@ def test_call_module_name(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("Bar", code2, table)
     visitor = VbaVisitor(table)
-    modules = visitor.table.definitions["vbaproject"]["modules"]
+    modules = table.definitions["vbaproject"]["modules"]
     func = modules["foomodule"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
