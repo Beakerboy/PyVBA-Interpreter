@@ -201,8 +201,10 @@ def test_missing_argument() -> None:
             }
         }
     }
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("hello", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
@@ -251,8 +253,10 @@ def test_two_functions() -> None:
     ])
 def test_sub_as_variable(code: str) -> None:
     visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nExpected Function or variable"
 
 
@@ -264,8 +268,10 @@ def test_func_as_variable() -> None:
             'Function Bar()\n'
             'End Function\n')
     visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaException):
-        visitor.execute_function("foo", [])
+        visitor.execute_function(func, [])
 
 
 @pytest.mark.parametrize(
@@ -296,7 +302,9 @@ def test_call_module_name(code1: str) -> None:
             }
         }
     }
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     expected = "Compile error:\nExpected variable or procedure, not project"
     assert str(e.value) == expected
