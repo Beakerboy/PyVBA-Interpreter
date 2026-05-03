@@ -331,6 +331,9 @@ class VbaVisitor(Visitor):
         l_express = self.visit(ctx.lExpression())
         assert l_express is not None
         name = ctx.unrestrictedName().getText().lower()
+        if l_express["type"] == FunctionType.PROJECT:
+            if name in l_express["modules"]:
+                return l_express["moduels"][name]
         if l_express["type"] == FunctionType.MODULE:
             if name in l_express["functions"]:
                 return l_express["functions"][name]
