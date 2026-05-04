@@ -29,7 +29,12 @@ vba_project = {
                     "name": "msgbox",
                     "type": FunctionType.FUNCTION,
                     "handle": getattr(Interaction, "MsgBox"),
-                    "module": "interaction"
+                    "module": "interaction",
+                    "params": [{
+                            "name": "prompt",
+                            "optional": False,
+                            "default": ""
+                    }]
                 }
             }
         }
@@ -157,24 +162,7 @@ def test_override(mock_print: str) -> None:
             'Function MsgBox(temp)\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     visitor.run_function(func, [])
@@ -186,29 +174,29 @@ def test_missing_argument() -> None:
             '    MsgBox\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nArgument not optional"
+
+
+def test_extra_argument() -> None:
+    code = ('Function Foo()\n'
+            '    Foo = Bar(1, 2)\n'
+            'End Function\n'
+            'Function Bar(Num)\n'
+            '    Bar = Num\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    with pytest.raises(VbaCompileException) as e:
+        visitor.run_function(func, [])
+    msg = ("Compile error:\nWrong number of arguments or invalid property"
+           " assignment")
+    assert str(e.value) == msg
 
 
 def test_two_functions() -> None:
@@ -310,24 +298,7 @@ def test_func_as_variable() -> None:
     ])
 def test_call_module_name(code1: str) -> None:
     visitor = build_interp(code1)
-    visitor.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
