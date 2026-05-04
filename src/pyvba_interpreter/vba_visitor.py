@@ -422,7 +422,7 @@ class VbaVisitor(Visitor):
             return self.table.definitions[name]
         if name in self.table.library_definitions:
             return self.table.library_definitions[name]
-        for proj in self.table.definitions:
+        for proj in self.table.definitions.values():
             if name in proj["modules"]:
                 return proj["modules"][name]
         raise VbaCompileException("Method or data member not found")
