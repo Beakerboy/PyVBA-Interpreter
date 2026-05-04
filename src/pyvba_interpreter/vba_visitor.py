@@ -449,7 +449,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Argument not optional")
             if len(args) > max:
                 msg = ("Wrong number of arguments or invalid property"
-                    "assignment")
+                       "assignment")
                 raise VbaCompileException(msg)
             i = 0
             for param in defn["params"]:
@@ -502,7 +502,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Argument not optional")
             if len(args) > max:
                 msg = ("Wrong number of arguments or invalid property"
-                    "assignment")
+                       "assignment")
                 raise VbaCompileException(msg)
             output = ctx(*args)
         else:
