@@ -502,11 +502,7 @@ class VbaVisitor(Visitor):
             if len(args) > max:
                 msg = "Wrong number of arguments or invalid property assignment"
                 raise VbaCompileException(msg)
-            try:
-                output = ctx(*args)
-            except Exception as e:
-                if str(e) != "":
-                    raise VbaCompileException("Argument not optional")
+            output = ctx(*args)
         else:
             output = None
         if defn["type"] == FunctionType.FUNCTION:
