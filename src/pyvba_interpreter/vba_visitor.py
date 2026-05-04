@@ -440,6 +440,16 @@ class VbaVisitor(Visitor):
         ctx = defn["handle"]
         if isinstance(ctx, Parser.ProcedureBodyContext):
             current_env = {}
+            min = 0
+            max = len(defn["params"])
+            for param in defn["params"]:
+                if not param["optional"]:
+                    min += 1
+            if len(args) < min:
+                raise VbaCompileException("Argument not optional")
+            if len(args) > max:
+                msg = "Wrong number of arguments or invalid property assignment"
+                raise VbaCompileException(msg)
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
@@ -481,6 +491,17 @@ class VbaVisitor(Visitor):
             self.env_stack.pop()
             self.context = previous_context
         elif ctx is not None:
+            current_env = {}
+            min = 0
+            max = len(defn["params"])
+            for param in defn["params"]:
+                if not param["optional"]:
+                    min += 1
+            if len(args) < min:
+                raise VbaCompileException("Argument not optional")
+            if len(args) > max:
+                msg = "Wrong number of arguments or invalid property assignment"
+                raise VbaCompileException(msg)
             try:
                 output = ctx(*args)
             except Exception as e:
