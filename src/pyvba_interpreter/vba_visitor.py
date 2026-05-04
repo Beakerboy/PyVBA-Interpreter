@@ -80,7 +80,7 @@ class VbaVisitor(Visitor):
             try:
                 command = self.visit(first_child)
             except VbaCompileException:
-                raise VbaCompileException("Sub or function not defined")
+                raise VbaCompileException("Sub or Function not defined")
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
