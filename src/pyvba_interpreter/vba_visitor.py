@@ -334,10 +334,12 @@ class VbaVisitor(Visitor):
         if l_express["type"] == FunctionType.PROJECT:
             if name in l_express["modules"]:
                 return l_express["modules"][name]
+            raise VbaCompileException("Method or data member not found")
         if l_express["type"] == FunctionType.MODULE:
             if name in l_express["functions"]:
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
+        raise VbaException("Not Supported")
 
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
