@@ -17,31 +17,6 @@ from typing import Any
 from unittest.mock import patch
 
 
-vba_project = {
-    "name": "vba",
-    "type": FunctionType.PROJECT,
-    "modules": {
-        "interaction": {
-            "name": "interaction",
-            "type": FunctionType.MODULE,
-            "functions": {
-                "msgbox": {
-                    "name": "msgbox",
-                    "type": FunctionType.FUNCTION,
-                    "handle": getattr(Interaction, "MsgBox"),
-                    "module": "interaction",
-                    "params": [{
-                            "name": "prompt",
-                            "optional": False,
-                            "default": ""
-                    }]
-                }
-            }
-        }
-    }
-}
-
-
 def build_interp(code: str) -> VbaVisitor:
     code = 'Attribute VB_NAME = "HelloWorld"\n' + code
     file_path = 'tests/files/test.bas'
@@ -66,7 +41,7 @@ def build_interp(code: str) -> VbaVisitor:
 
 @pytest.mark.parametrize(
     "input, expected", [
-        ("'\n    hello = 1", 1),
+        ("'x²\n    hello = 1", 1),
     ])
 def test_encoding(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
