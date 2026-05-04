@@ -19,7 +19,7 @@ def build_interp(code: str) -> VbaVisitor:
         pass
     with open(file_path, "w", newline='\r\n') as file:
         file.write(code)
-    input_stream = FileStream(file_path)
+    input_stream = FileStream(file_path, encoding="cp1252")
     lexer = Lexer(input_stream)
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
