@@ -475,7 +475,9 @@ class VbaVisitor(Visitor):
                         defn["type"] == FunctionType.PROPERTY
                 ):
                     raise VbaCompileException(e.msg)
-            output = current_env[defn["name"]]
+            output = None
+            if defn["type"] == FunctionType.FUNCTION:
+                output = current_env[defn["name"]]
             self.env_stack.pop()
             self.context = previous_context
         elif ctx is not None:
