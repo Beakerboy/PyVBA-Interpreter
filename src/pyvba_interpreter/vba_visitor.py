@@ -334,6 +334,9 @@ class VbaVisitor(Visitor):
         if l_express["type"] == FunctionType.PROJECT:
             if name in l_express["modules"]:
                 return l_express["modules"][name]
+            for mod in l_express["modules"].values()
+                if name in mod["functions"]:
+                return mod["functions"][name]
             raise VbaCompileException("Method or data member not found")
         if l_express["type"] == FunctionType.MODULE:
             if name in l_express["functions"]:
