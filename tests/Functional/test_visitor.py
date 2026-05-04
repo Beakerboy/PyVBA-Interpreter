@@ -29,7 +29,7 @@ vba_project = {
                     "name": "msgbox",
                     "type": FunctionType.FUNCTION,
                     "handle": getattr(Interaction, "MsgBox"),
-                    "module": "interaction"
+                    "module": "interaction",
                     "params": [{
                             "name": "prompt",
                             "optional": False,
