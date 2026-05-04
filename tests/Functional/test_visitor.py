@@ -16,7 +16,24 @@ from pyvba_interpreter.Exceptions.vba_exception import (
 from typing import Any
 from unittest.mock import patch
 
-
+vba_project = {
+    "name": "vba",
+    "type": FunctionType.PROJECT,
+    "modules": {
+        "interaction": {
+            "name": "interaction",
+            "type": FunctionType.MODULE,
+            "functions": {
+                "msgbox": {
+                    "name": "msgbox",
+                    "type": FunctionType.FUNCTION,
+                    "handle": getattr(Interaction, "MsgBox"),
+                    "module": "interaction"
+                }
+            }
+        }
+    }
+}
 def build_interp(code: str) -> VbaVisitor:
     code = 'Attribute VB_NAME = "HelloWorld"\n' + code
     file_path = 'tests/files/test.bas'
@@ -60,24 +77,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    interpreter.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    interpreter.table.library_definitions["vba"] = vba_project
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     interpreter.run_function(func, [])
@@ -223,6 +223,31 @@ def test_two_functions() -> None:
     func = modules["helloworld"]["functions"]["foo"]
     result = visitor.run_function(func, [])
     assert result == 2
+
+
+@patch('builtins.print')
+@pytest.mark.parametrize(
+    "statement", [
+        ('True Or Bar()'),
+        ('False And Bar()'),
+    ])
+def test_no_short_circuit(mock_print: str, statement: str) -> None:
+    """
+    Boolean Expressions do not short circuit
+    """
+    code = ('Function Foo()\n'
+            '    Foo = ' + statement + '\n'
+            'End Function\n'
+            'Function Bar()\n'
+            '    Bar = False\n'
+            '    MsgBox "Bar is Called"\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    visitor.table.library_definitions["vba"] = vba_project
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    visitor.run_function(func, [])
+    mock_print.assert_called_with("Bar is Called")
 
 
 @pytest.mark.parametrize(
