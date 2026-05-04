@@ -14,7 +14,6 @@ from pyvba_interpreter.Exceptions.vba_exception import (
     VbaException
 )
 from typing import Any
-from unittest.mock import patch
 
 
 def build_interp(code: str) -> VbaVisitor:
