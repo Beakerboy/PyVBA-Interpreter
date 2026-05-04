@@ -516,6 +516,7 @@ class VbaVisitor(Visitor):
         for proj in self.table.definitions.values():
             if (
                     cur_module != "" and
+                    cur_module in proj["modules"] and
                     command in proj["modules"][cur_module]["functions"]
             ):
                 return proj["modules"][cur_module]["functions"][command]
