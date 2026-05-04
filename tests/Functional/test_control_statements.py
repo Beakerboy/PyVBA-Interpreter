@@ -27,7 +27,7 @@ def build_interp(code: str) -> VbaVisitor:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VbaListener(table)
+    listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     return VbaVisitor(table)
@@ -78,7 +78,9 @@ def build_interp(code: str) -> VbaVisitor:
 def test_factorial(code: str) -> None:
     code = 'Function Fact(Num)\n' + code + 'End Function\n'
     interpreter = build_interp(code)
-    result = interpreter.execute_function("fact", [5])
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["factorial"]["functions"]["fact"]
+    result = interpreter.run_function(func, [5])
     expected = 120
     assert result == expected
 
@@ -103,8 +105,10 @@ def test_factorial(code: str) -> None:
     ])
 def test_exit_sub_exception(code: str) -> None:
     interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["factorial"]["functions"]["fact"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("fact", [5])
+        interpreter.run_function(func, [5])
     assert str(e.value) == "Compile error:\nExit For not within For...Next"
 
 
@@ -120,6 +124,8 @@ def test_exit_sub_exception(code: str) -> None:
     ])
 def test_do_exception(code: str) -> None:
     interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["factorial"]["functions"]["fact"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.execute_function("fact", [5])
+        interpreter.run_function(func, [5])
     assert str(e.value) == "Compile error:\nLoop without Do"

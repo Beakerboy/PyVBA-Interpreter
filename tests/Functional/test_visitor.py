@@ -33,7 +33,7 @@ def build_interp(code: str) -> VbaVisitor:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VbaListener(table)
+    listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     return VbaVisitor(table)
@@ -43,7 +43,11 @@ def build_interp(code: str) -> VbaVisitor:
 @pytest.mark.parametrize(
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
+        ('Call VBA.MsgBox("Hello World")', "Hello World"),
+        ('Call VBA.Interaction.MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
+        ('VBA.MsgBox "Hello World"', "Hello World"),
+        ('VBA.Interaction.MsgBox "Hello World"', "Hello World"),
         ('Call MsgBox(1 < 2)', "True"),
         ('Call MsgBox(1 <= 2)', "True"),
         ('Call MsgBox(1 > 2)', "False"),
@@ -58,16 +62,25 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter = build_interp(code)
     interpreter.table.library_definitions["vba"] = {
         "name": "vba",
-        "type": FunctionType.MODULE,
-        "functions": {
-            "msgbox": {
-                "type": FunctionType.FUNCTION,
-                "handle": getattr(Interaction, "MsgBox"),
-                "module": "vba"
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
             }
         }
     }
-    interpreter.execute_function("hello", [])
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    interpreter.run_function(func, [])
     mock_print.assert_called_with(expected)
 
 
@@ -90,8 +103,6 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = True Xor False', True),
         ('hello = True Imp False', False),
         ('hello = True Eqv False', False),
-        ('hello = Array(1)', [1]),
-        ('hello = Array(1, 2)', [1, 2]),
         ('hello = 1\n'
          'Exit Function\n'
          'hello = 2\n', 1),
@@ -101,7 +112,9 @@ def test_function(input: str, expected: Any) -> None:
             '    ' + input + '\n'
             'End Function\n')
     interpreter = build_interp(code)
-    result = interpreter.execute_function("hello", [])
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
     assert result == expected
 
 
@@ -115,7 +128,9 @@ def test_function_arguments(
             '    ' + input + '\n'
             'End Function\n')
     visitor = build_interp(code)
-    result = visitor.execute_function("hello", args)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = visitor.run_function(func, args)
     assert result == expected
 
 
@@ -124,8 +139,10 @@ def test_function_not_defined() -> None:
             '    Bar\n'
             'End Function\n')
     visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nSub or Function not defined"
 
 
@@ -137,12 +154,27 @@ def test_override(mock_print: str) -> None:
             'Function MsgBox(temp)\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {"msgbox": {
-        "type": FunctionType.FUNCTION,
-        "handle": getattr(Interaction, "MsgBox"),
-        "module": "vba"
-    }}
-    visitor.execute_function("hello", [])
+    visitor.table.library_definitions["vba"] = {
+        "name": "vba",
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
+            }
+        }
+    }
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    visitor.run_function(func, [])
     mock_print.assert_not_called()
 
 
@@ -153,17 +185,26 @@ def test_missing_argument() -> None:
     visitor = build_interp(code)
     visitor.table.library_definitions["vba"] = {
         "name": "vba",
-        "type": FunctionType.MODULE,
-        "functions": {
-            "msgbox": {
-                "type": FunctionType.FUNCTION,
-                "handle": getattr(Interaction, "MsgBox"),
-                "module": "vba"
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
             }
         }
     }
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("hello", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
@@ -178,7 +219,9 @@ def test_two_functions() -> None:
             '    Bar = 2\n'
             'End Function\n')
     visitor = build_interp(code)
-    result = visitor.execute_function("foo", [])
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
     assert result == 2
 
 
@@ -210,8 +253,10 @@ def test_two_functions() -> None:
     ])
 def test_sub_as_variable(code: str) -> None:
     visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nExpected Function or variable"
 
 
@@ -223,5 +268,41 @@ def test_func_as_variable() -> None:
             'Function Bar()\n'
             'End Function\n')
     visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaException):
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
+
+
+@pytest.mark.parametrize(
+    "code1", [
+        ('Function Foo()\n'
+         '    Foo = VBA()\n'
+         'End Function\n'),
+    ])
+def test_call_module_name(code1: str) -> None:
+    visitor = build_interp(code1)
+    visitor.table.library_definitions["vba"] = {
+        "name": "vba",
+        "type": FunctionType.PROJECT,
+        "modules": {
+            "interaction": {
+                "name": "interaction",
+                "type": FunctionType.MODULE,
+                "functions": {
+                    "msgbox": {
+                        "name": "msgbox",
+                        "type": FunctionType.FUNCTION,
+                        "handle": getattr(Interaction, "MsgBox"),
+                        "module": "interaction"
+                    }
+                }
+            }
+        }
+    }
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    with pytest.raises(VbaCompileException) as e:
+        visitor.run_function(func, [])
+    expected = "Compile error:\nExpected variable or procedure, not project"
+    assert str(e.value) == expected

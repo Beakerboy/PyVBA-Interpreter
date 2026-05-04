@@ -14,6 +14,8 @@ def main() -> None:
                         help="The function or call statement to execute.")
     parser.add_argument("module",
                         help="The module that contains your code.")
+    parser.add_argument("project",
+                        help="The project that contains your code.")
     args = parser.parse_args()
     function_to_run = args.function
     path = Path(args.module).resolve()
@@ -26,15 +28,16 @@ def main() -> None:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VbaListener(table)
+    listener = VbaListener(args.project, table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
 
     interpreter = VbaVisitor(table)
     interpreter.visit(tree)
-    if function_to_run in table.definitions[args.module]["functions"]:
-        target_node = table.definitions[
-            args.module]["functions"][function_to_run]
+    project = table.definitions[args.project]
+    module = project["modules"][args.module]
+    if function_to_run in module["functions"]:
+        target_node = module["functions"][function_to_run]
         interpreter.visitChildren(target_node)
     else:
         print("error:")

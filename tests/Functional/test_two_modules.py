@@ -11,7 +11,7 @@ from pyvba_interpreter.Exceptions.vba_compile_exception import (
 )
 
 
-def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
+def build_interp(name: str, code: str, table: SymbolTable) -> None:
     code = f'Attribute VB_NAME = "{name}"\n{code}'
     file_path = f'tests/files/{name}.bas'
     try:
@@ -26,10 +26,9 @@ def build_interp(name: str, code: str, table: SymbolTable) -> VbaVisitor:
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
     tree = vbaparser.module()
-    listener = VbaListener(table)
+    listener = VbaListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
-    return table
 
 
 @pytest.mark.parametrize(
@@ -64,7 +63,9 @@ def test_two_files(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
-    result = visitor.execute_function("foo", [])
+    modules = table.definitions["vbaproject"]["modules"]
+    func = modules["foomodule"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
     expected = 42
     assert result == expected
 
@@ -81,8 +82,10 @@ def test_member_not_found(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("BarModule", code2, table)
     visitor = VbaVisitor(table)
+    modules = table.definitions["vbaproject"]["modules"]
+    func = modules["foomodule"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nMethod or data member not found"
 
 
@@ -98,7 +101,9 @@ def test_call_module_name(code1: str, code2: str) -> None:
     build_interp("FooModule", code1, table)
     build_interp("Bar", code2, table)
     visitor = VbaVisitor(table)
+    modules = table.definitions["vbaproject"]["modules"]
+    func = modules["foomodule"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        visitor.execute_function("foo", [])
+        visitor.run_function(func, [])
     expected = "Compile error:\nExpected variable or procedure, not module"
     assert str(e.value) == expected
