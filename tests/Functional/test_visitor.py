@@ -211,7 +211,7 @@ def test_missing_argument() -> None:
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
-def test_missing_argument() -> None:
+def test_extra_argument() -> None:
     code = ('Function Foo()\n'
             '    Foo = Bar(1, 2)\n'
             'End Function\n'
