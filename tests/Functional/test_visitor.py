@@ -174,24 +174,7 @@ def test_missing_argument() -> None:
             '    MsgBox\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     with pytest.raises(VbaCompileException) as e:
