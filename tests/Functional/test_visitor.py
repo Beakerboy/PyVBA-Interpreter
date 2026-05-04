@@ -212,7 +212,7 @@ def test_extra_argument() -> None:
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
     msg = ("Compile error:\nWrong number of arguments or invalid property"
-           "assignment")
+           " assignment")
     assert str(e.value) == msg
 
 
