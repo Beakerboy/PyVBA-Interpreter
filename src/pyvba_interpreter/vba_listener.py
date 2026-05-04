@@ -15,11 +15,12 @@ class VbaListener(Listener):
         self.table = table
         self.module_name = ""
         self.project_name = project.lower()
-        self.table.definitions[self.project_name] = {
-            "name": self.project_name,
-            "type": FunctionType.PROJECT,
-            "modules": {}
-        }
+        if self.project_name not in self.table.definitions:
+            self.table.definitions[self.project_name] = {
+                "name": self.project_name,
+                "type": FunctionType.PROJECT,
+                "modules": {}
+            }
 
     def enterProceduralModuleHeader(                               # noqa: N802
             self: T,
