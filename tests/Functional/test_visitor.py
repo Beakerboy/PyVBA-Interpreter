@@ -211,6 +211,22 @@ def test_missing_argument() -> None:
     assert str(e.value) == "Compile error:\nArgument not optional"
 
 
+def test_missing_argument() -> None:
+    code = ('Function Foo()\n'
+            '    Foo = Bar(1, 2)\n'
+            'End Function\n'
+            'Function Bar(Num)\n'
+            '    Bar = Num\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    with pytest.raises(VbaCompileException) as e:
+        visitor.run_function(func, [])
+    msg = "Wrong number of arguments or invalid property assignment"
+    assert str(e.value) == msg
+
+
 def test_two_functions() -> None:
     """
     Test that one function can pass its result to another.
