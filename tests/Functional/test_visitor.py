@@ -35,6 +35,8 @@ vba_project = {
         }
     }
 }
+
+
 def build_interp(code: str) -> VbaVisitor:
     code = 'Attribute VB_NAME = "HelloWorld"\n' + code
     file_path = 'tests/files/test.bas'
