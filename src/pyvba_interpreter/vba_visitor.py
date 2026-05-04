@@ -77,7 +77,10 @@ class VbaVisitor(Visitor):
             else:
                 raise Exception("Unsupported")
         else:
-            command = self.visit(first_child)
+            try:
+                command = self.visit(first_child)
+            except VbaCompileException:
+                raise VbaCompileException("Sub or function not defined")
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
