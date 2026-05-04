@@ -162,24 +162,7 @@ def test_override(mock_print: str) -> None:
             'Function MsgBox(temp)\n'
             'End Function\n')
     visitor = build_interp(code)
-    visitor.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     visitor.run_function(func, [])
@@ -331,24 +314,7 @@ def test_func_as_variable() -> None:
     ])
 def test_call_module_name(code1: str) -> None:
     visitor = build_interp(code1)
-    visitor.table.library_definitions["vba"] = {
-        "name": "vba",
-        "type": FunctionType.PROJECT,
-        "modules": {
-            "interaction": {
-                "name": "interaction",
-                "type": FunctionType.MODULE,
-                "functions": {
-                    "msgbox": {
-                        "name": "msgbox",
-                        "type": FunctionType.FUNCTION,
-                        "handle": getattr(Interaction, "MsgBox"),
-                        "module": "interaction"
-                    }
-                }
-            }
-        }
-    }
+    visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
