@@ -16,6 +16,7 @@ from pyvba_interpreter.Exceptions.vba_exception import (
 from typing import Any
 from unittest.mock import patch
 
+
 vba_project = {
     "name": "vba",
     "type": FunctionType.PROJECT,
