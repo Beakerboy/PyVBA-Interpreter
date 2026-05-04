@@ -211,7 +211,8 @@ def test_extra_argument() -> None:
     func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
-    msg = "Wrong number of arguments or invalid property assignment"
+    msg = ("Compile error:\nWrong number of arguments or invalid property"
+           "assignment")
     assert str(e.value) == msg
 
 
