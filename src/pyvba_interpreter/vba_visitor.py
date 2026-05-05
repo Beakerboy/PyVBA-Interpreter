@@ -266,6 +266,12 @@ class VbaVisitor(Visitor):
             value = value[1]
         return -1 * value
 
+    def visitParenthesizedExpress(                                 # noqa: N802
+            self: T,
+            ctx: Parser.ParenthesizedExpressContext
+    ) -> Any:
+        return self.visit(ctx.expression())
+
     def visitRelationExpression(                                   # noqa: N802
             self: T,
             ctx: Parser.RelationExpressionContext
