@@ -37,7 +37,7 @@ jobs:
       run: |
         pytest --cov=src
         coveralls --service=github
-        ls -al ./.coverage
+        cat ./.coverage
   flake8:
     runs-on: ubuntu-latest
     strategy:
