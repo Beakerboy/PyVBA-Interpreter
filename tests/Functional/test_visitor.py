@@ -100,6 +100,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 1 + 1', 2),
         ('hello = 6 - 1', 5),
         ('hello = 6 * 4', 24),
+        ('hello = (6 * 4)', 24),
         ('hello = 10 / 2', 5.0),
         ('hello = 10 Mod 3', 1),
         ('hello = 10 \\ 3', 3),
