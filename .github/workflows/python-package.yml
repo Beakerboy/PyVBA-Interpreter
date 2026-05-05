@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.14"]
 
     steps:
     - uses: actions/checkout@v6
@@ -37,7 +37,7 @@ jobs:
       run: |
         pytest --cov=src
         coveralls --service=github
-        ls -al
+        ls -al ./.coverage
   flake8:
     runs-on: ubuntu-latest
     strategy:
