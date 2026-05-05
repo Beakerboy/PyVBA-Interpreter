@@ -270,7 +270,11 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.ParenthesizedExpressContext
     ) -> Any:
-        return self.visit(ctx.expression())
+        value = self.visit(ctx.parenthesizedExpression().expression())
+        assert value is not None
+        if isinstance(value, tuple):
+            value = value[1]
+        return value
 
     def visitRelationExpression(                                   # noqa: N802
             self: T,
