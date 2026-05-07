@@ -444,6 +444,7 @@ class VbaVisitor(Visitor):
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
         previous_context = self.context
+        self.context[0] = defn["project"]
         self.context[1] = defn["module"]
         self.context[2] = defn["name"]
 
