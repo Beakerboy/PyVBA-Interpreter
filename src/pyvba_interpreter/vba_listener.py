@@ -52,6 +52,7 @@ class VbaListener(Listener):
             "name": name.lower(),
             "type": FunctionType.FUNCTION,
             "module": self.module_name.lower(),
+            "project": self.project_name,
             "handle": ctx.procedureBody(),
             "params": params
         }
