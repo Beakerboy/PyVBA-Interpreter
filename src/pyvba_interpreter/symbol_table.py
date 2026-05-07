@@ -19,6 +19,7 @@ class ParamDefinition(TypedDict):
 
 class FunctionBase(TypedDict):
     type: FunctionType
+    project: str
     module: str
 
 
