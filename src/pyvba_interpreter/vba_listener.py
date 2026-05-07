@@ -70,6 +70,7 @@ class VbaListener(Listener):
         funcs[name.lower()] = {
             "name": name.lower(),
             "type": FunctionType.SUB,
+            "project": self.project_name,
             "module": self.module_name.lower(),
             "handle": ctx.procedureBody(),
             "params": params
