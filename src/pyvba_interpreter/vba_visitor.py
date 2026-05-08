@@ -36,6 +36,7 @@ class VbaVisitor(Visitor):
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
+                return self.env_stack[-1][self.context[2]]
             except (ExitDoException, ExitForException, ExitPropertyException,
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
@@ -43,7 +44,6 @@ class VbaVisitor(Visitor):
                 pass
             finally:
                 self.env_stack.pop()
-            return self.env_stack[-1][self.context[2]]
 
     def visitSubroutineDeclaration(self: T, ctx) -> None:
         if ctx.procedureBody() is not None:
