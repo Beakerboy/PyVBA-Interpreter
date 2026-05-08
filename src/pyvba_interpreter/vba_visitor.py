@@ -31,20 +31,32 @@ class VbaVisitor(Visitor):
         # The current project, module, and function context
         self.context = ["vbaproject", "", ""]
 
-    def visitFunctionDeclaration(self: T, ctx) -> Any:
+    def visitFunctionDeclaration(                                  # noqa: N802
+            self: T,
+            ctx: Parser.FunctionDeclarationContext) -> Any:
+        self.env_stack[-1][self.context[2]] = None
+        if ctx.procedureBody() is not None:
+            try:
+                self.visit(ctx.procedureBody())
+                return self.env_stack[-1][self.context[2]]
+            except (ExitDoException, ExitForException, ExitPropertyException,
+                    ExitSubException) as e:
+                raise VbaCompileException(e.msg)
+            except ExitFunctionException:
+                return self.env_stack[-1][self.context[2]]
+
+    def visitSubroutineDeclaration(                                # noqa: N802
+            self: T,
+            ctx: Parser.SubroutineDeclarationContext) -> None:
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
             except (ExitDoException, ExitForException, ExitPropertyException,
-                    ExitSubException) as e:
+                    ExitFunctionException) as e:
                 raise VbaCompileException(e.msg)
-            except ExitFunctionException as e:
-        return self.env[self.context[2]]
+            except ExitSubException:
+                pass
 
-    def visitSubroutineDeclaration(self: T, ctx) -> None:
-        if ctx.procedureBody() is not None:
-            self.visit(ctx.procedureBody())
-        
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
         i = 1
@@ -457,13 +469,13 @@ class VbaVisitor(Visitor):
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
-        previous_context = self.context
-        self.context[0] = defn["project"]
-        self.context[1] = defn["module"]
-        self.context[2] = defn["name"]
-
         ctx = defn["handle"]
-        if isinstance(ctx, Parser.ProcedureBodyContext):
+        if (
+                isinstance(ctx, Parser.FunctionDeclarationContext) or
+                isinstance(ctx, Parser.SubroutineDeclarationContext)
+        ):
+            previous_context = self.context.copy()
+            self.context = [defn["project"], defn["module"], defn["name"]]
             current_env = {}
             min = 0
             max = len(defn["params"])
@@ -485,39 +497,12 @@ class VbaVisitor(Visitor):
                         current_env[param["name"]] = args[i]
                 i += 1
             self.env_stack.append(current_env)
-            if defn["type"] == FunctionType.FUNCTION:
-                current_env[defn["name"]] = None
             try:
-                self.visitChildren(ctx)
-            except ExitDoException as e:
-                raise VbaCompileException(e.msg)
-            except ExitForException as e:
-                raise VbaCompileException(e.msg)
-            except ExitFunctionException as e:
-                if (
-                        defn["type"] == FunctionType.SUB or
-                        defn["type"] == FunctionType.PROPERTY
-                ):
-                    raise VbaCompileException(e.msg)
-            except ExitPropertyException as e:
-                if (
-                        defn["type"] == FunctionType.FUNCTION or
-                        defn["type"] == FunctionType.SUB
-                ):
-                    raise VbaCompileException(e.msg)
-            except ExitSubException as e:
-                if (
-                        defn["type"] == FunctionType.FUNCTION or
-                        defn["type"] == FunctionType.PROPERTY
-                ):
-                    raise VbaCompileException(e.msg)
-            output = None
-            if defn["type"] == FunctionType.FUNCTION:
-                output = current_env[defn["name"]]
-            self.env_stack.pop()
-            self.context = previous_context
+                output = self.visit(ctx)
+            finally:
+                self.env_stack.pop()
+                self.context = previous_context
         elif ctx is not None:
-            current_env = {}
             min = 0
             max = len(defn["params"])
             for param in defn["params"]:
@@ -531,7 +516,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(msg)
             output = ctx(*args)
         else:
-            output = None
+            raise Exception("Unknown Function Type")
         if defn["type"] == FunctionType.FUNCTION:
             return output
 
