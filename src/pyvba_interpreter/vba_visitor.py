@@ -1,7 +1,7 @@
 from typing import Any, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
-from vba_stdlib.literal_factory import literal_from_string
+from vba_types.literal_factory import literal_from_string
 from .symbol_table import (
     FunctionDefinition, FunctionType, LibraryDefinition, SymbolTable
 )
