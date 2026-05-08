@@ -46,8 +46,6 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(e.msg)
             except ExitFunctionException:
                 return self.env_stack[-1][self.context[2]]
-            finally:
-                self.env_stack.pop()
 
     def visitSubroutineDeclaration(self: T, ctx) -> None:
         if ctx.procedureBody() is not None:
@@ -58,8 +56,6 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(e.msg)
             except ExitSubException:
                 pass
-            finally:
-                self.env_stack.pop()
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
@@ -504,6 +500,7 @@ class VbaVisitor(Visitor):
             try:
                 output = self.visit(ctx)
             finally:
+                self.env_stack.pop()
                 self.context = previous_context
         elif ctx is not None:
             min = 0
