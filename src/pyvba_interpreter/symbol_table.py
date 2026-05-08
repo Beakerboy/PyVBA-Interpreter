@@ -43,6 +43,7 @@ class ModuleDefinition(TypedDict):
     name: str
     type: FunctionType
     functions: dict[str, FunctionDefinition]
+    extra: dict[str, Any]
 
 
 class LibModuleDefinition(TypedDict):
