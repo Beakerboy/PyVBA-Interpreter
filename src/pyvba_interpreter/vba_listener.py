@@ -35,7 +35,8 @@ class VbaListener(Listener):
         project["modules"][self.module_name.lower()] = {
             "name": self.module_name.lower(),
             "type": FunctionType.MODULE,
-            "functions": {}
+            "functions": {},
+            "extra": {}
         }
 
     def enterFunctionDeclaration(                                  # noqa: N802
