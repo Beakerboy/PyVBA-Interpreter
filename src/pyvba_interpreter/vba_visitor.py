@@ -36,7 +36,10 @@ class VbaVisitor(Visitor):
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
-                return self.env_stack[-1][self.context[2]]
+                try:
+                    output = self.env_stack[-1][self.context[2]]
+                except Exception as e:
+                    raise Exception (str(e) + self.env_stack)
             except (ExitDoException, ExitForException, ExitPropertyException,
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
