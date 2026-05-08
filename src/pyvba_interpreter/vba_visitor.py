@@ -32,6 +32,7 @@ class VbaVisitor(Visitor):
         self.context = ["vbaproject", "", ""]
 
     def visitFunctionDeclaration(self: T, ctx) -> Any:
+        self.env_stack[-1][self.context[2]] = None
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
@@ -498,8 +499,6 @@ class VbaVisitor(Visitor):
                         current_env[param["name"]] = args[i]
                 i += 1
             self.env_stack.append(current_env)
-            if defn["type"] == FunctionType.FUNCTION:
-                current_env[defn["name"]] = None
             output = self.visit(ctx)
             self.context = previous_context
         elif ctx is not None:
@@ -516,7 +515,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(msg)
             output = ctx(*args)
         else:
-            output = None
+            raise Exception("Unknown Function Type")
         if defn["type"] == FunctionType.FUNCTION:
             return output
 
