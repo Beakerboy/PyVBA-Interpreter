@@ -503,8 +503,10 @@ class VbaVisitor(Visitor):
                         current_env[param["name"]] = args[i]
                 i += 1
             self.env_stack.append(current_env)
-            output = self.visit(ctx)
-            self.context = previous_context
+            try:
+                output = self.visit(ctx)
+            finally:
+                self.context = previous_context
         elif ctx is not None:
             min = 0
             max = len(defn["params"])
