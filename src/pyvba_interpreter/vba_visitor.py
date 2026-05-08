@@ -40,7 +40,7 @@ class VbaVisitor(Visitor):
                     output = self.env_stack[-1][self.context[2]]
                     return output
                 except Exception as e:
-                    raise Exception (str(e) + self.env_stack)
+                    raise Exception (str(e) + str(self.env_stack))
             except (ExitDoException, ExitForException, ExitPropertyException,
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
