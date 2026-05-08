@@ -38,7 +38,7 @@ class VbaVisitor(Visitor):
             except (ExitDoException, ExitForException, ExitPropertyException,
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
-            except ExitFunctionException as e:
+            except ExitFunctionException:
                 pass
         
         output = self.env_stack[self.context[2]]
@@ -52,7 +52,7 @@ class VbaVisitor(Visitor):
             except (ExitDoException, ExitForException, ExitPropertyException,
                     ExitFunctionException) as e:
                 raise VbaCompileException(e.msg)
-            except ExitSubException as e:
+            except ExitSubException:
                 pass
         self.env_stack.pop()
 
