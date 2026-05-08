@@ -474,10 +474,8 @@ class VbaVisitor(Visitor):
                 isinstance(ctx, Parser.FunctionDeclarationContext) or
                 isinstance(ctx, Parser.SubroutineDeclarationContext)
         ):
-            previous_context = self.context.copy
-            self.context[0] = defn["project"]
-            self.context[1] = defn["module"]
-            self.context[2] = defn["name"]
+            previous_context = self.context.copy()
+            self.context = [defn["project"], defn["module"], defn["name"]]
             current_env = {}
             min = 0
             max = len(defn["params"])
