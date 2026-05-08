@@ -85,14 +85,14 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     code = ('Function hello()\n'
             '    ' + input + '\n'
             'End Function\n')
-    interpreter = build_interp(code)
-    interpreter.table.library_definitions["vba"] = vba_project
-    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    visitor = build_interp(code)
+    visitor.table.library_definitions["vba"] = vba_project
+    modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     try:
-        interpreter.run_function(func, [])
+        visitor.run_function(func, [])
     except Exception:
-        raise Exception(str(table.definitions) + str(table.library_definitions))
+        raise Exception(str(visitor.table.definitions) + str(visitor.table.library_definitions))
     mock_print.assert_called_with(expected)
 
 
