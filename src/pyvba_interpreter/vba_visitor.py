@@ -39,12 +39,23 @@ class VbaVisitor(Visitor):
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
             except ExitFunctionException as e:
-        return self.env[self.context[2]]
+                pass
+        
+        output = self.env_stack[self.context[2]]
+        self.env_stack.pop()
+        return output
 
     def visitSubroutineDeclaration(self: T, ctx) -> None:
         if ctx.procedureBody() is not None:
-            self.visit(ctx.procedureBody())
-        
+            try:
+                self.visit(ctx.procedureBody())
+            except (ExitDoException, ExitForException, ExitPropertyException,
+                    ExitFunctionException) as e:
+                raise VbaCompileException(e.msg)
+            except ExitSubException as e:
+                pass
+        self.env_stack.pop()
+
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
         i = 1
@@ -487,34 +498,7 @@ class VbaVisitor(Visitor):
             self.env_stack.append(current_env)
             if defn["type"] == FunctionType.FUNCTION:
                 current_env[defn["name"]] = None
-            try:
-                self.visitChildren(ctx)
-            except ExitDoException as e:
-                raise VbaCompileException(e.msg)
-            except ExitForException as e:
-                raise VbaCompileException(e.msg)
-            except ExitFunctionException as e:
-                if (
-                        defn["type"] == FunctionType.SUB or
-                        defn["type"] == FunctionType.PROPERTY
-                ):
-                    raise VbaCompileException(e.msg)
-            except ExitPropertyException as e:
-                if (
-                        defn["type"] == FunctionType.FUNCTION or
-                        defn["type"] == FunctionType.SUB
-                ):
-                    raise VbaCompileException(e.msg)
-            except ExitSubException as e:
-                if (
-                        defn["type"] == FunctionType.FUNCTION or
-                        defn["type"] == FunctionType.PROPERTY
-                ):
-                    raise VbaCompileException(e.msg)
-            output = None
-            if defn["type"] == FunctionType.FUNCTION:
-                output = current_env[defn["name"]]
-            self.env_stack.pop()
+            output = self.visit(ctx)
             self.context = previous_context
         elif ctx is not None:
             current_env = {}
