@@ -31,6 +31,20 @@ class VbaVisitor(Visitor):
         # The current project, module, and function context
         self.context = ["vbaproject", "", ""]
 
+    def visitFunctionDeclaration(self: T, ctx) -> Any:
+        if ctx.procedureBody() is not None:
+            try:
+                self.visit(ctx.procedureBody())
+            except (ExitDoException, ExitForException, ExitPropertyException,
+                    ExitSubException) as e:
+                raise VbaCompileException(e.msg)
+            except ExitFunctionException as e:
+        return self.env[self.context[2]]
+
+    def visitSubroutineDeclaration(self: T, ctx) -> None:
+        if ctx.procedureBody() is not None:
+            self.visit(ctx.procedureBody())
+        
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
         i = 1
