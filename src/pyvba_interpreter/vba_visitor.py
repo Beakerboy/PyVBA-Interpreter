@@ -45,7 +45,8 @@ class VbaVisitor(Visitor):
             output = self.env_stack[-1][self.context[2]]
         except:
             raise Exception(str(self.env_stack))
-        self.env_stack.pop()
+        finally:
+            self.env_stack.pop()
         return output
 
     def visitSubroutineDeclaration(self: T, ctx) -> None:
@@ -57,7 +58,8 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(e.msg)
             except ExitSubException:
                 pass
-        self.env_stack.pop()
+            finally:
+                self.env_stack.pop()
 
     @staticmethod
     def _get_op(ctx: ParserRuleContext) -> str:
