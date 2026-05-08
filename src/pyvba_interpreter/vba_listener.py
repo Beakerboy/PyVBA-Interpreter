@@ -54,7 +54,8 @@ class VbaListener(Listener):
             "module": self.module_name.lower(),
             "project": self.project_name,
             "handle": ctx,
-            "params": params
+            "params": params,
+            "extra": {}
         }
 
     def enterSubroutineDeclaration(                                # noqa: N802
@@ -73,7 +74,8 @@ class VbaListener(Listener):
             "project": self.project_name,
             "module": self.module_name.lower(),
             "handle": ctx,
-            "params": params
+            "params": params,
+            "extra": {}
         }
 
     def _get_params(
