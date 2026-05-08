@@ -468,16 +468,15 @@ class VbaVisitor(Visitor):
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
-        previous_context = self.context
-        self.context[0] = defn["project"]
-        self.context[1] = defn["module"]
-        self.context[2] = defn["name"]
-
         ctx = defn["handle"]
         if (
                 isinstance(ctx, Parser.FunctionDeclarationContext) or
                 isinstance(ctx, Parser.SubroutineDeclarationContext)
         ):
+            previous_context = self.context
+            self.context[0] = defn["project"]
+            self.context[1] = defn["module"]
+            self.context[2] = defn["name"]
             current_env = {}
             min = 0
             max = len(defn["params"])
@@ -504,7 +503,6 @@ class VbaVisitor(Visitor):
             output = self.visit(ctx)
             self.context = previous_context
         elif ctx is not None:
-            current_env = {}
             min = 0
             max = len(defn["params"])
             for param in defn["params"]:
