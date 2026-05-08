@@ -43,8 +43,8 @@ class VbaVisitor(Visitor):
                 pass
         try:
             output = self.env_stack[-1][self.context[2]]
-        except:
-            raise Exception(str(self.env_stack))
+        except Exception as e:
+            raise Exception(str(e) + "\n" + str(self.env_stack))
         finally:
             self.env_stack.pop()
         return output
