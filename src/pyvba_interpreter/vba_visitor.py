@@ -38,6 +38,7 @@ class VbaVisitor(Visitor):
                 self.visit(ctx.procedureBody())
                 try:
                     output = self.env_stack[-1][self.context[2]]
+                    return output
                 except Exception as e:
                     raise Exception (str(e) + self.env_stack)
             except (ExitDoException, ExitForException, ExitPropertyException,
