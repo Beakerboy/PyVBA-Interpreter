@@ -89,7 +89,10 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     interpreter.table.library_definitions["vba"] = vba_project
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
-    interpreter.run_function(func, [])
+    try:
+        interpreter.run_function(func, [])
+    except Exception:
+        raise Exception(str(table.definitions) + str(table.library_definitions))
     mock_print.assert_called_with(expected)
 
 
