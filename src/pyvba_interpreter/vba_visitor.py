@@ -41,13 +41,9 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(e.msg)
             except ExitFunctionException:
                 pass
-        try:
-            output = self.env_stack[-1][self.context[2]]
-        except Exception as e:
-            raise Exception(str(e) + "\n" + str(self.env_stack))
-        finally:
-            self.env_stack.pop()
-        return output
+            finally:
+                self.env_stack.pop()
+            return self.env_stack[-1][self.context[2]]
 
     def visitSubroutineDeclaration(self: T, ctx) -> None:
         if ctx.procedureBody() is not None:
