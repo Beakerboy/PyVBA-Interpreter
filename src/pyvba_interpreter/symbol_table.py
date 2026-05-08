@@ -21,6 +21,7 @@ class FunctionBase(TypedDict):
     type: FunctionType
     project: str
     module: str
+    extra: dict[str, Any]
 
 
 class FunctionDefinition(FunctionBase):
