@@ -41,7 +41,7 @@ class VbaVisitor(Visitor):
             except ExitFunctionException:
                 pass
         
-        output = self.env_stack[self.context[2]]
+        output = self.env_stack[-1][self.context[2]]
         self.env_stack.pop()
         return output
 
