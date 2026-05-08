@@ -53,7 +53,7 @@ class VbaListener(Listener):
             "type": FunctionType.FUNCTION,
             "module": self.module_name.lower(),
             "project": self.project_name,
-            "handle": ctx.procedureBody(),
+            "handle": ctx,
             "params": params
         }
 
@@ -72,7 +72,7 @@ class VbaListener(Listener):
             "type": FunctionType.SUB,
             "project": self.project_name,
             "module": self.module_name.lower(),
-            "handle": ctx.procedureBody(),
+            "handle": ctx,
             "params": params
         }
 
