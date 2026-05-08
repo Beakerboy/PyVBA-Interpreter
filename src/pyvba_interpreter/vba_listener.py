@@ -20,7 +20,7 @@ class VbaListener(Listener):
                 "name": self.project_name,
                 "type": FunctionType.PROJECT,
                 "modules": {},
-                "exrta": {}
+                "extra": {}
             }
 
     def enterProceduralModuleHeader(                               # noqa: N802
