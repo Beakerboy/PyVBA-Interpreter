@@ -56,6 +56,7 @@ class ProjectDefinition(TypedDict):
     name: str
     type: FunctionType
     modules: dict[str, ModuleDefinition]
+    extra: dict[str, Any]
 
 
 class LibProjectDefinition(TypedDict):
