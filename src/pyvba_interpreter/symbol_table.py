@@ -25,7 +25,7 @@ class FunctionBase(TypedDict):
 
 class FunctionDefinition(FunctionBase):
     name: str
-    handle: Parser.ProcedureBodyContext | None
+    handle: Parser.FunctionDefinitionContext | Parser.SubroutineDefinitionContext
     params: list[ParamDefinition]
 
 
