@@ -474,7 +474,10 @@ class VbaVisitor(Visitor):
         self.context[2] = defn["name"]
 
         ctx = defn["handle"]
-        if isinstance(ctx, Parser.ProcedureBodyContext):
+        if (
+                isinstance(ctx, Parser.FunctionDeclarationContext) or
+                isinstance(ctx, Parser.SubroutineDeclarationContext)
+        ):
             current_env = {}
             min = 0
             max = len(defn["params"])
