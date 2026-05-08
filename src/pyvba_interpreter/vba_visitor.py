@@ -31,7 +31,9 @@ class VbaVisitor(Visitor):
         # The current project, module, and function context
         self.context = ["vbaproject", "", ""]
 
-    def visitFunctionDeclaration(self: T, ctx) -> Any:
+    def visitFunctionDeclaration(                                  # noqa: N802
+            self: T,
+            ctx: Parser.FunctionDeclarationContext) -> Any:
         self.env_stack[-1][self.context[2]] = None
         if ctx.procedureBody() is not None:
             try:
@@ -43,7 +45,9 @@ class VbaVisitor(Visitor):
             except ExitFunctionException:
                 return self.env_stack[-1][self.context[2]]
 
-    def visitSubroutineDeclaration(self: T, ctx) -> None:
+    def visitSubroutineDeclaration(                                # noqa: N802
+            self: T,
+            ctx: Parser.SubroutineDeclarationContext) -> None:
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
