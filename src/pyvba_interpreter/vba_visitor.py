@@ -407,9 +407,7 @@ class VbaVisitor(Visitor):
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
-            cls = defn.__self__.__new__(defn.__self__)
-            
-            return defn(cls, *args)
+            return VBAArray(*args)
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
