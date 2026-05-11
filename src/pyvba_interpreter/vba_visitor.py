@@ -470,7 +470,7 @@ class VbaVisitor(Visitor):
         for proj in self.table.definitions.values():
             if name in proj["modules"]:
                 return proj["modules"][name]
-        raise VbaCompileException("Method or data member not found")
+        raise VbaCompileException(f"Method or data member not found {name}")
 
     def visitSpecialForm(                                          # noqa: N802
             self: T,
