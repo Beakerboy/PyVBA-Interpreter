@@ -408,6 +408,8 @@ class VbaVisitor(Visitor):
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
             return VBAArray(*args)
+        if isinstance(defn, VBAArray):
+            return VBAArray.__get__(*args)
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
