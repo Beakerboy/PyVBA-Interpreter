@@ -1,5 +1,4 @@
 from antlr4_vba.vbaParser import vbaParser as Parser
-from enum import Enum
 from typing import Any, Callable, TypedDict, TypeVar
 
 
