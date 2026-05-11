@@ -128,7 +128,7 @@ def test_function(input: str, expected: Any) -> None:
     assert result == expected
 
 
-def test_function() -> None:
+def test_array() -> None:
     code = ('Function hello()\n'
             '    hello = Array(1, 2, 3)\n'
             'End Function\n')
