@@ -409,7 +409,7 @@ class VbaVisitor(Visitor):
         if isinstance(defn, Callable):
             return VBAArray(*args)
         if isinstance(defn, VBAArray):
-            return VBAArray.__getitem__(*args)
+            return defn[int(args[0]))
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
