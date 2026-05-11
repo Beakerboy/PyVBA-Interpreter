@@ -3,14 +3,6 @@ from enum import Enum
 from typing import Any, Callable, TypedDict, TypeVar
 
 
-class FunctionType(Enum):
-    PROJECT = 0
-    MODULE = 1
-    FUNCTION = 2
-    SUB = 3
-    PROPERTY = 4
-
-
 class ParamDefinition(TypedDict):
     name: str
     optional: bool
