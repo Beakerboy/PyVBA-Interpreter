@@ -448,8 +448,6 @@ class VbaVisitor(Visitor):
 
         current_env = self.env_stack[-1]
         name = ctx.getText().lower()
-        if name == "array":
-            return getattr(VBAArray, "__init__"),
         if name in current_env:
             if self._function_in_project(name):
                 return (
@@ -468,6 +466,13 @@ class VbaVisitor(Visitor):
             if name in proj["modules"]:
                 return proj["modules"][name]
         raise VbaCompileException("Method or data member not found")
+
+    def visitSpecialForm(                                          # noqa: N802
+            self: T,
+            ctx: Parser.SpecialFormContext) -> Any:
+        name = ctx.getText().lower()
+        if name == "array":
+            return getattr(VBAArray, "__init__"),
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
