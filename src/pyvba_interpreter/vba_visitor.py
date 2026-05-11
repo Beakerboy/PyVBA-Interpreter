@@ -12,6 +12,7 @@ from .Exceptions.exit_function_exception import ExitFunctionException
 from .Exceptions.exit_property_exception import ExitPropertyException
 from .Exceptions.exit_sub_exception import ExitSubException
 from .Exceptions.vba_exception import VbaException
+from vba_types.array import VBAArray
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -447,6 +448,8 @@ class VbaVisitor(Visitor):
 
         current_env = self.env_stack[-1]
         name = ctx.getText().lower()
+        if name == "array":
+            return getattr(VBAArray, "__init__"),
         if name in current_env:
             if self._function_in_project(name):
                 return (
