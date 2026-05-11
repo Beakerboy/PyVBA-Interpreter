@@ -405,6 +405,8 @@ class VbaVisitor(Visitor):
         args: list[Any] = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
+        if isinstance(defn, Callable):
+            return defn(*args)
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
@@ -469,15 +471,10 @@ class VbaVisitor(Visitor):
 
     def visitSpecialForm(                                          # noqa: N802
             self: T,
-            ctx: Parser.SpecialFormContext) -> dict:
+            ctx: Parser.SpecialFormContext) -> Callable:
         name = ctx.getText().lower()
         if name == "array":
-            return {
-                "name": "array",
-                "type": FunctionTypes.FUNCTION,
-                "module": "vba_types",
-                "handle": getattr(VBAArray, "__init__"),
-            }
+            return getattr(VBAArray, "__init__"),
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
