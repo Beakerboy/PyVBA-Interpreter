@@ -128,6 +128,19 @@ def test_function(input: str, expected: Any) -> None:
     assert result == expected
 
 
+def test_function(input: str, expected: Any) -> None:
+    code = ('Function hello()\n'
+            '    hello = Array(1, 2, 3)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert result[0] == 1
+    assert result[1] == 2
+    assert result[2] == 3
+
+
 @pytest.mark.parametrize(
     "arg_list, input, args, expected", [
         ('Arg', 'hello = Arg', [1], 1),
