@@ -18,7 +18,7 @@ class ParamDefinition(TypedDict):
 
 
 class FunctionBase(TypedDict):
-    type: FunctionType
+    type: str
     project: str
     module: str
     extra: dict[str, Any]
@@ -41,27 +41,27 @@ class LibraryDefinition(FunctionBase):
 
 class ModuleDefinition(TypedDict):
     name: str
-    type: FunctionType
+    type: str
     functions: dict[str, FunctionDefinition]
     extra: dict[str, Any]
 
 
 class LibModuleDefinition(TypedDict):
     name: str
-    type: FunctionType
+    type: str
     functions: dict[str, LibraryDefinition]
 
 
 class ProjectDefinition(TypedDict):
     name: str
-    type: FunctionType
+    type: str
     modules: dict[str, ModuleDefinition]
     extra: dict[str, Any]
 
 
 class LibProjectDefinition(TypedDict):
     name: str
-    type: FunctionType
+    type: str
     modules: dict[str, LibModuleDefinition]
 
 
