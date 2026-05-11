@@ -473,7 +473,7 @@ class VbaVisitor(Visitor):
     def visitSpecialForm(                                          # noqa: N802
             self: T,
             ctx: Parser.SpecialFormContext) -> Callable:
-        name = ctx.getText().lower()
+        # name = ctx.getText().lower()
         # if name == "array":
         return getattr(VBAArray, "__init__"),
 
