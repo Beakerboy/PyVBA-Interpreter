@@ -2,7 +2,7 @@ from typing import TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_stdlib.literal_factory import literal_from_string
-from .symbol_table import FunctionType, ParamDefinition, SymbolTable
+from .symbol_table import ParamDefinition, SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.vba_exception import VbaException
 
@@ -18,7 +18,7 @@ class VbaListener(Listener):
         if self.project_name not in self.table.definitions:
             self.table.definitions[self.project_name] = {
                 "name": self.project_name,
-                "type": FunctionType.PROJECT,
+                "type": "project",
                 "modules": {},
                 "extra": {}
             }
@@ -34,7 +34,7 @@ class VbaListener(Listener):
         project = self.table.definitions[self.project_name]
         project["modules"][self.module_name.lower()] = {
             "name": self.module_name.lower(),
-            "type": FunctionType.MODULE,
+            "type": "module",
             "functions": {},
             "extra": {}
         }
@@ -52,7 +52,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         funcs[name.lower()] = {
             "name": name.lower(),
-            "type": FunctionType.FUNCTION,
+            "type": "function",
             "module": self.module_name.lower(),
             "project": self.project_name,
             "handle": ctx,
@@ -72,7 +72,7 @@ class VbaListener(Listener):
         params = self._get_params(ctx.procedureParameters())
         funcs[name.lower()] = {
             "name": name.lower(),
-            "type": FunctionType.SUB,
+            "type": "sub",
             "project": self.project_name,
             "module": self.module_name.lower(),
             "handle": ctx,

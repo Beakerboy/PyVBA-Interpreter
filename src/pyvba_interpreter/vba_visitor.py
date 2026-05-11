@@ -3,7 +3,7 @@ from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_types.literal_factory import literal_from_string
 from .symbol_table import (
-    FunctionDefinition, FunctionType, LibraryDefinition, SymbolTable
+    FunctionDefinition, LibraryDefinition, SymbolTable
 )
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.exit_do_exception import ExitDoException
@@ -76,7 +76,7 @@ class VbaVisitor(Visitor):
             if self._function_in_project(var_name):
                 defn = self.visit(ctx.lExpression())
                 assert defn is not None
-                if defn["type"] == FunctionType.SUB:
+                if defn["type"] == "sub":
                     raise VbaCompileException("Expected Function or variable")
                 else:
                     raise VbaException()
@@ -371,14 +371,14 @@ class VbaVisitor(Visitor):
         l_express = self.visit(ctx.lExpression())
         assert l_express is not None
         name = ctx.unrestrictedName().getText().lower()
-        if l_express["type"] == FunctionType.PROJECT:
+        if l_express["type"] == "project":
             if name in l_express["modules"]:
                 return l_express["modules"][name]
             for mod in l_express["modules"].values():
                 if name in mod["functions"]:
                     return mod["functions"][name]
             raise VbaCompileException("Method or data member not found")
-        if l_express["type"] == FunctionType.MODULE:
+        if l_express["type"] == "module":
             if name in l_express["functions"]:
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
@@ -394,12 +394,12 @@ class VbaVisitor(Visitor):
         if isinstance(defn, tuple):
             defn = defn[0]
         if isinstance(defn, dict):
-            if defn["type"] == FunctionType.SUB:
+            if defn["type"] == "sub":
                 raise VbaCompileException("Expected Function or variable")
-            if defn["type"] == FunctionType.MODULE:
+            if defn["type"] == "module":
                 msg = "Expected variable or procedure, not module"
                 raise VbaCompileException(msg)
-            if defn["type"] == FunctionType.PROJECT:
+            if defn["type"] == "project":
                 msg = "Expected variable or procedure, not project"
                 raise VbaCompileException(msg)
 
@@ -421,10 +421,10 @@ class VbaVisitor(Visitor):
         assert defn is not None
         if isinstance(defn, tuple):
             defn = defn[0]
-        if defn["type"] == FunctionType.MODULE:
+        if defn["type"] == "module":
             msg = "Expected variable or procedure, not module"
             raise VbaCompileException(msg)
-        if defn["type"] == FunctionType.PROJECT:
+        if defn["type"] == "project":
             msg = "Expected variable or procedure, not project"
             raise VbaCompileException(msg)
 
@@ -530,7 +530,7 @@ class VbaVisitor(Visitor):
             output = ctx(*args)
         else:
             raise Exception("Unknown Function Type")
-        if defn["type"] == FunctionType.FUNCTION:
+        if defn["type"] == "function":
             return output
 
     def _find_function_in_definition(
