@@ -393,14 +393,15 @@ class VbaVisitor(Visitor):
         assert defn is not None
         if isinstance(defn, tuple):
             defn = defn[0]
-        if defn["type"] == FunctionType.SUB:
-            raise VbaCompileException("Expected Function or variable")
-        if defn["type"] == FunctionType.MODULE:
-            msg = "Expected variable or procedure, not module"
-            raise VbaCompileException(msg)
-        if defn["type"] == FunctionType.PROJECT:
-            msg = "Expected variable or procedure, not project"
-            raise VbaCompileException(msg)
+        if isinstance(defn, dict):
+            if defn["type"] == FunctionType.SUB:
+                raise VbaCompileException("Expected Function or variable")
+            if defn["type"] == FunctionType.MODULE:
+                msg = "Expected variable or procedure, not module"
+                raise VbaCompileException(msg)
+            if defn["type"] == FunctionType.PROJECT:
+                msg = "Expected variable or procedure, not project"
+                raise VbaCompileException(msg)
 
         args: list[Any] = []
         if ctx.argumentList() is not None:
