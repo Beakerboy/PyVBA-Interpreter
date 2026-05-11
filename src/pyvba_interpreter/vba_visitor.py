@@ -1,4 +1,4 @@
-from typing import Any, TypeVar
+from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from vba_types.literal_factory import literal_from_string
@@ -469,7 +469,7 @@ class VbaVisitor(Visitor):
 
     def visitSpecialForm(                                          # noqa: N802
             self: T,
-            ctx: Parser.SpecialFormContext) -> Any:
+            ctx: Parser.SpecialFormContext) -> Callable:
         name = ctx.getText().lower()
         if name == "array":
             return getattr(VBAArray, "__init__"),
