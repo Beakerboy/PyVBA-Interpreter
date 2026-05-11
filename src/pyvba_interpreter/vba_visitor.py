@@ -474,8 +474,8 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.SpecialFormContext) -> Callable:
         name = ctx.getText().lower()
-        if name == "array":
-            return getattr(VBAArray, "__init__"),
+        # if name == "array":
+        return getattr(VBAArray, "__init__"),
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
