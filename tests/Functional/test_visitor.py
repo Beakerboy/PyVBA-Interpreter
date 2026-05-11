@@ -141,6 +141,18 @@ def test_array() -> None:
     assert result[2] == 3
 
 
+def test_array() -> None:
+    code = ('Function hello()\n'
+            '    Temp = Array(1, 2, 3)\n'
+            '    hello = Temp(0)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert result == 1
+    
+
 @pytest.mark.parametrize(
     "arg_list, input, args, expected", [
         ('Arg', 'hello = Arg', [1], 1),
