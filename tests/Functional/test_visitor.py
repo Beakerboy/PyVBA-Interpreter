@@ -19,15 +19,15 @@ from unittest.mock import patch
 
 vba_project = {
     "name": "vba",
-    "type": FunctionType.PROJECT,
+    "type": "project",
     "modules": {
         "interaction": {
             "name": "interaction",
-            "type": FunctionType.MODULE,
+            "type": "module",
             "functions": {
                 "msgbox": {
                     "name": "msgbox",
-                    "type": FunctionType.FUNCTION,
+                    "type": "function",
                     "handle": getattr(Interaction, "msgbox"),
                     "project": "vba",
                     "module": "interaction",
