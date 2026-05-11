@@ -28,7 +28,7 @@ vba_project = {
                 "msgbox": {
                     "name": "msgbox",
                     "type": FunctionType.FUNCTION,
-                    "handle": getattr(Interaction, "MsgBox"),
+                    "handle": getattr(Interaction, "msgbox"),
                     "project": "vba",
                     "module": "interaction",
                     "params": [{
@@ -126,6 +126,31 @@ def test_function(input: str, expected: Any) -> None:
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
     assert result == expected
+
+
+def test_array() -> None:
+    code = ('Function hello()\n'
+            '    hello = Array(1, 2, 3)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert result[0] == 1
+    assert result[1] == 2
+    assert result[2] == 3
+
+
+def test_array_index() -> None:
+    code = ('Function hello()\n'
+            '    Temp = Array(1, 2, 3)\n'
+            '    hello = Temp(0)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert result == 1
 
 
 @pytest.mark.parametrize(

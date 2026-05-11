@@ -1,7 +1,7 @@
-from typing import Any, TypeVar
+from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
-from vba_stdlib.literal_factory import literal_from_string
+from vba_types.literal_factory import literal_from_string
 from .symbol_table import (
     FunctionDefinition, FunctionType, LibraryDefinition, SymbolTable
 )
@@ -12,6 +12,7 @@ from .Exceptions.exit_function_exception import ExitFunctionException
 from .Exceptions.exit_property_exception import ExitPropertyException
 from .Exceptions.exit_sub_exception import ExitSubException
 from .Exceptions.vba_exception import VbaException
+from vba_types.array import VBAArray
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -392,18 +393,23 @@ class VbaVisitor(Visitor):
         assert defn is not None
         if isinstance(defn, tuple):
             defn = defn[0]
-        if defn["type"] == FunctionType.SUB:
-            raise VbaCompileException("Expected Function or variable")
-        if defn["type"] == FunctionType.MODULE:
-            msg = "Expected variable or procedure, not module"
-            raise VbaCompileException(msg)
-        if defn["type"] == FunctionType.PROJECT:
-            msg = "Expected variable or procedure, not project"
-            raise VbaCompileException(msg)
+        if isinstance(defn, dict):
+            if defn["type"] == FunctionType.SUB:
+                raise VbaCompileException("Expected Function or variable")
+            if defn["type"] == FunctionType.MODULE:
+                msg = "Expected variable or procedure, not module"
+                raise VbaCompileException(msg)
+            if defn["type"] == FunctionType.PROJECT:
+                msg = "Expected variable or procedure, not project"
+                raise VbaCompileException(msg)
 
         args: list[Any] = []
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
+        if isinstance(defn, Callable):
+            return VBAArray(*args)
+        if isinstance(defn, VBAArray):
+            return defn[int(args[0])]
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
@@ -465,6 +471,13 @@ class VbaVisitor(Visitor):
             if name in proj["modules"]:
                 return proj["modules"][name]
         raise VbaCompileException("Method or data member not found")
+
+    def visitSpecialForm(                                          # noqa: N802
+            self: T,
+            ctx: Parser.SpecialFormContext) -> Callable:
+        # name = ctx.getText().lower()
+        # if name == "array":
+        return getattr(VBAArray, "__init__")
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
