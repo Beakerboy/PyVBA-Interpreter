@@ -90,8 +90,8 @@ class VbaListener(Listener):
             if parameter_list.positionalParameters() is not None:
                 pos_params = parameter_list.positionalParameters()
                 while pos_params.positionalParam(i) is not None:
-                    param = pos_params.positionalParam(i)
-                    untyped_name = param.paramDcl().untypedNameParamDcl()
+                    pos_param = pos_params.positionalParam(i)
+                    untyped_name = pos_param.paramDcl().untypedNameParamDcl()
                     name = untyped_name.ambiguousIdentifier().getText().lower()
                     param: ParamDefinition = {
                         "name": name,
