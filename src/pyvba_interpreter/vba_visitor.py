@@ -212,8 +212,9 @@ class VbaVisitor(Visitor):
     def visitLocalVariableDeclaration(                             # noqa: N802
             self: T,
             ctx: Parser.LocalVariableDeclarationContext) -> None:
+        dcl = self.visit(cyc.variableDeclarationList())
         current_env = self.env_stack[-1]
-        current_env["temp"] = literal_from_string("0")
+        current_env[dcl[0]] = dcl[1]
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -232,6 +233,11 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
         return literal_from_string(ctx.getText())
+
+    def visitUntypedVariableDcl(                                   # noqa: N802
+            self: T,
+            ctx: Parser.UntypedVariableDclContext) -> Any:
+        return ("temp", literal_from_string("0")
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
