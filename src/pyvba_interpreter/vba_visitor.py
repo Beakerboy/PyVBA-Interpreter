@@ -1,7 +1,7 @@
+import vba_types
 from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
-import vba_types
 from .symbol_table import (
     FunctionDefinition, LibraryDefinition, SymbolTable
 )
@@ -12,7 +12,6 @@ from .Exceptions.exit_function_exception import ExitFunctionException
 from .Exceptions.exit_property_exception import ExitPropertyException
 from .Exceptions.exit_sub_exception import ExitSubException
 from .Exceptions.vba_exception import VbaException
-from vba_types.array import VBAArray
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -423,8 +422,8 @@ class VbaVisitor(Visitor):
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
-            return VBAArray(*args)
-        if isinstance(defn, VBAArray):
+            return vba_types.array.VBAArray(*args)
+        if isinstance(defn,  vba_types.array.VBAArray):
             return defn[int(args[0])]
         return self.run_function(defn, args)
 
@@ -493,7 +492,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.SpecialFormContext) -> Callable:
         # name = ctx.getText().lower()
         # if name == "array":
-        return getattr(VBAArray, "__init__")
+        return getattr(vba_types.array.VBAArray, "__init__")
 
     def visitTypeSpec(                                             # noqa: N802
             self: T,
