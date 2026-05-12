@@ -1,7 +1,7 @@
 from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
-from vba_types.literal_factory import literal_from_string
+import vba_types
 from .symbol_table import (
     FunctionDefinition, LibraryDefinition, SymbolTable
 )
@@ -234,13 +234,14 @@ class VbaVisitor(Visitor):
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
-        return literal_from_string(ctx.getText())
+        return vba_types.literal_factory.literal_from_string(ctx.getText())
 
     def visitUntypedVariableDcl(                                   # noqa: N802
             self: T,
             ctx: Parser.UntypedVariableDclContext) -> tuple[str, Any]:
         name = ctx.ambiguousIdentifier().getText().lower()
-        return (name, literal_from_string("0"))
+        type = self.visit(ctx.asClause())
+        return (name, type)
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
@@ -494,6 +495,13 @@ class VbaVisitor(Visitor):
         # if name == "array":
         return getattr(VBAArray, "__init__")
 
+    def visitTypeSpec(                                             # noqa: N802
+            self: T,
+            ctx: Parser.TypeSpecContext) -> Any:
+        if ctx.builtinType() is not None:
+            type_name = ctx.builtinType().getText().lower()
+            return new_type_from_string(type_name)
+
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
@@ -596,3 +604,8 @@ class VbaVisitor(Visitor):
                 if function in libmod["functions"]:
                     return True
         return False
+
+    @staticmethod
+    def (new_type_from_string(type_name: str) -> Any:
+        if type_name == "integer":
+            return vba_types.integer.VBAInteger()
