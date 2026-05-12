@@ -500,7 +500,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.TypeSpecContext) -> Any:
         if ctx.builtinType() is not None:
             type_name = ctx.builtinType().getText().lower()
-            return _new_type_from_string(type_name)
+            return self._new_type_from_string(type_name)
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
