@@ -239,6 +239,7 @@ class VbaVisitor(Visitor):
     def visitUntypedVariableDcl(                                   # noqa: N802
             self: T,
             ctx: Parser.UntypedVariableDclContext) -> tuple[str, Any]:
+        name = ctx.ambiguousIdentifier().getText().lower()
         return ("temp", literal_from_string("0"))
 
     def visitArithmeticExpression(                                 # noqa: N802
