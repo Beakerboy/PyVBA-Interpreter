@@ -233,7 +233,7 @@ class VbaVisitor(Visitor):
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
-        return vba_types.literal_factory.literal_from_string(ctx.getText())
+        return vba_types.literal_from_string(ctx.getText())
 
     def visitUntypedVariableDcl(                                   # noqa: N802
             self: T,
