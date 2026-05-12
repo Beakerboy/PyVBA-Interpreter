@@ -213,7 +213,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LocalVariableDeclarationContext) -> None:
         current_env = self.env_stack[-1]
-        current_env["temp"] = 0
+        current_env["temp"] = literal_from_string("0")
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
