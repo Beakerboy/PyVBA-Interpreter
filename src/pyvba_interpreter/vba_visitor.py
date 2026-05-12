@@ -1,7 +1,7 @@
+import vba_types
 from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
-from vba_types.literal_factory import literal_from_string
 from .symbol_table import (
     FunctionDefinition, LibraryDefinition, SymbolTable
 )
@@ -12,7 +12,6 @@ from .Exceptions.exit_function_exception import ExitFunctionException
 from .Exceptions.exit_property_exception import ExitPropertyException
 from .Exceptions.exit_sub_exception import ExitSubException
 from .Exceptions.vba_exception import VbaException
-from vba_types.array import VBAArray
 
 
 T = TypeVar('T', bound='VbaVisitor')
@@ -209,6 +208,15 @@ class VbaVisitor(Visitor):
                 except ExitForException:
                     break
 
+    def visitLocalVariableDeclaration(                             # noqa: N802
+            self: T,
+            ctx: Parser.LocalVariableDeclarationContext) -> None:
+        current_env = self.env_stack[-1]
+        if ctx.variableDeclarationList() is not None:
+            dcl = self.visit(ctx.variableDeclarationList())
+            if dcl is not None:
+                current_env[dcl[0]] = dcl[1]
+
     def visitArgumentList(                                         # noqa: N802
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
@@ -225,7 +233,14 @@ class VbaVisitor(Visitor):
     def visitLiteralExpression(                                    # noqa: N802
             self: T,
             ctx: Parser.LiteralExpressionContext) -> Any:
-        return literal_from_string(ctx.getText())
+        return vba_types.literal_from_string(ctx.getText())
+
+    def visitUntypedVariableDcl(                                   # noqa: N802
+            self: T,
+            ctx: Parser.UntypedVariableDclContext) -> tuple[str, Any]:
+        name = ctx.ambiguousIdentifier().getText().lower()
+        type = self.visit(ctx.asClause())
+        return (name, type)
 
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
@@ -407,8 +422,8 @@ class VbaVisitor(Visitor):
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
-            return VBAArray(*args)
-        if isinstance(defn, VBAArray):
+            return vba_types.array.VBAArray(*args)
+        if isinstance(defn,  vba_types.array.VBAArray):
             return defn[int(args[0])]
         return self.run_function(defn, args)
 
@@ -477,7 +492,14 @@ class VbaVisitor(Visitor):
             ctx: Parser.SpecialFormContext) -> Callable:
         # name = ctx.getText().lower()
         # if name == "array":
-        return getattr(VBAArray, "__init__")
+        return getattr(vba_types.array.VBAArray, "__init__")
+
+    def visitTypeSpec(                                             # noqa: N802
+            self: T,
+            ctx: Parser.TypeSpecContext) -> Any:
+        if ctx.typeExpression().builtinType() is not None:
+            type_name = ctx.typeExpression().builtinType().getText().lower()
+            return self._new_type_from_string(type_name)
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
@@ -581,3 +603,8 @@ class VbaVisitor(Visitor):
                 if function in libmod["functions"]:
                     return True
         return False
+
+    @staticmethod
+    def _new_type_from_string(type_name: str) -> Any:
+        if type_name == "integer":
+            return vba_types.integer.VBAInteger()
