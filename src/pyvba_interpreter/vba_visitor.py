@@ -608,3 +608,5 @@ class VbaVisitor(Visitor):
     def _new_type_from_string(type_name: str) -> Any:
         if type_name == "integer":
             return vba_types.integer.VBAInteger()
+        if type_name == "variant":
+            return vba_types.integer.VBAEmpty()
