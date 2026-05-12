@@ -482,6 +482,9 @@ class VbaVisitor(Visitor):
             return self.table.definitions[name]
         if name in self.table.library_definitions:
             return self.table.library_definitions[name]
+        for lib_proj in self.table.library_definitions.values():
+            if name in lib_proj["modules"]:
+                return lib_proj["modules"][name]
         for proj in self.table.definitions.values():
             if name in proj["modules"]:
                 return proj["modules"][name]
