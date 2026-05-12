@@ -117,7 +117,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
          'Exit Function\n'
          'hello = 2\n', 1),
         ('Dim Temp as Integer\n'
-         'Foo = Temp\n', 0),
+         'hello = Temp\n', 0),
     ])
 def test_function(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
