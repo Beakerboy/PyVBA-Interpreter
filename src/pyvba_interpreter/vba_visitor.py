@@ -212,7 +212,7 @@ class VbaVisitor(Visitor):
     def visitLocalVariableDeclaration(                             # noqa: N802
             self: T,
             ctx: Parser.LocalVariableDeclarationContext) -> None:
-        dcl = self.visit(cyc.variableDeclarationList())
+        dcl = self.visit(ctx.variableDeclarationList())
         current_env = self.env_stack[-1]
         current_env[dcl[0]] = dcl[1]
 
