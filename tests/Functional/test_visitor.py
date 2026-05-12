@@ -71,15 +71,11 @@ def build_interp(code: str) -> VbaVisitor:
         ('Call MsgBox("Hello World")', "Hello World"),
         ('Call VBA.MsgBox("Hello World")', "Hello World"),
         ('Call VBA.Interaction.MsgBox("Hello World")', "Hello World"),
+        ('Call Interaction.MsgBox("Hello World")', "Hello World"),
         ('MsgBox "Hello World"', "Hello World"),
         ('VBA.MsgBox "Hello World"', "Hello World"),
         ('VBA.Interaction.MsgBox "Hello World"', "Hello World"),
-        ('Call MsgBox(1 < 2)', "True"),
-        ('Call MsgBox(1 <= 2)', "True"),
-        ('Call MsgBox(1 > 2)', "False"),
-        ('Call MsgBox(1 >= 2)', "False"),
-        ('Call MsgBox(1 = 2)', "False"),
-        ('Call MsgBox(1 <> 2)', "True"),
+        ('Interaction.MsgBox "Hello World"', "Hello World"),
     ])
 def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     code = ('Function hello()\n'
@@ -113,6 +109,12 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = True Xor False', True),
         ('hello = True Imp False', False),
         ('hello = True Eqv False', False),
+        ('hello = 1 < 2', True),
+        ('hello = 1 <= 2', True),
+        ('hello = 1 > 2', False),
+        ('hello = 1 >= 2', False),
+        ('hello = 1 = 2', False),
+        ('hello = 1 <> 2', True),
         ('hello = 1\n'
          'Exit Function\n'
          'hello = 2\n', 1),
