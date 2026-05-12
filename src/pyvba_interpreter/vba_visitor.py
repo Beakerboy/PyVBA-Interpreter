@@ -498,7 +498,7 @@ class VbaVisitor(Visitor):
     def visitTypeSpec(                                             # noqa: N802
             self: T,
             ctx: Parser.TypeSpecContext) -> Any:
-        if ctx.builtinType() is not None:
+        if ctx.typeExpression().builtinType() is not None:
             type_name = ctx.builtinType().getText().lower()
             return self._new_type_from_string(type_name)
 
