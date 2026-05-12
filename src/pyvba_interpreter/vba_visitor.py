@@ -209,6 +209,12 @@ class VbaVisitor(Visitor):
                 except ExitForException:
                     break
 
+    def visitLocalVariableDeclaration(                             # noqa: N802
+            self: T,
+            ctx: Parser.LocalVariableDeclarationContext) -> None:
+        current_env = self.env_stack[-1]
+        current_env["num"] = 0
+
     def visitArgumentList(                                         # noqa: N802
             self: T,
             ctx: Parser.ArgumentListContext) -> list[Any]:
