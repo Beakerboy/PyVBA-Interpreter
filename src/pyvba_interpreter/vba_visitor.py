@@ -500,7 +500,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.TypeSpecContext) -> Any:
         if ctx.builtinType() is not None:
             type_name = ctx.builtinType().getText().lower()
-            return new_type_from_string(type_name)
+            return _new_type_from_string(type_name)
 
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
@@ -606,6 +606,6 @@ class VbaVisitor(Visitor):
         return False
 
     @staticmethod
-    def (new_type_from_string(type_name: str) -> Any:
+    def _new_type_from_string(type_name: str) -> Any:
         if type_name == "integer":
             return vba_types.integer.VBAInteger()
