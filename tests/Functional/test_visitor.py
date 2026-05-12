@@ -160,6 +160,7 @@ def test_array_index() -> None:
 @pytest.mark.parametrize(
     "arg_list, input, args, expected", [
         ('Arg', 'hello = Arg', [1], 1),
+        ('Arg As Integer', 'hello = Arg', [1], 1),
     ])
 def test_function_arguments(
         arg_list: str, input: str, args: list, expected: Any) -> None:
