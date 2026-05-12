@@ -78,7 +78,7 @@ class VbaVisitor(Visitor):
                 if defn["type"] == "sub":
                     raise VbaCompileException("Expected Function or variable")
                 else:
-                    raise VbaException(f"Error On Line: {ctx.start.line}")
+                    raise VbaException(f"Error On Line {ctx.start.line}, {var_name}")
         value = self.visit(ctx.expression())
         if isinstance(value, tuple):
             value = value[1]
