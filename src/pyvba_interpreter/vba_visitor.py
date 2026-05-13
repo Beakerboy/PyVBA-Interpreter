@@ -202,8 +202,8 @@ class VbaVisitor(Visitor):
         self.raise_for_except = False
         current_env[n] = start
         while (
-                (step < 0 and current_env[n] < end_value) !=
-                (step >= 0 and current_env[n] > end_value)
+                (step < vba_types.VBAInteger(0) and current_env[n] < end_value) !=
+                (step >= vba_types.VBAInteger(0) and current_env[n] > end_value)
         ):
             if stmt.statementBlock() is not None:
                 try:
