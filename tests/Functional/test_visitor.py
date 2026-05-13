@@ -154,9 +154,9 @@ def test_array() -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result[0] == 1
-    assert result[1] == 2
-    assert result[2] == 3
+    assert int(result[0]) == 1
+    assert int(result[1]) == 2
+    assert int(result[2]) == 3
 
 
 def test_array_index() -> None:
@@ -168,7 +168,7 @@ def test_array_index() -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result == 1
+    assert result.value == 1
 
 
 @pytest.mark.parametrize(
