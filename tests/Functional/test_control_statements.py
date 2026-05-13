@@ -109,7 +109,7 @@ def test_exit_sub_exception(code: str) -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.run_function(func, [5])
+        interpreter.run_function(func, [VBAInteger(5)])
     assert str(e.value) == "Compile error:\nExit For not within For...Next"
 
 
