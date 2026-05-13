@@ -118,6 +118,7 @@ def test_int_function(input: str, expected: Any) -> None:
     result = interpreter.run_function(func, [])
     assert result.value == expected
 
+
 @pytest.mark.parametrize(
     "input, expected", [
         ('hello = True', True),
@@ -143,6 +144,7 @@ def test_bool_function(input: str, expected: Any) -> None:
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
     assert bool(result) == expected
+
 
 def test_array() -> None:
     code = ('Function hello()\n'
