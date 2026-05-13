@@ -153,7 +153,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.IfStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
-        if condition:
+        if bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
         else:
@@ -166,7 +166,7 @@ class VbaVisitor(Visitor):
         stmt = ctx.getChild(0)
         assert stmt is not None
         condition = self.visit(stmt.booleanExpression())
-        if condition:
+        if bool(condition):
             if hasattr(type(stmt), "listOrLabel"):
                 self.visit(stmt.listOrLabel())
         else:
