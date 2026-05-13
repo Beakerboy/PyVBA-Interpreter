@@ -102,6 +102,24 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 10 Mod 3', 1),
         ('hello = 10 \\ 3', 3),
         ('hello = 2 ^ 2', 4),
+        ('hello = 1\n'
+         'Exit Function\n'
+         'hello = 2\n', 1),
+        ('Dim Temp as Integer\n'
+         'hello = Temp\n', 0),
+    ])
+def test_int_function(input: str, expected: Any) -> None:
+    code = ('Function hello()\n'
+            '    ' + input + '\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert result.value == expected
+
+@pytest.mark.parametrize(
+    "input, expected", [
         ('hello = True', True),
         ('hello = False', False),
         ('hello = True And False', False),
@@ -115,13 +133,8 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 1 >= 2', False),
         ('hello = 1 = 2', False),
         ('hello = 1 <> 2', True),
-        ('hello = 1\n'
-         'Exit Function\n'
-         'hello = 2\n', 1),
-        ('Dim Temp as Integer\n'
-         'hello = Temp\n', 0),
     ])
-def test_function(input: str, expected: Any) -> None:
+def test_bool_function(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
             '    ' + input + '\n'
             'End Function\n')
@@ -129,8 +142,7 @@ def test_function(input: str, expected: Any) -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result == expected
-
+    assert bool(result) == expected
 
 def test_array() -> None:
     code = ('Function hello()\n'
