@@ -194,7 +194,6 @@ class VbaVisitor(Visitor):
         start = self.visit(clause.startValue())
         end_value = self.visit(clause.endValue())
         assert end_value is not None
-        stop = end_value + 1
         step = 1
         if clause.stepClause() is not None:
             step = self.visit(clause.stepClause().stepIncrement())
