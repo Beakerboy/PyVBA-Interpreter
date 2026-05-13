@@ -259,7 +259,7 @@ def test_two_functions() -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     result = visitor.run_function(func, [])
-    assert result == 2
+    assert result.value == 2
 
 
 @patch('builtins.print')
