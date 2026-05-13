@@ -67,7 +67,7 @@ def test_two_files(code1: str, code2: str) -> None:
     func = modules["foomodule"]["functions"]["foo"]
     result = visitor.run_function(func, [])
     expected = 42
-    assert result == expected
+    assert int(result) == expected
 
 
 @pytest.mark.parametrize(
