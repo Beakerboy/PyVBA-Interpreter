@@ -147,7 +147,7 @@ class VbaVisitor(Visitor):
                     except ExitDoException:
                         break
                 cond = self.visit(cond_clau.getChild(0).booleanExpression())
-                condition = cond == (type == "while")
+                condition = (bool(cond) == (type == "while"))
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
