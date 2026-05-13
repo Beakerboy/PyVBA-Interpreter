@@ -200,6 +200,8 @@ class VbaVisitor(Visitor):
         current_env = self.env_stack[-1]
         self.raise_for_except = False
         current_env[n] = start
+        # Check if start, end, and step are Let-coercable to a Double:
+        # Raise Type Mismatch (13) if not.
         while (
                 (step < vba_types.VBAInteger(0) and current_env[n] < end_value) !=
                 (step >= vba_types.VBAInteger(0) and current_env[n] > end_value)
