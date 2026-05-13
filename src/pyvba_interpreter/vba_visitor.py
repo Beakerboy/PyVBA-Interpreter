@@ -194,7 +194,7 @@ class VbaVisitor(Visitor):
         start = self.visit(clause.startValue())
         end_value = self.visit(clause.endValue())
         assert end_value is not None
-        step = 1
+        step = vba_types.VBAInteger(1)
         if clause.stepClause() is not None:
             step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
