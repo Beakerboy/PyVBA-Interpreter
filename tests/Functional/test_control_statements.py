@@ -81,7 +81,7 @@ def test_factorial(code: str) -> None:
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
-    result = interpreter.run_function(func, [vbaInteger(5)])
+    result = interpreter.run_function(func, [VBAInteger(5)])
     expected = 120
     assert int(result) == expected
 
