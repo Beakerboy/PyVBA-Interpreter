@@ -200,13 +200,17 @@ class VbaVisitor(Visitor):
             step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
         self.raise_for_except = False
-        for i in range(start, stop, step):
-            current_env[n] = i
+        current_env[n] = start
+        while (
+                (step < 0 and current_env[n] < end_value) !=
+                (step >= 0 and current_env[n] > end_value)
+        )
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
                 except ExitForException:
                     break
+            current_env[n] += step
 
     def visitLocalVariableDeclaration(                             # noqa: N802
             self: T,
