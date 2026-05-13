@@ -177,7 +177,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.WhileStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
-        while condition:
+        while bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
             condition = self.visit(ctx.booleanExpression())
