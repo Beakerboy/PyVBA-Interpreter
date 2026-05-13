@@ -82,7 +82,7 @@ def test_factorial(code: str) -> None:
     func = modules["factorial"]["functions"]["fact"]
     result = interpreter.run_function(func, [5])
     expected = 120
-    assert result == expected
+    assert int(result) == expected
 
 
 @pytest.mark.parametrize(
