@@ -204,7 +204,7 @@ class VbaVisitor(Visitor):
         while (
                 (step < 0 and current_env[n] < end_value) !=
                 (step >= 0 and current_env[n] > end_value)
-        )
+        ):
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
