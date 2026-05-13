@@ -9,6 +9,7 @@ from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
 )
+from vba_types import VBAInteger
 
 
 def build_interp(code: str) -> VbaVisitor:
@@ -80,7 +81,7 @@ def test_factorial(code: str) -> None:
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
-    result = interpreter.run_function(func, [5])
+    result = interpreter.run_function(func, [vbaInteger(5)])
     expected = 120
     assert int(result) == expected
 
