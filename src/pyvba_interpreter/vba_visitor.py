@@ -508,7 +508,7 @@ class VbaVisitor(Visitor):
         return getattr(vba_types.array.VBAArray, "__init__")
 
     def visitReservedName(                                         # noqa: N802
-            self:T,
+            self: T,
             ctx: Parser.ReservedNameContext) -> Any:
         name = ctx.getText().lower()
         if self._function_in_project(name):
