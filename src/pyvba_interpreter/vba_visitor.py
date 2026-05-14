@@ -387,7 +387,7 @@ class VbaVisitor(Visitor):
         elif op == "XOR":
             return vba_types.VBABoolean(left != right)
         elif op == "IMP":
-            return not vba_types.VBABoolean(left or right)
+            return vba_types.VBABoolean(not (left or right))
         else:  # op == "EQV":
             return vba_types.VBABoolean(left == right)
 
