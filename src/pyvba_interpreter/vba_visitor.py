@@ -510,6 +510,7 @@ class VbaVisitor(Visitor):
     def visitReservedName(                                         # noqa: N802
             self:T,
             ctx: Parser.ReservedNameContext) -> Any:
+        name = ctx.getText().lower()
         if self._function_in_project(name):
             return self._find_function_in_definition(name, self.context[1])
 
