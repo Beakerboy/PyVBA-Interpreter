@@ -203,16 +203,11 @@ class VbaVisitor(Visitor):
         current_env[n] = start
         # Check if start, end, and step are Let-coercable to a Double:
         # Raise Type Mismatch (13) if not.
-        while (
-                (
-                    step.value < 0 and
-                    bool(current_env[n] < end_value)
-                ) !=
-                (
-                    (step.value >= 0) and
-                    bool(current_env[n] > end_value)
-                )
-        ):
+        while True:
+            if step.value >= 0 and bool(current_env[n] > end_value):
+                break
+            if step.value < 0 and bool(current_env[n] < end_value):
+                break
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
