@@ -203,14 +203,14 @@ class VbaVisitor(Visitor):
         current_env[n] = start
         # Check if start, end, and step are Let-coercable to a Double:
         # Raise Type Mismatch (13) if not.
-        step1 = step < vba_types.VBAInteger(0)
-        step2 = step >= vba_types.VBAInteger(0)
         while (
                 (
-                    step1.vba_and(current_env[n] < end_value)
+                    step.value < 0 and
+                    bool(current_env[n] < end_value)
                 ) !=
                 (
-                    step2.vba_and(current_env[n] > end_value)
+                    (step.value >= 0) and
+                    bool(current_env[n] > end_value)
                 )
         ):
             if stmt.statementBlock() is not None:
@@ -218,9 +218,7 @@ class VbaVisitor(Visitor):
                     self.visit(stmt.statementBlock())
                 except ExitForException:
                     break
-            current_env[n] += step
-            step1 = step < vba_types.VBAInteger(0)
-            step2 = step >= vba_types.VBAInteger(0)
+            current_env[n] = current_env[n] + step
 
     def visitLocalVariableDeclaration(                             # noqa: N802
             self: T,
