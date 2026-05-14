@@ -1,5 +1,6 @@
 import os
 import pytest
+import vba_types
 from vba_stdlib.interaction import Interaction
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
@@ -144,6 +145,7 @@ def test_bool_function(input: str, expected: Any) -> None:
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
     assert bool(result) == expected
+    assert isinstance(result, vba_types.boolean.VBABoolean)
 
 
 def test_array() -> None:

@@ -83,6 +83,7 @@ def test_factorial(code: str) -> None:
     func = modules["factorial"]["functions"]["fact"]
     result = interpreter.run_function(func, [VBAInteger(5)])
     expected = 120
+    assert isinstance(result, VBAInteger)
     assert int(result) == expected
 
 

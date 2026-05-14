@@ -123,7 +123,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Loop without Do")
             cond_clau = ctx.conditionClause(0)
             cond = self.visit(cond_clau.getChild(0).booleanExpression())
-            condition = (bool(cond) == cond_clau.whileClause() is not None)
+            condition = (bool(cond) == (cond_clau.whileClause() is not None))
             run_while = True
         elif ctx.conditionClause(1) is not None:
             cond_clau = ctx.conditionClause(1)
@@ -203,16 +203,11 @@ class VbaVisitor(Visitor):
         current_env[n] = start
         # Check if start, end, and step are Let-coercable to a Double:
         # Raise Type Mismatch (13) if not.
-        while (
-                (
-                    step.value < 0 and
-                    bool(current_env[n] < end_value)
-                ) !=
-                (
-                    (step.value >= 0) and
-                    bool(current_env[n] > end_value)
-                )
-        ):
+        while True:
+            if step.value >= 0 and bool(current_env[n] > end_value):
+                break
+            if step.value < 0 and bool(current_env[n] < end_value):
+                break
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
@@ -365,7 +360,7 @@ class VbaVisitor(Visitor):
 
     def visitBooleanExpress(                                    # noqa: N802
             self: T,
-            ctx: Parser.BooleanExpressContext) -> bool:
+            ctx: Parser.BooleanExpressContext) -> vba_types.VBABoolean:
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
@@ -381,15 +376,15 @@ class VbaVisitor(Visitor):
             right = right[1]
         op = self._get_op(ctx).upper()
         if op == "AND":
-            return left and right
+            return vba_types.VBABoolean(left and right)
         elif op == "OR":
-            return left or right
+            return vba_types.VBABoolean(left or right)
         elif op == "XOR":
-            return left != right
+            return vba_types.VBABoolean(left != right)
         elif op == "IMP":
-            return not left or right
+            return vba_types.VBABoolean(not (left or right))
         else:  # op == "EQV":
-            return left == right
+            return vba_types.VBABoolean(left == right)
 
     def visitMemberAccessExpress(                                # noqa N802
             self: T,
