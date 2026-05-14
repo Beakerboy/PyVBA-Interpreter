@@ -333,7 +333,7 @@ class VbaVisitor(Visitor):
     def visitRelationExpression(                                   # noqa: N802
             self: T,
             ctx: Parser.RelationExpressionContext
-    ) -> bool:
+    ) -> vba_types.VBABoolean:
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
