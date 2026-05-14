@@ -204,12 +204,14 @@ class VbaVisitor(Visitor):
         # Raise Type Mismatch (13) if not.
         while (
                 (
-                    step < vba_types.VBAInteger(0) and
-                    current_env[n] < end_value
+                    (step < vba_types.VBAInteger(0)).and(
+                        current_env[n] < end_value
+                    )
                 ) !=
                 (
-                    step >= vba_types.VBAInteger(0) and
-                    current_env[n] > end_value
+                    (step >= vba_types.VBAInteger(0)).and(
+                        current_env[n] > end_value
+                    )
                 )
         ):
             if stmt.statementBlock() is not None:
