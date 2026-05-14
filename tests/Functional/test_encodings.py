@@ -43,4 +43,4 @@ def test_encoding(input: str, expected: Any) -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result == expected
+    assert int(result) == expected

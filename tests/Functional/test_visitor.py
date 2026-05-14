@@ -1,5 +1,6 @@
 import os
 import pytest
+import vba_types
 from vba_stdlib.interaction import Interaction
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
@@ -102,6 +103,25 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 10 Mod 3', 1),
         ('hello = 10 \\ 3', 3),
         ('hello = 2 ^ 2', 4),
+        ('hello = 1\n'
+         'Exit Function\n'
+         'hello = 2\n', 1),
+        ('Dim Temp as Integer\n'
+         'hello = Temp\n', 0),
+    ])
+def test_int_function(input: str, expected: Any) -> None:
+    code = ('Function hello()\n'
+            '    ' + input + '\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert result.value == expected
+
+
+@pytest.mark.parametrize(
+    "input, expected", [
         ('hello = True', True),
         ('hello = False', False),
         ('hello = True And False', False),
@@ -115,13 +135,8 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
         ('hello = 1 >= 2', False),
         ('hello = 1 = 2', False),
         ('hello = 1 <> 2', True),
-        ('hello = 1\n'
-         'Exit Function\n'
-         'hello = 2\n', 1),
-        ('Dim Temp as Integer\n'
-         'hello = Temp\n', 0),
     ])
-def test_function(input: str, expected: Any) -> None:
+def test_bool_function(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
             '    ' + input + '\n'
             'End Function\n')
@@ -129,7 +144,8 @@ def test_function(input: str, expected: Any) -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result == expected
+    assert bool(result) == expected
+    assert isinstance(result, vba_types.boolean.VBABoolean)
 
 
 def test_array() -> None:
@@ -140,9 +156,9 @@ def test_array() -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result[0] == 1
-    assert result[1] == 2
-    assert result[2] == 3
+    assert int(result[0]) == 1
+    assert int(result[1]) == 2
+    assert int(result[2]) == 3
 
 
 def test_array_index() -> None:
@@ -154,7 +170,7 @@ def test_array_index() -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
-    assert result == 1
+    assert result.value == 1
 
 
 @pytest.mark.parametrize(
@@ -245,7 +261,7 @@ def test_two_functions() -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     result = visitor.run_function(func, [])
-    assert result == 2
+    assert result.value == 2
 
 
 @patch('builtins.print')

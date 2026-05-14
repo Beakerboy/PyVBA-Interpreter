@@ -78,7 +78,8 @@ class VbaVisitor(Visitor):
                 if defn["type"] == "sub":
                     raise VbaCompileException("Expected Function or variable")
                 else:
-                    raise VbaException(f"Error On Line {ctx.start.line}, {var_name}")
+                    msg = f"Error On Line {ctx.start.line}, {var_name}"
+                    raise VbaException(msg)
         value = self.visit(ctx.expression())
         if isinstance(value, tuple):
             value = value[1]
@@ -122,7 +123,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Loop without Do")
             cond_clau = ctx.conditionClause(0)
             cond = self.visit(cond_clau.getChild(0).booleanExpression())
-            condition = cond == (cond_clau.whileClause() is not None)
+            condition = (bool(cond) == (cond_clau.whileClause() is not None))
             run_while = True
         elif ctx.conditionClause(1) is not None:
             cond_clau = ctx.conditionClause(1)
@@ -147,13 +148,13 @@ class VbaVisitor(Visitor):
                     except ExitDoException:
                         break
                 cond = self.visit(cond_clau.getChild(0).booleanExpression())
-                condition = cond == (type == "while")
+                condition = (bool(cond) == (type == "while"))
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
             ctx: Parser.IfStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
-        if condition:
+        if bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
         else:
@@ -166,7 +167,7 @@ class VbaVisitor(Visitor):
         stmt = ctx.getChild(0)
         assert stmt is not None
         condition = self.visit(stmt.booleanExpression())
-        if condition:
+        if bool(condition):
             if hasattr(type(stmt), "listOrLabel"):
                 self.visit(stmt.listOrLabel())
         else:
@@ -177,7 +178,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.WhileStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
-        while condition:
+        while bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
             condition = self.visit(ctx.booleanExpression())
@@ -194,19 +195,25 @@ class VbaVisitor(Visitor):
         start = self.visit(clause.startValue())
         end_value = self.visit(clause.endValue())
         assert end_value is not None
-        stop = end_value + 1
-        step = 1
+        step = vba_types.VBAInteger(1)
         if clause.stepClause() is not None:
             step = self.visit(clause.stepClause().stepIncrement())
         current_env = self.env_stack[-1]
         self.raise_for_except = False
-        for i in range(start, stop, step):
-            current_env[n] = i
+        current_env[n] = start
+        # Check if start, end, and step are Let-coercable to a Double:
+        # Raise Type Mismatch (13) if not.
+        while True:
+            if step.value >= 0 and bool(current_env[n] > end_value):
+                break
+            if step.value < 0 and bool(current_env[n] < end_value):
+                break
             if stmt.statementBlock() is not None:
                 try:
                     self.visit(stmt.statementBlock())
                 except ExitForException:
                     break
+            current_env[n] = current_env[n] + step
 
     def visitLocalVariableDeclaration(                             # noqa: N802
             self: T,
@@ -321,7 +328,7 @@ class VbaVisitor(Visitor):
     def visitRelationExpression(                                   # noqa: N802
             self: T,
             ctx: Parser.RelationExpressionContext
-    ) -> bool:
+    ) -> vba_types.VBABoolean:
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
@@ -353,7 +360,7 @@ class VbaVisitor(Visitor):
 
     def visitBooleanExpress(                                    # noqa: N802
             self: T,
-            ctx: Parser.BooleanExpressContext) -> bool:
+            ctx: Parser.BooleanExpressContext) -> vba_types.VBABoolean:
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
@@ -369,15 +376,15 @@ class VbaVisitor(Visitor):
             right = right[1]
         op = self._get_op(ctx).upper()
         if op == "AND":
-            return left and right
+            return vba_types.VBABoolean(left and right)
         elif op == "OR":
-            return left or right
+            return vba_types.VBABoolean(left or right)
         elif op == "XOR":
-            return left != right
+            return vba_types.VBABoolean(left != right)
         elif op == "IMP":
-            return not left or right
+            return vba_types.VBABoolean(not (left or right))
         else:  # op == "EQV":
-            return left == right
+            return vba_types.VBABoolean(left == right)
 
     def visitMemberAccessExpress(                                # noqa N802
             self: T,

@@ -9,6 +9,7 @@ from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
 )
+from vba_types import VBAInteger
 
 
 def build_interp(code: str) -> VbaVisitor:
@@ -80,9 +81,10 @@ def test_factorial(code: str) -> None:
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
-    result = interpreter.run_function(func, [5])
+    result = interpreter.run_function(func, [VBAInteger(5)])
     expected = 120
-    assert result == expected
+    assert isinstance(result, VBAInteger)
+    assert int(result) == expected
 
 
 @pytest.mark.parametrize(
@@ -108,7 +110,7 @@ def test_exit_sub_exception(code: str) -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.run_function(func, [5])
+        interpreter.run_function(func, [VBAInteger(5)])
     assert str(e.value) == "Compile error:\nExit For not within For...Next"
 
 
@@ -127,5 +129,5 @@ def test_do_exception(code: str) -> None:
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
     with pytest.raises(VbaCompileException) as e:
-        interpreter.run_function(func, [5])
+        interpreter.run_function(func, [VBAInteger(5)])
     assert str(e.value) == "Compile error:\nLoop without Do"

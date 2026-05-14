@@ -1,2 +1,4 @@
 class VbaException(Exception):
-    pass
+    msg: str
+    # project, file, line, column, token
+    context: tuple

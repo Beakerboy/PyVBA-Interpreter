@@ -54,6 +54,7 @@ class LibProjectDefinition(TypedDict):
     name: str
     type: str
     modules: dict[str, LibModuleDefinition]
+    classes: dict[str, LibModuleDefinition]
 
 
 T = TypeVar('T', bound='SymbolTable')
