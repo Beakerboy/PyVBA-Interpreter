@@ -507,6 +507,12 @@ class VbaVisitor(Visitor):
         # if name == "array":
         return getattr(vba_types.array.VBAArray, "__init__")
 
+    def visitReservedName(                                         # noqa: N802
+            self:T
+            ctx: Parser.ReservedNameContext) -> Any:
+        if self._function_in_project(name):
+            return self._find_function_in_definition(name, self.context[1])
+
     def visitTypeSpec(                                             # noqa: N802
             self: T,
             ctx: Parser.TypeSpecContext) -> Any:
