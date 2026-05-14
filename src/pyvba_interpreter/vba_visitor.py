@@ -218,6 +218,8 @@ class VbaVisitor(Visitor):
                 except ExitForException:
                     break
             current_env[n] += step
+            step1 = step < vba_types.VBAInteger(0)
+            step2 = step >= vba_types.VBAInteger(0)
 
     def visitLocalVariableDeclaration(                             # noqa: N802
             self: T,
