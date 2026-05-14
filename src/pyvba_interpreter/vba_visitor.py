@@ -202,16 +202,14 @@ class VbaVisitor(Visitor):
         current_env[n] = start
         # Check if start, end, and step are Let-coercable to a Double:
         # Raise Type Mismatch (13) if not.
+        step1 = step < vba_types.VBAInteger(0)
+        step2 = step >= vba_types.VBAInteger(0)
         while (
                 (
-                    (step < vba_types.VBAInteger(0)).and(
-                        current_env[n] < end_value
-                    )
+                    step1.and(current_env[n] < end_value)
                 ) !=
                 (
-                    (step >= vba_types.VBAInteger(0)).and(
-                        current_env[n] > end_value
-                    )
+                    step2.and(current_env[n] > end_value)
                 )
         ):
             if stmt.statementBlock() is not None:
