@@ -206,10 +206,10 @@ class VbaVisitor(Visitor):
         step2 = step >= vba_types.VBAInteger(0)
         while (
                 (
-                    step1.and(current_env[n] < end_value)
+                    step1.vba_and(current_env[n] < end_value)
                 ) !=
                 (
-                    step2.and(current_env[n] > end_value)
+                    step2.vba_and(current_env[n] > end_value)
                 )
         ):
             if stmt.statementBlock() is not None:
