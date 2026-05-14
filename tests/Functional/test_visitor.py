@@ -145,7 +145,7 @@ def test_bool_function(input: str, expected: Any) -> None:
     func = modules["helloworld"]["functions"]["hello"]
     result = interpreter.run_function(func, [])
     assert bool(result) == expected
-    assert isinstance(result, vba_types.VBABoolean)
+    assert isinstance(result, vba_types.boolean.VBABoolean)
 
 
 def test_array() -> None:
