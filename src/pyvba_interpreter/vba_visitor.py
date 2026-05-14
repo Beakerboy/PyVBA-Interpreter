@@ -365,7 +365,7 @@ class VbaVisitor(Visitor):
 
     def visitBooleanExpress(                                    # noqa: N802
             self: T,
-            ctx: Parser.BooleanExpressContext) -> bool:
+            ctx: Parser.BooleanExpressContext) -> vba_types.VBABoolean:
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
@@ -381,15 +381,15 @@ class VbaVisitor(Visitor):
             right = right[1]
         op = self._get_op(ctx).upper()
         if op == "AND":
-            return left and right
+            return vba_types.VBABoolean(left and right)
         elif op == "OR":
-            return left or right
+            return vba_types.VBABoolean(left or right)
         elif op == "XOR":
-            return left != right
+            return vba_types.VBABoolean(left != right)
         elif op == "IMP":
-            return not left or right
+            return not vba_types.VBABoolean(left or right)
         else:  # op == "EQV":
-            return left == right
+            return vba_types.VBABoolean(left == right)
 
     def visitMemberAccessExpress(                                # noqa N802
             self: T,
