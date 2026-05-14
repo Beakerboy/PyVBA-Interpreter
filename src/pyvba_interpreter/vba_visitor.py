@@ -122,7 +122,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Loop without Do")
             cond_clau = ctx.conditionClause(0)
             cond = self.visit(cond_clau.getChild(0).booleanExpression())
-            condition = cond == vba_types.VBABoolean(cond_clau.whileClause() is not None)
+            condition = vba_types.VBABoolean(cond == vba_types.VBABoolean(cond_clau.whileClause()) is not None)
             run_while = True
         elif ctx.conditionClause(1) is not None:
             cond_clau = ctx.conditionClause(1)
