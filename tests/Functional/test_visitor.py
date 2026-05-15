@@ -5,6 +5,7 @@ from vba_stdlib.interaction import Interaction
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
+from pytest_mock import MockerFixture
 from pyvba_interpreter.symbol_table import SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
@@ -66,7 +67,6 @@ def build_interp(code: str) -> VbaVisitor:
     return VbaVisitor(table)
 
 
-@patch('builtins.print')
 @pytest.mark.parametrize(
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
@@ -78,7 +78,9 @@ def build_interp(code: str) -> VbaVisitor:
         ('VBA.Interaction.MsgBox "Hello World"', "Hello World"),
         ('Interaction.MsgBox "Hello World"', "Hello World"),
     ])
-def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
+def test_msgbox(input: str, expected: Any, mocker: MockerFixture) -> None:
+    mock_print = mocker.patch('builtins.print')
+    mocker.patch('builtins.input', return_value="")
     code = ('Function hello()\n'
             '    ' + input + '\n'
             'End Function\n')
@@ -87,7 +89,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     visitor.run_function(func, [])
-    mock_print.assert_called_with(expected)
+    mock_print.assert_called_with(f"Microsoft Excel\n\n{expected}\nOK")
 
 
 @pytest.mark.parametrize(
@@ -264,16 +266,17 @@ def test_two_functions() -> None:
     assert result.value == 2
 
 
-@patch('builtins.print')
 @pytest.mark.parametrize(
     "statement", [
         ('True Or Bar()'),
         ('False And Bar()'),
     ])
-def test_no_short_circuit(mock_print: str, statement: str) -> None:
+def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
     """
     Boolean Expressions do not short circuit
     """
+    mock_print = mocker.patch('builtins.print')
+    mocker.patch('builtins.input', return_value="")
     code = ('Function Foo()\n'
             '    Foo = ' + statement + '\n'
             'End Function\n'
@@ -286,7 +289,8 @@ def test_no_short_circuit(mock_print: str, statement: str) -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     visitor.run_function(func, [])
-    mock_print.assert_called_with("Bar is Called")
+    expected = "Bar is Called"
+    mock_print.assert_called_with(f"Microsoft Excel\n\n{expected}\nOK")
 
 
 @pytest.mark.parametrize(
