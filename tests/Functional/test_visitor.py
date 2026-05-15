@@ -289,7 +289,8 @@ def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     visitor.run_function(func, [])
-    mock_print.assert_called_with("Bar is Called")
+    expected = "Bar is Called"
+    mock_print.assert_called_with(f"Microsoft Excel\n\n{expected}\nOK")
 
 
 @pytest.mark.parametrize(
