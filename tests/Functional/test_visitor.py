@@ -87,7 +87,7 @@ def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
     visitor.run_function(func, [])
-    mock_print.assert_called_with(expected)
+    mock_print.assert_called_with(f"Microsoft Excel\n\n{expected}\nOK)
 
 
 @pytest.mark.parametrize(
