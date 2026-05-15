@@ -266,16 +266,17 @@ def test_two_functions() -> None:
     assert result.value == 2
 
 
-@patch('builtins.print')
 @pytest.mark.parametrize(
     "statement", [
         ('True Or Bar()'),
         ('False And Bar()'),
     ])
-def test_no_short_circuit(mock_print: str, statement: str) -> None:
+def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
     """
     Boolean Expressions do not short circuit
     """
+    mock_print = mocker.patch('builtins.print')
+    mocker.patch('builtins.input', return_value="")
     code = ('Function Foo()\n'
             '    Foo = ' + statement + '\n'
             'End Function\n'
