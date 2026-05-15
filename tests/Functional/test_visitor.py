@@ -5,6 +5,7 @@ from vba_stdlib.interaction import Interaction
 from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
+from pytest_mock import MockerFixture
 from pyvba_interpreter.symbol_table import SymbolTable
 from pyvba_interpreter.vba_listener import VbaListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
@@ -66,7 +67,6 @@ def build_interp(code: str) -> VbaVisitor:
     return VbaVisitor(table)
 
 
-@patch('builtins.print')
 @pytest.mark.parametrize(
     "input, expected", [
         ('Call MsgBox("Hello World")', "Hello World"),
@@ -78,7 +78,9 @@ def build_interp(code: str) -> VbaVisitor:
         ('VBA.Interaction.MsgBox "Hello World"', "Hello World"),
         ('Interaction.MsgBox "Hello World"', "Hello World"),
     ])
-def test_msgbox(mock_print: str, input: str, expected: Any) -> None:
+def test_msgbox(input: str, expected: Any, mocker: MockerFixture) -> None:
+    mock_print = mocker.patch('builtins.print')
+    mocker.patch('builtins.input', return_value="")
     code = ('Function hello()\n'
             '    ' + input + '\n'
             'End Function\n')
