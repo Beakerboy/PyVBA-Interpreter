@@ -105,6 +105,8 @@ def test_msgbox(input: str, expected: Any, mocker: MockerFixture) -> None:
         ('hello = 10 Mod 3', 1),
         ('hello = 10 \\ 3', 3),
         ('hello = 2 ^ 2', 4),
+        ('hello = "Hello" & " World"', "Hello World"),
+        ('hello = 1 & 2 & "Hello"', "12Hello"),
         ('hello = 1\n'
          'Exit Function\n'
          'hello = 2\n', 1),
