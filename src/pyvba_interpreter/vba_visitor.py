@@ -550,6 +550,8 @@ class VbaVisitor(Visitor):
                 else:
                     if len(args) > i:
                         current_env[param["name"]] = args[i]
+                    else:
+                        current_env[param["name"]] = param["default"]
                 i += 1
             self.env_stack.append(current_env)
             try:
