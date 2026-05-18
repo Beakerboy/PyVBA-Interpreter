@@ -249,6 +249,24 @@ class VbaVisitor(Visitor):
         type = self.visit(ctx.asClause())
         return (name, type)
 
+    def visitConcatExpression(                                     # noqa: N802
+            self: T,
+            ctx: Parser.ArithmeticExpressionContext) -> vba_types.VBAString:
+        left_child = ctx.getChild(0)
+        assert left_child is not None
+        left = self.visit(left_child)
+        if isinstance(left, tuple):
+            left = left[1]
+        assert left is not None
+        last = ctx.getChildCount() - 1
+        right_child = ctx.getChild(last)
+        assert right_child is not None
+        right = self.visit(right_child)
+        if isinstance(right, tuple):
+            right = right[1]
+        assert right is not None
+        return vba_types.VBAString(str(left.value) + str(right.value))
+
     def visitArithmeticExpression(                                 # noqa: N802
             self: T,
             ctx: Parser.ArithmeticExpressionContext) -> Any:
