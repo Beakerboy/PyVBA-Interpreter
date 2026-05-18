@@ -331,7 +331,7 @@ class VbaVisitor(Visitor):
         assert value is not None
         if isinstance(value, tuple):
             value = value[1]
-        return -1 * value
+        return vba_types.VBAInteger(-1) * value
 
     def visitParenthesizedExpress(                                 # noqa: N802
             self: T,
