@@ -251,7 +251,7 @@ class VbaVisitor(Visitor):
 
     def visitConcatExpression(                                     # noqa: N802
             self: T,
-            ctx: Parser.ArithmeticExpressionContext) -> vba_types.VBAString:
+            ctx: Parser.ConcatExpressionContext) -> vba_types.VBAString:
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
