@@ -223,7 +223,7 @@ class VbaVisitor(Visitor):
         if ctx.variableDeclarationList() is not None:
             dcl = self.visit(ctx.variableDeclarationList())
             if dcl is not None:
-                current_env[dcl[0]] = vba_types.VBAVAariable(value=dcl[1])
+                current_env[dcl[0]] = vba_types.VBAVariable(value=dcl[1])
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
