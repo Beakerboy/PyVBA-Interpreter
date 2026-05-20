@@ -564,7 +564,9 @@ class VbaVisitor(Visitor):
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
-                    current_env[param["name"]] = args[i]
+                    var = param["var"]
+                    var.value = args[i]
+                    current_env[param["name"]] = var
                 else:
                     if len(args) > i:
                         current_env[param["name"]] = args[i]
