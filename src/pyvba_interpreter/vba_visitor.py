@@ -449,7 +449,10 @@ class VbaVisitor(Visitor):
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
             return vba_types.array.VBAArray(*args)
-        if isinstance(defn,  vba_types.array.VBAArray):
+        if (
+                isinstance(defn,  vba_types.VBAVariable) and
+                isinstance(defn.value,  vba_types.VBAArray
+           ):
             return defn[int(args[0])]
         return self.run_function(defn, args)
 
