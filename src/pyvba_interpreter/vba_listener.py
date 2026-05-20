@@ -100,7 +100,7 @@ class VbaListener(Listener):
                         var = VBAVariable(type)
                     param: ParamDefinition = {
                         "name": name,
-                        "var": var
+                        "var": var,
                         "optional": False,
                         "default": None
                     }
