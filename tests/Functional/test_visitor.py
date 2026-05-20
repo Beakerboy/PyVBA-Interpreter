@@ -140,6 +140,8 @@ def test_int_function(input: str, expected: Any) -> None:
         ('hello = 1 >= 2', False),
         ('hello = 1 = 2', False),
         ('hello = 1 <> 2', True),
+        ('Temp = 5\n'
+         '    hello = Temp = 1', False),
     ])
 def test_bool_function(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
