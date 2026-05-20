@@ -180,8 +180,8 @@ def test_array_index() -> None:
 
 @pytest.mark.parametrize(
     "arg_list, input, args, expected", [
-        ('Arg', 'hello = Arg', [1], 1),
-        ('Arg As Integer', 'hello = Arg', [1], 1),
+        ('Arg', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
+        ('Arg As Integer', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
     ])
 def test_function_arguments(
         arg_list: str, input: str, args: list, expected: Any) -> None:
@@ -191,7 +191,7 @@ def test_function_arguments(
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
-    result = visitor.run_function(func, args)
+    result = visitor.run_function(func, args).value
     assert result == expected
 
 
