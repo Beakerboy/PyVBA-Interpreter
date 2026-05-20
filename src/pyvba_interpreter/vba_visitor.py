@@ -33,7 +33,7 @@ class VbaVisitor(Visitor):
 
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
-            ctx: Parser.FunctionDeclarationContext) -> Any:
+            ctx: Parser.FunctionDeclarationContext) -> vba_types.VBATypeBase:
         self.env_stack[-1][self.context[2]] = vba_types.VBAVariable()
         if ctx.procedureBody() is not None:
             try:
