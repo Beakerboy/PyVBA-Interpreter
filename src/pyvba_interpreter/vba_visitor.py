@@ -453,7 +453,7 @@ class VbaVisitor(Visitor):
                 isinstance(defn,  vba_types.VBAVariable) and
                 isinstance(defn.value,  vba_types.VBAArray)
            ):
-            return defn[int(args[0])]
+            return defn.value[int(args[0])]
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
