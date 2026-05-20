@@ -174,7 +174,7 @@ def test_array() -> None:
     ])
 def test_array_index(input: str) -> None:
     code = ('Function hello()\n'
-            + str +
+            + input +
             'End Function\n')
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
