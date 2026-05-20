@@ -451,7 +451,7 @@ class VbaVisitor(Visitor):
             return vba_types.array.VBAArray(*args)
         if (
                 isinstance(defn,  vba_types.VBAVariable) and
-                isinstance(defn.value,  vba_types.VBAArray
+                isinstance(defn.value,  vba_types.VBAArray)
            ):
             return defn[int(args[0])]
         return self.run_function(defn, args)
