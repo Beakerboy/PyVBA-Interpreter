@@ -29,7 +29,7 @@ class VbaVisitor(Visitor):
         self.env_stack: list[dict[str, Any]] = []
 
         # The current project, module, and function context
-        self.context = ["vbaproject", "", ""]
+        self.context = ("vbaproject", "", "")
 
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
@@ -551,7 +551,7 @@ class VbaVisitor(Visitor):
                 isinstance(ctx, Parser.SubroutineDeclarationContext)
         ):
             previous_context = self.context.copy()
-            self.context = [defn["project"], defn["module"], defn["name"]]
+            self.context = (defn["project"], defn["module"], defn["name"])
             current_env = {}
             min = 0
             max = len(defn["params"])
