@@ -34,7 +34,7 @@ class VbaVisitor(Visitor):
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
             ctx: Parser.FunctionDeclarationContext) -> Any:
-        self.env_stack[-1][self.context[2]] = None
+        self.env_stack[-1][self.context[2]] = vba_types.VBAVariable()
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
@@ -43,7 +43,7 @@ class VbaVisitor(Visitor):
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
             except ExitFunctionException:
-                return self.env_stack[-1][self.context[2]]
+                return self.env_stack[-1][self.context[2]].value
 
     def visitSubroutineDeclaration(                                # noqa: N802
             self: T,
@@ -80,12 +80,13 @@ class VbaVisitor(Visitor):
                 else:
                     msg = f"Error On Line {ctx.start.line}, {var_name}"
                     raise VbaException(msg)
+            current_env[var_name] = vba_types.VBAVariable()
         value = self.visit(ctx.expression())
         if isinstance(value, tuple):
             value = value[1]
         if isinstance(value, dict):
             raise VbaCompileException("Expected Function or variable")
-        current_env[var_name] = value
+        current_env[var_name].value = value
 
     def visitCallStatement(                                        # noqa: N802
             self: T,
