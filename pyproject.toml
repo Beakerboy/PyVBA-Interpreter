@@ -21,7 +21,7 @@ dependencies = [
   'antlr4-tools',
   'antlr4_vba',
   'python-dateutil',
-  'vba_types @ git+https://github.com/Beakerboy/Vba-Types@dev',
+  'vba_types @ git+https://github.com/Beakerboy/Vba-Types@variable',
 ]
 [project.optional-dependencies]
 tests = [
