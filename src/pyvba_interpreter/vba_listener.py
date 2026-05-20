@@ -96,7 +96,8 @@ class VbaListener(Listener):
                     if untyped_name.parameterType() is None:
                         var = VBAVariable()
                     else:
-                        type = untyped_name.parameterType().typeExpression().getText().lower()
+                        type_expres = untyped_name.parameterType()
+                        type = type_expres.typeExpression().getText().lower()
                         var = VBAVariable(type)
                     param: ParamDefinition = {
                         "name": name,
