@@ -43,8 +43,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException(e.msg)
             except ExitFunctionException:
                 pass
-            finally:
-                return self.env_stack[-1][self.context[2]].value
+        return self.env_stack[-1][self.context[2]].value
 
     def visitSubroutineDeclaration(                                # noqa: N802
             self: T,
