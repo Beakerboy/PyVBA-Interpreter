@@ -166,10 +166,15 @@ def test_array() -> None:
     assert int(result[2]) == 3
 
 
-def test_array_index() -> None:
+@pytest.mark.parametrize(
+    "input", [
+        ('    Temp = Array(1, 2, 3)\n'
+         '    hello = Temp(0)\n'),
+        ('    hello = Array(1, 2, 3)(0)\n'),
+    ])
+def test_array_index(input: str) -> None:
     code = ('Function hello()\n'
-            '    Temp = Array(1, 2, 3)\n'
-            '    hello = Temp(0)\n'
+            + str +
             'End Function\n')
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
