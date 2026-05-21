@@ -1,11 +1,14 @@
+from __future__ import annotations
 from antlr4_vba.vbaParser import vbaParser as Parser
 from typing import Any, Callable, TypedDict, TypeVar
+from vba_types import VBAVariable
 
 
 class ParamDefinition(TypedDict):
     name: str
     optional: bool
     default: Any
+    var: VBAVariable
 
 
 class FunctionBase(TypedDict):
