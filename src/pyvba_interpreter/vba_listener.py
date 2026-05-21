@@ -119,8 +119,9 @@ class VbaListener(Listener):
                     opt_param = opt_params.optionalParam(i)
                     name = opt_param.paramDcl().getText().lower()
                     mech = "byref"
-                    if opt_param.optionalPrefix().parameterMechanism() is not None:
-                        mech = opt_param.optionalPrefix().parameterMechanism().getText().lower()
+                    prefix =  opt_param.optionalPrefix()
+                    if prefix.parameterMechanism() is not None:
+                        mech = prefix.parameterMechanism().getText().lower()
                     # ToDo, evaluate that the ConstantExpression meets the
                     # static semantics outlined in 5.6.16.1
                     default = None
