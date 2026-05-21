@@ -56,7 +56,7 @@ def build_interp(code: str) -> VbaVisitor:
 def test_byref(code: str, expected: int) -> None:
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
-    func = modules["factorial"]["functions"]["fact"]
+    func = modules["factorial"]["functions"]["foo"]
     result = visitor.run_function(func, [VBAInteger(5)])
     expected = 120
     assert isinstance(result, VBAInteger)
