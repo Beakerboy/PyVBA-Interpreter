@@ -1,7 +1,7 @@
 from typing import TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
-from vba_types import literal_from_string
+from vba_types import literal_from_string, VBAVariable
 from .symbol_table import ParamDefinition, SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.vba_exception import VbaException
@@ -93,8 +93,15 @@ class VbaListener(Listener):
                     pos_param = pos_params.positionalParam(i)
                     untyped_name = pos_param.paramDcl().untypedNameParamDcl()
                     name = untyped_name.ambiguousIdentifier().getText().lower()
+                    if untyped_name.parameterType() is None:
+                        var = VBAVariable()
+                    else:
+                        type_expres = untyped_name.parameterType()
+                        type = type_expres.typeExpression().getText().lower()
+                        var = VBAVariable(type)
                     param: ParamDefinition = {
                         "name": name,
+                        "var": var,
                         "optional": False,
                         "default": None
                     }
@@ -114,10 +121,12 @@ class VbaListener(Listener):
                         default = literal_from_string(
                             def_val.constantExpression().getText()
                         )
+                    var = VBAVariable(value=default)
                     param = {
                         "name": name,
                         "optional": True,
-                        "default": default
+                        "default": default,
+                        "var": var
                     }
                     params.append(param)
                     i += 1

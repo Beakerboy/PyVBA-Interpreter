@@ -1,3 +1,4 @@
+import copy
 import vba_types
 from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
@@ -29,21 +30,21 @@ class VbaVisitor(Visitor):
         self.env_stack: list[dict[str, Any]] = []
 
         # The current project, module, and function context
-        self.context = ["vbaproject", "", ""]
+        self.context = ("vbaproject", "", "")
 
     def visitFunctionDeclaration(                                  # noqa: N802
             self: T,
-            ctx: Parser.FunctionDeclarationContext) -> Any:
-        self.env_stack[-1][self.context[2]] = None
+            ctx: Parser.FunctionDeclarationContext) -> vba_types.VBATypeBase:
+        self.env_stack[-1][self.context[2]] = vba_types.VBAVariable()
         if ctx.procedureBody() is not None:
             try:
                 self.visit(ctx.procedureBody())
-                return self.env_stack[-1][self.context[2]]
             except (ExitDoException, ExitForException, ExitPropertyException,
                     ExitSubException) as e:
                 raise VbaCompileException(e.msg)
             except ExitFunctionException:
-                return self.env_stack[-1][self.context[2]]
+                pass
+        return self.env_stack[-1][self.context[2]].value
 
     def visitSubroutineDeclaration(                                # noqa: N802
             self: T,
@@ -80,12 +81,13 @@ class VbaVisitor(Visitor):
                 else:
                     msg = f"Error On Line {ctx.start.line}, {var_name}"
                     raise VbaException(msg)
+            current_env[var_name] = vba_types.VBAVariable()
         value = self.visit(ctx.expression())
         if isinstance(value, tuple):
             value = value[1]
         if isinstance(value, dict):
             raise VbaCompileException("Expected Function or variable")
-        current_env[var_name] = value
+        current_env[var_name].value = value
 
     def visitCallStatement(                                        # noqa: N802
             self: T,
@@ -222,7 +224,7 @@ class VbaVisitor(Visitor):
         if ctx.variableDeclarationList() is not None:
             dcl = self.visit(ctx.variableDeclarationList())
             if dcl is not None:
-                current_env[dcl[0]] = dcl[1]
+                current_env[dcl[0]] = vba_types.VBAVariable(value=dcl[1])
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -448,7 +450,12 @@ class VbaVisitor(Visitor):
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
             return vba_types.array.VBAArray(*args)
-        if isinstance(defn,  vba_types.array.VBAArray):
+        if (
+                isinstance(defn,  vba_types.VBAVariable) and
+                isinstance(defn.value,  vba_types.VBAArray)
+           ):
+            return defn.value[int(args[0])]
+        if isinstance(defn,  vba_types.VBAArray):
             return defn[int(args[0])]
         return self.run_function(defn, args)
 
@@ -547,8 +554,8 @@ class VbaVisitor(Visitor):
                 isinstance(ctx, Parser.FunctionDeclarationContext) or
                 isinstance(ctx, Parser.SubroutineDeclarationContext)
         ):
-            previous_context = self.context.copy()
-            self.context = [defn["project"], defn["module"], defn["name"]]
+            previous_context = self.context
+            self.context = (defn["project"], defn["module"], defn["name"])
             current_env = {}
             min = 0
             max = len(defn["params"])
@@ -564,12 +571,15 @@ class VbaVisitor(Visitor):
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
-                    current_env[param["name"]] = args[i]
+                    var = copy.copy(param["var"])
+                    var.value = args[i]
+                    current_env[param["name"]] = var
                 else:
                     if len(args) > i:
-                        current_env[param["name"]] = args[i]
+                        current_env[param["name"]] = copy.copy(args[i])
                     else:
-                        current_env[param["name"]] = param["default"]
+                        new_obj = copy.copy(param["default"])
+                        current_env[param["name"]] = new_obj
                 i += 1
             self.env_stack.append(current_env)
             try:

@@ -140,6 +140,8 @@ def test_int_function(input: str, expected: Any) -> None:
         ('hello = 1 >= 2', False),
         ('hello = 1 = 2', False),
         ('hello = 1 <> 2', True),
+        ('Temp = 5\n'
+         '    hello = Temp = 1', False),
     ])
 def test_bool_function(input: str, expected: Any) -> None:
     code = ('Function hello()\n'
@@ -166,10 +168,15 @@ def test_array() -> None:
     assert int(result[2]) == 3
 
 
-def test_array_index() -> None:
+@pytest.mark.parametrize(
+    "input", [
+        ('    Temp = Array(1, 2, 3)\n'
+         '    hello = Temp(0)\n'),
+        ('    hello = Array(1, 2, 3)(0)\n'),
+    ])
+def test_array_index(input: str) -> None:
     code = ('Function hello()\n'
-            '    Temp = Array(1, 2, 3)\n'
-            '    hello = Temp(0)\n'
+            + input +
             'End Function\n')
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
@@ -180,8 +187,8 @@ def test_array_index() -> None:
 
 @pytest.mark.parametrize(
     "arg_list, input, args, expected", [
-        ('Arg', 'hello = Arg', [1], 1),
-        ('Arg As Integer', 'hello = Arg', [1], 1),
+        ('Arg', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
+        ('Arg As Integer', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
     ])
 def test_function_arguments(
         arg_list: str, input: str, args: list, expected: Any) -> None:
@@ -191,7 +198,7 @@ def test_function_arguments(
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["hello"]
-    result = visitor.run_function(func, args)
+    result = visitor.run_function(func, args).value
     assert result == expected
 
 
