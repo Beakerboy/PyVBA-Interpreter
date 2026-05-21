@@ -64,8 +64,9 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText()
+        mod_name = self.module_name.lower()
         modules = self.table.definitions[self.project_name.lower()]["modules"]
-        funcs = modules[self.module_name.lower()]["functions"]
+        funcs = modules[mod_name]["functions"]
         if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
@@ -93,6 +94,9 @@ class VbaListener(Listener):
                     pos_param = pos_params.positionalParam(i)
                     untyped_name = pos_param.paramDcl().untypedNameParamDcl()
                     name = untyped_name.ambiguousIdentifier().getText().lower()
+                    mech = "byref"
+                    if pos_param.parameterMechanism() is not None:
+                        mech = pos_param.parameterMechanism().getText().lower()
                     if untyped_name.parameterType() is None:
                         var = VBAVariable()
                     else:
@@ -103,7 +107,8 @@ class VbaListener(Listener):
                         "name": name,
                         "var": var,
                         "optional": False,
-                        "default": None
+                        "default": None,
+                        "mech": mech
                     }
                     params.append(param)
                     i += 1
@@ -113,6 +118,10 @@ class VbaListener(Listener):
                 while opt_params.optionalParam(i) is not None:
                     opt_param = opt_params.optionalParam(i)
                     name = opt_param.paramDcl().getText().lower()
+                    mech = "byref"
+                    prefix = opt_param.optionalPrefix()
+                    if prefix.parameterMechanism() is not None:
+                        mech = prefix.parameterMechanism().getText().lower()
                     # ToDo, evaluate that the ConstantExpression meets the
                     # static semantics outlined in 5.6.16.1
                     default = None
@@ -126,7 +135,8 @@ class VbaListener(Listener):
                         "name": name,
                         "optional": True,
                         "default": default,
-                        "var": var
+                        "var": var,
+                        "mech": mech
                     }
                     params.append(param)
                     i += 1

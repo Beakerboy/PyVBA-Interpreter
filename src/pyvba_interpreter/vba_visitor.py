@@ -571,8 +571,13 @@ class VbaVisitor(Visitor):
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
-                    var = copy.copy(param["var"])
-                    var.value = args[i]
+                    if isinstance(args[i], vba_types.VBATypeBase):
+                        var = copy.copy(param["var"])
+                        var.value = args[i]
+                    elif param["mech"] == "byref":
+                        var = args[i]
+                    else:
+                        var = copy.copy(args[i])
                     current_env[param["name"]] = var
                 else:
                     if len(args) > i:

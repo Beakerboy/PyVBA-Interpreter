@@ -9,6 +9,7 @@ class ParamDefinition(TypedDict):
     optional: bool
     default: Any
     var: VBAVariable
+    mech: str
 
 
 class FunctionBase(TypedDict):
