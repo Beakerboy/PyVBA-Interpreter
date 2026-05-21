@@ -110,5 +110,5 @@ def test_byref_error(code: str) -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
-        result = visitor.run_function(func, [])
+        visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\nByRef argument type mismatch"
