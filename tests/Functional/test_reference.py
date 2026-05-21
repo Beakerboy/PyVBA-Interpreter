@@ -96,7 +96,7 @@ def test_byref(code: str, expected: int) -> None:
          '    Num1 = 11\n'
          'End Sub\n'),
         ('Function Foo()\n'
-         '    Dim Num As Long\n
+         '    Dim Num As Long\n'
          '    Num = 10\n'
          '    Bar Num\n'
          '    Foo = Num\n'
