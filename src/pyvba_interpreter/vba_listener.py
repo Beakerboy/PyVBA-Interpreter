@@ -93,6 +93,9 @@ class VbaListener(Listener):
                     pos_param = pos_params.positionalParam(i)
                     untyped_name = pos_param.paramDcl().untypedNameParamDcl()
                     name = untyped_name.ambiguousIdentifier().getText().lower()
+                    mech = "byref"
+                    if pos_param.parameterMechanism() is not None:
+                        mech = pos_param.parameterMechanism().getText().lower()
                     if untyped_name.parameterType() is None:
                         var = VBAVariable()
                     else:
@@ -103,7 +106,8 @@ class VbaListener(Listener):
                         "name": name,
                         "var": var,
                         "optional": False,
-                        "default": None
+                        "default": None,
+                        "mech" = mech
                     }
                     params.append(param)
                     i += 1
