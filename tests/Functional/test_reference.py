@@ -56,6 +56,15 @@ def build_interp(code: str) -> VbaVisitor:
          'End Function\n'
          'Sub Bar(ByVal Num1)\n'
          '    Num1 = 11\n'
+         'End Sub\n', 10),
+        ('Function Foo()\n'
+         '    Dim Num as Long\n'
+         '    Num = 10\n'
+         '    Bar Num\n'
+         '    Foo = Num\n'
+         'End Function\n'
+         'Sub Bar(ByVal Num1 As Integer)\n'
+         '    Num1 = 11\n'
          'End Sub\n', 10)
     ])
 def test_byref(code: str, expected: int) -> None:
