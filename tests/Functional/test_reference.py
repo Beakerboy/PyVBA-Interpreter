@@ -53,7 +53,7 @@ def build_interp(code: str) -> VbaVisitor:
          '    Num1 = 11\n'
          'End Sub\n', 10)
     ])
-def test_factorial(code: str, expected: int) -> None:'
+def test_factorial(code: str, expected: int) -> None:
     visitor = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["fact"]
