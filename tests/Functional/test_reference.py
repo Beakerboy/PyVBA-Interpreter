@@ -44,6 +44,14 @@ def build_interp(code: str) -> VbaVisitor:
          'Sub Bar(Num1)\n'
          '    Num1 = 11\n'
          'End Sub\n', 11),
+        ('Function Foo()\n'
+         '    Num = 10\n'
+         '    Bar Num\n'
+         '    Foo = Num\n'
+         'End Function\n'
+         'Sub Bar(ByRef Num1)\n'
+         '    Num1 = 11\n'
+         'End Sub\n', 10)
     ])
 def test_factorial(code: str, expected: int) -> None:'
     visitor = build_interp(code)
