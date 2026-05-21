@@ -78,7 +78,7 @@ def build_interp(code: str) -> VbaVisitor:
         ('    If Num = 2 Then\n'
          '        Fact = 2\n'
          '    Else\n'
-         '        Fact = Num * 24\n'
+         '        Fact = Num * Fact(Num - 1)\n'
          '    End If\n'),
     ])
 def test_factorial(code: str) -> None:
