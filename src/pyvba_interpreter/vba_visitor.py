@@ -1,3 +1,4 @@
+import copy
 import vba_types
 from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
@@ -570,14 +571,14 @@ class VbaVisitor(Visitor):
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
-                    var = param["var"]
+                    var = copy.copy(param["var"])
                     var.value = args[i]
-                    current_env[param["name"]] = var.copy()
+                    current_env[param["name"]] = var
                 else:
                     if len(args) > i:
-                        current_env[param["name"]] = args[i]
+                        current_env[param["name"]] = copy.copy(args[i])
                     else:
-                        current_env[param["name"]] = param["default"]
+                        current_env[param["name"]] = copy.copy(param["default"])
                 i += 1
             self.env_stack.append(current_env)
             try:
