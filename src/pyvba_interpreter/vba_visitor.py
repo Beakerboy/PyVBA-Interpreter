@@ -597,7 +597,7 @@ class VbaVisitor(Visitor):
                 raise VbaCompileException("Argument not optional")
             if len(args) > max:
                 msg = ("Wrong number of arguments or invalid property"
-                       " assignment")
+                       f" assignment. Given: {len(args)}, max:{max}")
                 raise VbaCompileException(msg)
             output = ctx(*args)
         else:
