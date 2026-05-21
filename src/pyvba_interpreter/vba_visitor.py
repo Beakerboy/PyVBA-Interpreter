@@ -455,7 +455,7 @@ class VbaVisitor(Visitor):
                 isinstance(defn.value,  vba_types.VBAArray)
            ):
             return defn.value[int(args[0])]
-        if isinstance(defn,  vba_types.VBAArray) :
+        if isinstance(defn,  vba_types.VBAArray):
             return defn[int(args[0])]
         return self.run_function(defn, args)
 
@@ -578,7 +578,8 @@ class VbaVisitor(Visitor):
                     if len(args) > i:
                         current_env[param["name"]] = copy.copy(args[i])
                     else:
-                        current_env[param["name"]] = copy.copy(param["default"])
+                        new_obj = copy.copy(param["default"])
+                        current_env[param["name"]] = new_obj
                 i += 1
             self.env_stack.append(current_env)
             try:
