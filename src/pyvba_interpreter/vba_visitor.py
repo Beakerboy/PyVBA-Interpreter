@@ -571,7 +571,7 @@ class VbaVisitor(Visitor):
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
-                    if isinstance(args[i], VBATypeBase):
+                    if isinstance(args[i], vba_types.VBATypeBase):
                         var = copy.copy(param["var"])
                         var.value = args[i]
                     elif param["mech"] == "byref":
