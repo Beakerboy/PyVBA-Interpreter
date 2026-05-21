@@ -38,9 +38,9 @@ def build_interp(code: str) -> VbaVisitor:
          '    Bar Num\n'
          '    Foo = Num\n'
          'End Function\n'
-         'Sub Bar(Num1)\n'
+         'Function Bar(Num1)\n'
          '    Num1 = 11\n'
-         'End Sub\n', 11),
+         'End Function\n', 11),
         ('Function Foo()\n'
          '    Num = 10\n'
          '    Bar Num\n'
