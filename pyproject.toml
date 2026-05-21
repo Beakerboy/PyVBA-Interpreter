@@ -21,7 +21,7 @@ dependencies = [
   'antlr4-tools',
   'antlr4_vba',
   'python-dateutil',
-  'vba_types @ git+https://github.com/Beakerboy/Vba-Types@variable',
+  'vba_types @ git+https://github.com/Beakerboy/Vba-Types@dev',
 ]
 [project.optional-dependencies]
 tests = [
@@ -34,7 +34,7 @@ tests = [
   'pytest-mock',
   'types-antlr4-python3-runtime',
   'types-python-dateutil',
-  'vba_stdlib @ git+https://github.com/Beakerboy/vbaStdLib@variable',
+  'vba_stdlib @ git+https://github.com/Beakerboy/vbaStdLib@dev',
 ]
 [project.urls]
 "Homepage" = "https://github.com/Beakerboy/VBA-Precompiler"
