@@ -75,8 +75,8 @@ def build_interp(code: str) -> VbaVisitor:
          '        Fact = Fact * Num\n'
          '        Num = Num - 1\n'
          '    Loop While Num > 1\n'),
-        ('    If Num = 1 Then\n'
-         '        Fact = 1\n'
+        ('    If Num = 2 Then\n'
+         '        Fact = 2\n'
          '    Else\n'
          '        Fact = Num * 24\n'
          '    End If\n'),
