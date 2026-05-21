@@ -64,8 +64,9 @@ class VbaListener(Listener):
             self: T,
             ctx: Parser.SubroutineDeclarationContext) -> None:
         name = ctx.subroutineName().getText()
+        mod_name = self.module_name.lower()
         modules = self.table.definitions[self.project_name.lower()]["modules"]
-        funcs = modules[self.module_name.lower()]["functions"]
+        funcs = modules[mod_name]["functions"]
         if name.lower() in funcs:
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
