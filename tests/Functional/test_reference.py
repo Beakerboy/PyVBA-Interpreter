@@ -55,6 +55,5 @@ def test_byref(code: str, expected: int) -> None:
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["factorial"]["functions"]["foo"]
     result = visitor.run_function(func, [])
-    expected = 120
     assert isinstance(result, VBAInteger)
     assert int(result) == expected
