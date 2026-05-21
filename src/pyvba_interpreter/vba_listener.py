@@ -107,7 +107,7 @@ class VbaListener(Listener):
                         "var": var,
                         "optional": False,
                         "default": None,
-                        "mech" = mech
+                        "mech": mech
                     }
                     params.append(param)
                     i += 1
