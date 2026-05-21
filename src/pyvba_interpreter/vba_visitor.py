@@ -577,7 +577,8 @@ class VbaVisitor(Visitor):
                     elif param["mech"] == "byref":
                         var = args[i]
                     else:
-                        var = copy.copy(args[i])
+                        var = copy.copy(param["var"])
+                        var.value = args[i].value
                     current_env[param["name"]] = var
                 else:
                     if len(args) > i:
