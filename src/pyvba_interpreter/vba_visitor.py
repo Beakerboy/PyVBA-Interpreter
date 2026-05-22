@@ -160,7 +160,17 @@ class VbaVisitor(Visitor):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
         else:
-            if ctx.elseBlock() is not None:
+            i = 0
+            run_else = False
+            while ctx.elseIfBlock(i) is not None:
+                condition = self.visit(ctx.elseIfBlock(i).booleanExpression())
+                if bool(condition):
+                    if ctx.elseIfBlock(i).statementBlock() is not None:
+                        self.visit(ctx.elseIfBlock(i).statementBlock())
+                    run_else = True
+                    break
+                i += 1
+            if not run_else and ctx.elseBlock() is not None:
                 self.visit(ctx.elseBlock().statementBlock())
 
     def visitSingleLineIfStatement(                                # noqa: N802
