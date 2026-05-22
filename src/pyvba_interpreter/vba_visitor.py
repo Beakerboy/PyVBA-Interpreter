@@ -604,7 +604,13 @@ class VbaVisitor(Visitor):
                 msg = ("Wrong number of arguments or invalid property"
                        " assignment")
                 raise VbaCompileException(msg)
-            output = ctx(*args)
+            new_args = []
+            for arg in args:
+                if isinstance(arg, vba_types.VBAVariable):
+                    new_args.append(arg.value)
+                else:
+                    new_args.append(arg)
+            output = ctx(*new_args)
         else:
             raise Exception("Unknown Function Type")
         if defn["type"] == "function":
