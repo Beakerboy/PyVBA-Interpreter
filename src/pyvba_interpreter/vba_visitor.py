@@ -164,7 +164,7 @@ class VbaVisitor(Visitor):
             while ctx.elseIfBlock(i) is not None:
                 condition = self.visit(ctx.elseIfBlock(i).booleanExpression())
                 if (
-                        bool(condition) and 
+                        bool(condition) and
                         ctx.elseIfBlock(i).statementBlock() is not None
                 ):
                     self.visit(ctx.elseIfBlock(i).statementBlock())
