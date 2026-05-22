@@ -161,13 +161,13 @@ class VbaVisitor(Visitor):
                 self.visit(ctx.statementBlock())
         else:
             i = 0
-            run = False
             while ctx.elseIfBlock(i) is not None:
                 condition = self.visit(ctx.elseIfBlock(i).booleanExpression())
-                if not run and bool(condition):
-                    run = True
+                if bool(condition):
                     if ctx.elseIfBlock(i).statementBlock() is not None:
                         self.visit(ctx.elseIfBlock(i).statementBlock())
+                    break
+                i += 1
             if ctx.elseBlock() is not None:
                 self.visit(ctx.elseBlock().statementBlock())
 
