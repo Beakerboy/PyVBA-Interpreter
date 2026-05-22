@@ -157,7 +157,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.IfStatementContext) -> None:
         condition = self.visit(ctx.booleanExpression())
         elif_condition = False
-        if ctx.elseIfBlock() is not None:
+        if ctx.elseIfBlock(1) is not None:
             elif_condition = self.visit(ctx.elseIfBlock(1).booleanExpression())
         if bool(condition):
             if ctx.statementBlock() is not None:
