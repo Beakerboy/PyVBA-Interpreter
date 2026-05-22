@@ -158,12 +158,12 @@ class VbaVisitor(Visitor):
         condition = self.visit(ctx.booleanExpression())
         elif_condition = False
         if ctx.elseIfBlock() is not None:
-            elif_condition = self.visit(ctx.elseIfBlock().booleanExpression())
+            elif_condition = self.visit(ctx.elseIfBlock(1).booleanExpression())
         if bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
         elif bool(elif_condition):
-            self.visit(ctx.elseIfBlock().statementBlock())
+            self.visit(ctx.elseIfBlock(1).statementBlock())
         else:
             if ctx.elseBlock() is not None:
                 self.visit(ctx.elseBlock().statementBlock())
