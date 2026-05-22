@@ -77,6 +77,7 @@ def build_interp(code: str) -> VbaVisitor:
         ('VBA.MsgBox "Hello World"', "Hello World"),
         ('VBA.Interaction.MsgBox "Hello World"', "Hello World"),
         ('Interaction.MsgBox "Hello World"', "Hello World"),
+        ('Msg = "Hello World"\n    MsgBox Msg', "Hello World"),
     ])
 def test_msgbox(input: str, expected: Any, mocker: MockerFixture) -> None:
     mock_print = mocker.patch('builtins.print')
