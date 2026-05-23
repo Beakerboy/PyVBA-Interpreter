@@ -538,9 +538,14 @@ class VbaVisitor(Visitor):
     def visitSpecialForm(                                          # noqa: N802
             self: T,
             ctx: Parser.SpecialFormContext) -> Callable:
-        # name = ctx.getText().lower()
-        # if name == "array":
-        return getattr(vba_types.array.VBAArray, "__init__")
+        name = ctx.getText().lower()
+        if name == "array":
+            return getattr(vba_types.array.VBAArray, "__init__")
+        if name == "ubound":
+            return getattr(vba_types.array.VBAArray, "ubound")
+        if name == "lbound":
+            return getattr(vba_types.array.VBAArray, "lbound")
+
 
     def visitReservedName(                                         # noqa: N802
             self: T,
