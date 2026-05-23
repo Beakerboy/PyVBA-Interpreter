@@ -1,5 +1,5 @@
 import pytest
-from .build import build_interp
+from tests.Functional.build import build_interp
 from vba_types import VBAInteger
 
 
