@@ -546,7 +546,6 @@ class VbaVisitor(Visitor):
         if name == "lbound":
             return getattr(vba_types.array.VBAArray, "lbound")
 
-
     def visitReservedName(                                         # noqa: N802
             self: T,
             ctx: Parser.ReservedNameContext) -> Any:
