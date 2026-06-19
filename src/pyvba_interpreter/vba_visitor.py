@@ -545,7 +545,7 @@ class VbaVisitor(Visitor):
             return getattr(vba_types.array.VBAArray, "ubound")
         if name == "lbound":
             return getattr(vba_types.array.VBAArray, "lbound")
-
+        raise Exception(f"{name} not supported")
 
     def visitReservedName(                                         # noqa: N802
             self: T,
