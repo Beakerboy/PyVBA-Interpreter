@@ -365,17 +365,19 @@ def test_func_as_variable() -> None:
 
 
 @pytest.mark.parametrize(
-    "code1", [
-        ('Function Foo()\n'
-         '    Foo = VBA()\n'
-         'End Function\n'),
-    ])
-def test_call_module_name(code1: str) -> None:
+    "code, error", [
+        ('    Foo = VBA()\n',
+         "Expected variable or procedure, not project"),
+        ('    Debug.foo "a"\n,
+         "Expected: Print or ? or Assert")
+    ],
+    ids=["Call Module Name", "Test Debug Function Name"])
+def test_errors(code: str, error: str) -> None:
+    code1 = 'Function Foo()\n' + code + 'End Function\n'
     visitor = build_interp(code1)
     visitor.table.library_definitions["vba"] = vba_project
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["helloworld"]["functions"]["foo"]
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
-    expected = "Compile error:\nExpected variable or procedure, not project"
-    assert str(e.value) == expected
+    assert str(e.value) == "Compile error:\n" + error
