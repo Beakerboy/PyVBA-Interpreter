@@ -416,14 +416,11 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return vba_types.VBABoolean(left == right)
 
-    def visitMemberAccessExpress(                                # noqa N802
+    def sharedMemberAccess(                                      # noqa N802
             self: T,
-            ctx: Parser.MemberAccessExpressContext
+            ctx: (Parser.MemberAccessExpressionContext |
+                  Parser.MemberAccessExpressContext)
     ) -> FunctionDefinition | LibraryDefinition:
-        if ctx.l_express().getText().lower() == "debug":
-            options = ("assert", "print", "?")
-            if ctx.unrestrictedName().getText().lower() not in options:
-                raise VbaCompileException("Expected: Print or ? or Assert")
         l_express = self.visit(ctx.lExpression())
         assert l_express is not None
         name = ctx.unrestrictedName().getText().lower()
@@ -439,6 +436,22 @@ class VbaVisitor(Visitor):
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
         raise VbaException("Not Supported")
+
+    def visitMemberAccessExpression(                             # noqa N802
+            self: T,
+            ctx: Parser.MemberAccessExpressionContext
+    ) -> FunctionDefinition | LibraryDefinition:
+        if ctx.l_express().getText().lower() == "debug":
+            options = ("assert", "print", "?")
+            if ctx.unrestrictedName().getText().lower() not in options:
+                raise VbaCompileException("Expected: Print or ? or Assert")
+        return self.sharedMemberAccess(ctx)
+
+    def visitMemberAccessExpress(                                # noqa N802
+            self: T,
+            ctx: Parser.MemberAccessExpressContext
+    ) -> FunctionDefinition | LibraryDefinition:
+        return self.sharedMemberAccess(ctx)
 
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
