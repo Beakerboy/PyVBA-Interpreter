@@ -110,7 +110,7 @@ class VbaVisitor(Visitor):
                 command = self.visit(first_child)
             except VbaCompileException as e:
                 err_msg = "Method or data member not found "
-                if str(e.value)[:47] == "Compile error:\n" + err_msg
+                if str(e.value)[:47] == "Compile error:\n" + err_msg:
                     raise VbaCompileException("Sub or Function not defined")
                 raise e
             args = []
