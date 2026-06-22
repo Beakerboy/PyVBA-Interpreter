@@ -441,7 +441,7 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.MemberAccessExpressionContext
     ) -> FunctionDefinition | LibraryDefinition:
-        if ctx.l_express().getText().lower() == "debug":
+        if ctx.l_expression().getText().lower() == "debug":
             options = ("assert", "print", "?")
             if ctx.unrestrictedName().getText().lower() not in options:
                 raise VbaCompileException("Expected: Print or ? or Assert")
