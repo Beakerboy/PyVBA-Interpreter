@@ -106,10 +106,13 @@ class VbaVisitor(Visitor):
             else:
                 raise Exception("Unsupported")
         else:
-            #try:
-            command = self.visit(first_child)
-            #except VbaCompileException:
-            #raise VbaCompileException("Sub or Function not defined")
+            try:
+                command = self.visit(first_child)
+            except VbaCompileException as e:
+                err_msg = "Method or data member not found "
+                if str(e.value)[:47] == "Compile error:\n" + err_msg
+                    raise VbaCompileException("Sub or Function not defined")
+                raise e
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
