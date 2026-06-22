@@ -108,8 +108,11 @@ class VbaVisitor(Visitor):
         else:
             try:
                 command = self.visit(first_child)
-            except VbaCompileException:
-                raise VbaCompileException("Sub or Function not defined")
+            except VbaCompileException as e:
+                err_msg = "Method or data member not found "
+                if str(e)[:47] == "Compile error:\n" + err_msg:
+                    raise VbaCompileException("Sub or Function not defined")
+                raise e
             args = []
             if ctx.argumentList() is not None:
                 args = self.visit(ctx.argumentList())
@@ -416,9 +419,10 @@ class VbaVisitor(Visitor):
         else:  # op == "EQV":
             return vba_types.VBABoolean(left == right)
 
-    def visitMemberAccessExpress(                                # noqa N802
+    def sharedMemberAccess(                                      # noqa N802
             self: T,
-            ctx: Parser.MemberAccessExpressContext
+            ctx: (Parser.MemberAccessExpressionContext |
+                  Parser.MemberAccessExpressContext)
     ) -> FunctionDefinition | LibraryDefinition:
         l_express = self.visit(ctx.lExpression())
         assert l_express is not None
@@ -435,6 +439,22 @@ class VbaVisitor(Visitor):
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
         raise VbaException("Not Supported")
+
+    def visitMemberAccessExpression(                             # noqa N802
+            self: T,
+            ctx: Parser.MemberAccessExpressionContext
+    ) -> FunctionDefinition | LibraryDefinition:
+        if ctx.lExpression().getText().lower() == "debug":
+            options = ("assert", "print", "?")
+            if ctx.unrestrictedName().getText().lower() not in options:
+                raise VbaCompileException("Expected: Print or ? or Assert")
+        return self.sharedMemberAccess(ctx)
+
+    def visitMemberAccessExpress(                                # noqa N802
+            self: T,
+            ctx: Parser.MemberAccessExpressContext
+    ) -> FunctionDefinition | LibraryDefinition:
+        return self.sharedMemberAccess(ctx)
 
     # Can be an Array() or a function call because expressions are assigned
     # in Let Statements
