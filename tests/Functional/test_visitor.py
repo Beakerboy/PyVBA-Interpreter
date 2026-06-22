@@ -368,7 +368,7 @@ def test_func_as_variable() -> None:
     "code, error", [
         ('    Foo = VBA()\n',
          "Expected variable or procedure, not project"),
-        ('    Debug.foo "a"\n,
+        ('    Debug.foo "a"\n',
          "Expected: Print or ? or Assert")
     ],
     ids=["Call Module Name", "Test Debug Function Name"])
