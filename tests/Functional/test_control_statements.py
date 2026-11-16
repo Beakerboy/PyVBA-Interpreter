@@ -4,7 +4,7 @@ from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.symbol_table import SymbolTable
-from pyvba_interpreter.vba_listener import VbaListener
+from pyvba_interpreter.module_listener import ModuleListener
 from pyvba_interpreter.vba_visitor import VbaVisitor
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
@@ -28,7 +28,7 @@ def build_interp(code: str) -> VbaVisitor:
     vbaparser = Parser(ts)
     tree = vbaparser.module()
     table = SymbolTable()
-    listener = VbaListener("vbaproject", table)
+    listener = ModuleListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     return VbaVisitor(table)
