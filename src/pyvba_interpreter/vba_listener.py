@@ -5,12 +5,13 @@ modules.
 This listener registers module-level procedures and stores the associated
 parse-tree handles for later execution by visitors.
 """
-
+from __future__ import annotations
 from typing import TypeVar
 
 from antlr4_vba.vbaParser import vbaParser as Parser
 
 from .base_listener import BaseListener
+from .symbol_table import SymbolTable
 from .Exceptions.vba_compile_exception import VbaCompileException
 from .Exceptions.vba_exception import VbaException
 
@@ -22,7 +23,7 @@ class ModuleListener(BaseListener):
     Listener used to process VBA standard modules.
     """
 
-    def __init__(self: T, project: str, table) -> None:
+    def __init__(self: T, project: str, table: SymbolTable) -> None:
         super().__init__(project, table)
         self.module_name = ""
 
