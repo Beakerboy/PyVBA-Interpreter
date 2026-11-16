@@ -41,6 +41,13 @@ class ModuleDefinition(TypedDict):
     extra: dict[str, Any]
 
 
+class ClassDefinition(TypedDict):
+    name: str
+    type: str
+    methods: dict[str, FunctionDefinition]
+    extra: dict[str, Any]
+
+
 class LibModuleDefinition(TypedDict):
     name: str
     type: str
@@ -51,6 +58,7 @@ class ProjectDefinition(TypedDict):
     name: str
     type: str
     modules: dict[str, ModuleDefinition]
+    classes: dict[str, ClassDefinition]
     extra: dict[str, Any]
 
 
