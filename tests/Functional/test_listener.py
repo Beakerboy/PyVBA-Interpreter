@@ -4,7 +4,7 @@ from antlr4 import CommonTokenStream, FileStream, ParseTreeWalker
 from antlr4_vba.vbaLexer import vbaLexer as Lexer
 from antlr4_vba.vbaParser import vbaParser as Parser
 from pyvba_interpreter.symbol_table import SymbolTable
-from pyvba_interpreter.vba_listener import VbaListener
+from pyvba_interpreter.module_listener import ModuleListener
 from pyvba_interpreter.Exceptions.vba_compile_exception import (
     VbaCompileException
 )
@@ -17,7 +17,7 @@ def test_interpreter() -> None:
     vbaparser = Parser(ts)
     tree = vbaparser.module()  # or module?
     table = SymbolTable()
-    listener = VbaListener("vbaproject", table)
+    listener = ModuleListener("vbaproject", table)
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
     assert len(table.definitions) == 1
@@ -44,7 +44,7 @@ def test_exception() -> None:
     ts = CommonTokenStream(lexer)
     vbaparser = Parser(ts)
     tree = vbaparser.module()
-    listener = VbaListener("vbaproject", table)
+    listener = ModuleListener("vbaproject", table)
     walker = ParseTreeWalker()
     with pytest.raises(VbaCompileException) as e:
         walker.walk(listener, tree)
