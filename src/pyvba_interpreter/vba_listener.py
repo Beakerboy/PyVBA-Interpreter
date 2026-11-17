@@ -81,6 +81,33 @@ class VbaListener(Listener):
             "extra": {}
         }
 
+    _TYPE_SUFFIXES = {
+        "%": "integer",
+        "&": "long",
+        "!": "single",
+        "#": "double",
+        "@": "currency",
+        "$": "string",
+        "^": "longlong",
+    }
+
+    def _parse_param_dcl(
+            self: T,
+            param_dcl: Parser.ParamDclContext) -> tuple[str, str]:
+        if param_dcl.typedNameParamDcl() is not None:
+            typed_name = param_dcl.typedNameParamDcl().typedName()
+            name = typed_name.ambiguousIdentifier().getText().lower()
+            suffix = typed_name.typeSuffix().getText()
+            declared_type = self._TYPE_SUFFIXES.get(suffix, "variant")
+            return (name, declared_type)
+        untyped_name = param_dcl.untypedNameParamDcl()
+        name = untyped_name.ambiguousIdentifier().getText().lower()
+        if untyped_name.parameterType() is None:
+            return (name, "variant")
+        type_expres = untyped_name.parameterType()
+        declared_type = type_expres.typeExpression().getText().lower()
+        return (name, declared_type)
+
     def _get_params(
             self: T,
             ctx: Parser.ProcedureParametersContext) -> list[ParamDefinition]:
@@ -92,17 +119,13 @@ class VbaListener(Listener):
                 pos_params = parameter_list.positionalParameters()
                 while pos_params.positionalParam(i) is not None:
                     pos_param = pos_params.positionalParam(i)
-                    untyped_name = pos_param.paramDcl().untypedNameParamDcl()
-                    name = untyped_name.ambiguousIdentifier().getText().lower()
+                    name, declared_type = self._parse_param_dcl(
+                        pos_param.paramDcl()
+                    )
                     mech = "byref"
                     if pos_param.parameterMechanism() is not None:
                         mech = pos_param.parameterMechanism().getText().lower()
-                    if untyped_name.parameterType() is None:
-                        var = VBAVariable()
-                    else:
-                        type_expres = untyped_name.parameterType()
-                        type = type_expres.typeExpression().getText().lower()
-                        var = VBAVariable(type)
+                    var = VBAVariable(declared_type)
                     param: ParamDefinition = {
                         "name": name,
                         "var": var,
@@ -117,7 +140,9 @@ class VbaListener(Listener):
                 opt_params = parameter_list.optionalParameters()
                 while opt_params.optionalParam(i) is not None:
                     opt_param = opt_params.optionalParam(i)
-                    name = opt_param.paramDcl().getText().lower()
+                    name, declared_type = self._parse_param_dcl(
+                        opt_param.paramDcl()
+                    )
                     mech = "byref"
                     prefix = opt_param.optionalPrefix()
                     if prefix.parameterMechanism() is not None:
@@ -130,7 +155,7 @@ class VbaListener(Listener):
                         default = literal_from_string(
                             def_val.constantExpression().getText()
                         )
-                    var = VBAVariable(value=default)
+                    var = VBAVariable(declared_type, value=default)
                     param = {
                         "name": name,
                         "optional": True,
