@@ -71,10 +71,34 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.LetStatementContext) -> None:
         current_env = self.env_stack[-1]
-        var_name = ctx.lExpression().getText().lower()
+        l_expr = ctx.lExpression()
+        if isinstance(l_expr, Parser.IndexExpressContext):
+            arr_name = l_expr.lExpression().getText().lower()
+            args: list[Any] = []
+            arg_list = l_expr.argumentList()
+            if arg_list is not None:
+                visited_args = self.visit(arg_list)
+                if visited_args is not None:
+                    args = visited_args
+            value = self.visit(ctx.expression())
+            if isinstance(value, tuple):
+                value = value[1]
+            if isinstance(value, dict):
+                raise VbaCompileException("Expected Function or variable")
+            target = current_env[arr_name]
+            if isinstance(target, vba_types.VBAVariable):
+                target = target.value
+            if isinstance(target, vba_types.VBAArray):
+                key: int | tuple[int, ...] = (
+                    tuple(int(a) for a in args)
+                    if len(args) > 1 else int(args[0])
+                )
+                target[key] = value
+                return
+        var_name = l_expr.getText().lower()
         if var_name not in current_env:
             if self._function_in_project(var_name):
-                defn = self.visit(ctx.lExpression())
+                defn = self.visit(l_expr)
                 assert defn is not None
                 if defn["type"] == "sub":
                     raise VbaCompileException("Expected Function or variable")
@@ -235,9 +259,25 @@ class VbaVisitor(Visitor):
             ctx: Parser.LocalVariableDeclarationContext) -> None:
         current_env = self.env_stack[-1]
         if ctx.variableDeclarationList() is not None:
-            dcl = self.visit(ctx.variableDeclarationList())
-            if dcl is not None:
-                current_env[dcl[0]] = vba_types.VBAVariable(value=dcl[1])
+            dcls = self.visit(ctx.variableDeclarationList())
+            if isinstance(dcls, list):
+                for name, val in dcls:
+                    current_env[name] = vba_types.VBAVariable(value=val)
+            elif dcls is not None:
+                current_env[dcls[0]] = vba_types.VBAVariable(value=dcls[1])
+
+    def visitVariableDeclarationList(                              # noqa: N802
+            self: T,
+            ctx: Parser.VariableDeclarationListContext
+    ) -> list[tuple[str, Any]]:
+        decls: list[tuple[str, Any]] = []
+        i = 0
+        while ctx.variableDcl(i) is not None:
+            item = self.visit(ctx.variableDcl(i))
+            if item is not None:
+                decls.append(item)
+            i += 1
+        return decls
 
     def visitArgumentList(                                         # noqa: N802
             self: T,
@@ -261,8 +301,42 @@ class VbaVisitor(Visitor):
             self: T,
             ctx: Parser.UntypedVariableDclContext) -> tuple[str, Any]:
         name = ctx.ambiguousIdentifier().getText().lower()
-        type = self.visit(ctx.asClause())
-        return (name, type)
+        default_val: vba_types.VBATypeBase = vba_types.VBAEmpty()
+        as_clause = ctx.asClause()
+        if as_clause is not None:
+            visited_type = self.visit(as_clause)
+            if visited_type is not None:
+                default_val = visited_type
+        array_clause = ctx.arrayClause()
+        if array_clause is not None:
+            bounds = self._get_array_bounds(array_clause)
+            if bounds:
+                arr = vba_types.VBAArray.initialize(*bounds, empty=default_val)
+                return (name, arr)
+        return (name, default_val)
+
+    def _get_array_bounds(
+            self: T,
+            ctx: Parser.ArrayClauseContext) -> list[tuple[int, int]]:
+        bounds: list[tuple[int, int]] = []
+        array_dim = ctx.arrayDim()
+        if array_dim is None or array_dim.boundsList() is None:
+            return bounds
+        bounds_list = array_dim.boundsList()
+        i = 0
+        while bounds_list.dimSpec(i) is not None:
+            spec = bounds_list.dimSpec(i)
+            high_val: Any = self.visit(spec.upperBound().constantExpression())
+            high = int(high_val)
+            lower = spec.lowerBound()
+            if lower is not None:
+                low_val: Any = self.visit(lower.constantExpression())
+                low = int(low_val)
+            else:
+                low = 0
+            bounds.append((low, high))
+            i += 1
+        return bounds
 
     def visitConcatExpression(                                     # noqa: N802
             self: T,
@@ -481,12 +555,18 @@ class VbaVisitor(Visitor):
         if isinstance(defn, Callable):
             return vba_types.array.VBAArray(*args)
         if (
-                isinstance(defn,  vba_types.VBAVariable) and
-                isinstance(defn.value,  vba_types.VBAArray)
+                isinstance(defn, vba_types.VBAVariable) and
+                isinstance(defn.value, vba_types.VBAArray)
            ):
-            return defn.value[int(args[0])]
-        if isinstance(defn,  vba_types.VBAArray):
-            return defn[int(args[0])]
+            key: int | tuple[int, ...] = (
+                tuple(int(a) for a in args) if len(args) > 1 else int(args[0])
+            )
+            return defn.value[key]
+        if isinstance(defn, vba_types.VBAArray):
+            key = (
+                tuple(int(a) for a in args) if len(args) > 1 else int(args[0])
+            )
+            return defn[key]
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
