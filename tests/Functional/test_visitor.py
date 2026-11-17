@@ -304,8 +304,13 @@ def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
     mock_print.assert_called_with(f"Microsoft Excel\n\n{expected}\nOK")
 
 
-def test_default_arg() -> None:
-    code = ('Function hello(Optional Temp = 5)\n'
+@pytest.mark.parametrize(
+    "arg_decl", [
+        "Optional Temp = 5",
+        "Optional Temp As Integer = 5",
+    ])
+def test_default_arg(arg_decl: str) -> None:
+    code = (f'Function hello({arg_decl})\n'
             '    hello = Temp\n'
             'End Function\n')
     visitor = build_interp(code)
