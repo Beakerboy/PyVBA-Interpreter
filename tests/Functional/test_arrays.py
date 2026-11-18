@@ -72,3 +72,18 @@ def test_dim_multidimensional_array() -> None:
     func = module["functions"]["hello"]
     result = interpreter.run_function(func, [])
     assert int(result) == 99
+
+
+def test_simple_array() -> None:
+    code = ('Function Foo()\n'
+            '    Dim Values As Variant\n'
+            '    Values = Array(42, 37, 73)\n'
+            '    Foo = Values(1)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBALong)
+    assert int(result) == 37
