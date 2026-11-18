@@ -14,6 +14,7 @@ def test_dim_array_bounds() -> None:
     module = next(iter(modules.values()))
     func = module["functions"]["hello"]
     result = interpreter.run_function(func, [])
+    assert isinstance(result, VBALong)
     assert int(result) == 42
 
 
@@ -29,6 +30,7 @@ def test_dim_array_default_lower_bound() -> None:
     module = next(iter(modules.values()))
     func = module["functions"]["hello"]
     result = interpreter.run_function(func, [])
+    assert isinstance(result, VBALong)
     assert int(result) == 12
 
 
@@ -71,6 +73,7 @@ def test_dim_multidimensional_array() -> None:
     module = next(iter(modules.values()))
     func = module["functions"]["hello"]
     result = interpreter.run_function(func, [])
+    assert isinstance(result, VBALong)
     assert int(result) == 99
 
 
