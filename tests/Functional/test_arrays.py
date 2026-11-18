@@ -46,7 +46,7 @@ def test_ubound() -> None:
     assert int(result) == 2
 
 
-def test_ubound() -> None:
+def test_lbound() -> None:
     code = ('Function Foo()\n'
             '    Dim Values(2) As Integer\n'
             '    Foo = LBound(Values)\n'
