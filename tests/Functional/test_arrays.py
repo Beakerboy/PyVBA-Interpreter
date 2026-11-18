@@ -40,7 +40,7 @@ def test_ubound() -> None:
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     module = next(iter(modules.values()))
-    func = module["functions"]["Foo"]
+    func = module["functions"]["foo"]
     result = interpreter.run_function(func, [])
     assert isinstance(result, VBALong)
     assert int(result) == 2
@@ -54,7 +54,7 @@ def test_ubound() -> None:
     interpreter = build_interp(code)
     modules = interpreter.table.definitions["vbaproject"]["modules"]
     module = next(iter(modules.values()))
-    func = module["functions"]["Foo"]
+    func = module["functions"]["foo"]
     result = interpreter.run_function(func, [])
     assert isinstance(result, VBALong)
     assert int(result) == 0
