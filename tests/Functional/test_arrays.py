@@ -1,4 +1,5 @@
 from tests.Functional.build import build_interp
+from vba_types import VBALong
 
 
 def test_dim_array_bounds() -> None:
@@ -29,6 +30,34 @@ def test_dim_array_default_lower_bound() -> None:
     func = module["functions"]["hello"]
     result = interpreter.run_function(func, [])
     assert int(result) == 12
+
+
+def test_ubound() -> None:
+    code = ('Function Foo()\n'
+            '    Dim Values(2) As Integer\n'
+            '    Foo = UBound(Values)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBALong)
+    assert int(result) == 2
+
+
+def test_ubound() -> None:
+    code = ('Function Foo()\n'
+            '    Dim Values(2) As Integer\n'
+            '    Foo = LBound(Values)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["hello"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBALong)
+    assert int(result) == 0
 
 
 def test_dim_multidimensional_array() -> None:
