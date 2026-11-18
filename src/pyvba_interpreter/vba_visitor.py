@@ -93,6 +93,8 @@ class VbaVisitor(Visitor):
                     tuple(int(a) for a in args)
                     if len(args) > 1 else int(args[0])
                 )
+                if isinstance(value, vba_types.VBAVariable):
+                    value = value.value
                 target[key] = value
                 return
         var_name = l_expr.getText().lower()
@@ -553,7 +555,16 @@ class VbaVisitor(Visitor):
         if ctx.argumentList() is not None:
             args = self.visit(ctx.argumentList())
         if isinstance(defn, Callable):
-            return vba_types.array.VBAArray(*args)
+            if defn is getattr(vba_types.array.VBAArray, "__init__"):
+                return vba_types.array.VBAArray(*args)
+            unwrapped = [
+                a.value if isinstance(a, vba_types.VBAVariable) else a
+                for a in args
+            ]
+            res = defn(*unwrapped)
+            if isinstance(res, int) and not isinstance(res, bool):
+                return vba_types.VBAInteger(res)
+            return res
         if (
                 isinstance(defn, vba_types.VBAVariable) and
                 isinstance(defn.value, vba_types.VBAArray)
@@ -561,12 +572,18 @@ class VbaVisitor(Visitor):
             key: int | tuple[int, ...] = (
                 tuple(int(a) for a in args) if len(args) > 1 else int(args[0])
             )
-            return defn.value[key]
+            item = defn.value[key]
+            if isinstance(item, vba_types.VBAVariable):
+                return item.value
+            return item
         if isinstance(defn, vba_types.VBAArray):
             key = (
                 tuple(int(a) for a in args) if len(args) > 1 else int(args[0])
             )
-            return defn[key]
+            item = defn[key]
+            if isinstance(item, vba_types.VBAVariable):
+                return item.value
+            return item
         return self.run_function(defn, args)
 
     # Only used within implicit call statement.
