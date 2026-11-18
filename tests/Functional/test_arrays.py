@@ -1,6 +1,7 @@
 import pytest
 from tests.Functional.build import build_interp
 from vba_types import VBAInteger, VBALong
+from vba_types.exceptions import SubscriptOutOfRangeError, TypeMismatchError
 
 
 def test_dim_array_bounds() -> None:
@@ -72,3 +73,47 @@ def test_array_ubound_lbound(expr: str, expected: int) -> None:
     result = interpreter.run_function(func, [])
     assert isinstance(result, VBALong)
     assert int(result) == expected
+
+
+def test_array_index_with_variable() -> None:
+    code = ('Function Foo()\n'
+            '    Bar = Array(42, 37, 73)\n'
+            '    i = 1\n'
+            '    Foo = Bar(i)\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBAInteger)
+    assert int(result) == 37
+
+
+def test_array_index_with_string_raises_error() -> None:
+    code = ('Function Foo()\n'
+            '    Bar = Array(42, 37, 73)\n'
+            '    Foo = Bar("baz")\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    with pytest.raises(TypeMismatchError) as e:
+        interpreter.run_function(func, [])
+    assert "Type mismatch" in str(e.value)
+
+
+@pytest.mark.parametrize("invalid_index", [99, -2])
+def test_array_index_out_of_bounds(invalid_index: int) -> None:
+    code = ('Function Foo()\n'
+            '    Bar = Array(42, 37, 73)\n'
+            f'    Foo = Bar({invalid_index})\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    with pytest.raises(SubscriptOutOfRangeError) as e:
+        interpreter.run_function(func, [])
+    assert "Subscript out of range" in str(e.value)

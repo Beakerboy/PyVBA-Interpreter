@@ -89,10 +89,7 @@ class VbaVisitor(Visitor):
             if isinstance(target, vba_types.VBAVariable):
                 target = target.value
             if isinstance(target, vba_types.VBAArray):
-                key: int | tuple[int, ...] = (
-                    tuple(int(a) for a in args)
-                    if len(args) > 1 else int(args[0])
-                )
+                key = self._extract_array_key(args)
                 if isinstance(value, vba_types.VBAVariable):
                     value = value.value
                 target[key] = value
@@ -557,7 +554,7 @@ class VbaVisitor(Visitor):
         if isinstance(defn, Callable):
             if defn is getattr(vba_types.array.VBAArray, "__init__"):
                 return vba_types.array.VBAArray(*args)
-            unwrapped = [
+            unwrapped: list[Any] = [
                 a.value if isinstance(a, vba_types.VBAVariable) else a
                 for a in args
             ]
@@ -569,22 +566,34 @@ class VbaVisitor(Visitor):
                 isinstance(defn, vba_types.VBAVariable) and
                 isinstance(defn.value, vba_types.VBAArray)
            ):
-            key: int | tuple[int, ...] = (
-                tuple(int(a) for a in args) if len(args) > 1 else int(args[0])
-            )
+            key = self._extract_array_key(args)
             item = defn.value[key]
             if isinstance(item, vba_types.VBAVariable):
                 return item.value
             return item
         if isinstance(defn, vba_types.VBAArray):
-            key = (
-                tuple(int(a) for a in args) if len(args) > 1 else int(args[0])
-            )
+            key = self._extract_array_key(args)
             item = defn[key]
             if isinstance(item, vba_types.VBAVariable):
                 return item.value
             return item
         return self.run_function(defn, args)
+
+    @staticmethod
+    def _extract_array_key(args: list[Any]) -> int | tuple[int, ...]:
+        unwrapped: list[Any] = [
+            a.value if isinstance(a, vba_types.VBAVariable) else a
+            for a in args
+        ]
+        try:
+            if len(unwrapped) > 1:
+                return tuple(int(a) for a in unwrapped)
+            return int(unwrapped[0])
+        except ValueError as e:
+            err_cls = getattr(
+                vba_types.exceptions, "TypeMismatchError", TypeError
+            )
+            raise err_cls("Type mismatch") from e
 
     # Only used within implicit call statement.
     # Must be a Function or Sub
