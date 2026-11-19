@@ -113,6 +113,8 @@ class VbaVisitor(Visitor):
             value = value[1]
         if isinstance(value, dict):
             raise VbaCompileException("Expected Function or variable")
+        if isinstance(value, vba_types.VBAVariable):
+            value = copy.deepcopy(value.value)
         current_env[var_name].value = value
 
     def visitCallStatement(                                        # noqa: N802
@@ -317,6 +319,100 @@ class VbaVisitor(Visitor):
                 return (name, arr)
         return (name, default_val)
 
+    def visitRedimStatement(                                       # noqa: N802
+            self: T,
+            ctx: Parser.RedimStatementContext) -> None:
+        current_env = self.env_stack[-1]
+        dcl_list = ctx.redimDeclarationList()
+        if dcl_list is None:
+            return
+        i = 0
+        while dcl_list.redimVariableDcl(i) is not None:
+            dcl = dcl_list.redimVariableDcl(i)
+            untyped = dcl.redimUntypedDcl()
+            typed = dcl.redimTypedVariableDcl()
+            as_clause = None
+            if untyped is not None:
+                name = untyped.untypedName().getText().lower()
+                dyn_clause = untyped.dynamicArrayClause()
+                dyn_dim = (
+                    dyn_clause.dynamicArrayDim()
+                    if dyn_clause is not None else None
+                )
+                as_clause = (
+                    dyn_clause.asClause()
+                    if dyn_clause is not None else None
+                )
+            elif typed is not None:
+                ident = typed.typedName().ambiguousIdentifier()
+                name = ident.getText().lower()
+                dyn_dim = typed.dynamicArrayDim()
+            else:
+                i += 1
+                continue
+
+            default_val: vba_types.VBATypeBase = vba_types.VBAEmpty()
+            if name in current_env:
+                existing = current_env[name]
+                if isinstance(existing, vba_types.VBAVariable):
+                    if isinstance(existing.value, vba_types.VBAArray):
+                        default_val = getattr(
+                            existing.value, '_empty', vba_types.VBAEmpty()
+                        )
+                    elif existing.value is not None:
+                        default_val = existing.value
+            if as_clause is not None:
+                visited_type = self.visit(as_clause)
+                if visited_type is not None:
+                    default_val = visited_type
+            bounds = self._get_redim_bounds(dyn_dim)
+            arr = vba_types.VBAArray.initialize(*bounds, empty=default_val)
+            if name in current_env and isinstance(
+                    current_env[name], vba_types.VBAVariable):
+                current_env[name].value = arr
+            else:
+                current_env[name] = vba_types.VBAVariable(value=arr)
+            i += 1
+
+    def _get_redim_bounds(
+            self: T,
+            array_dim: Parser.DynamicArrayDimContext | None
+    ) -> list[tuple[int, int]]:
+        bounds: list[tuple[int, int]] = []
+        if array_dim is None or array_dim.dynamicBoundsList() is None:
+            return bounds
+        bounds_list = array_dim.dynamicBoundsList()
+        i = 0
+        while bounds_list.dynamicDimSpec(i) is not None:
+            spec = bounds_list.dynamicDimSpec(i)
+            upper_expr = spec.dynamicUpperBound().integerExpression()
+            high_val: Any = self.visit(upper_expr)
+            if isinstance(high_val, vba_types.VBAVariable):
+                high_val = high_val.value
+            high = int(high_val)
+            lower = spec.dynamicLowerBound()
+            if lower is not None:
+                low_val: Any = self.visit(lower.integerExpression())
+                if isinstance(low_val, vba_types.VBAVariable):
+                    low_val = low_val.value
+                low = int(low_val)
+            else:
+                low = 0
+            bounds.append((low, high))
+            i += 1
+        return bounds
+
+    def _is_constant_expr(self: T, ctx: ParserRuleContext | None) -> bool:
+        if ctx is None:
+            return True
+        if isinstance(ctx, Parser.AmbiguousIdentifierContext):
+            return False
+        for child in ctx.getChildren():
+            if isinstance(child, ParserRuleContext):
+                if not self._is_constant_expr(child):
+                    return False
+        return True
+
     def _get_array_bounds(
             self: T,
             ctx: Parser.ArrayClauseContext) -> list[tuple[int, int]]:
@@ -328,11 +424,17 @@ class VbaVisitor(Visitor):
         i = 0
         while bounds_list.dimSpec(i) is not None:
             spec = bounds_list.dimSpec(i)
-            high_val: Any = self.visit(spec.upperBound().constantExpression())
+            upper_expr = spec.upperBound().constantExpression()
+            if not self._is_constant_expr(upper_expr):
+                raise VbaCompileException("Constant expression required")
+            high_val: Any = self.visit(upper_expr)
             high = int(high_val)
             lower = spec.lowerBound()
             if lower is not None:
-                low_val: Any = self.visit(lower.constantExpression())
+                lower_expr = lower.constantExpression()
+                if not self._is_constant_expr(lower_expr):
+                    raise VbaCompileException("Constant expression required")
+                low_val: Any = self.visit(lower_expr)
                 low = int(low_val)
             else:
                 low = 0
@@ -801,5 +903,7 @@ class VbaVisitor(Visitor):
     def _new_type_from_string(type_name: str) -> Any:
         if type_name == "integer":
             return vba_types.VBAInteger()
+        if type_name == "double":
+            return vba_types.VBADouble()
         if type_name == "variant":
             return vba_types.VBAEmpty()
