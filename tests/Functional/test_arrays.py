@@ -1,3 +1,7 @@
+from pyvba_interpreter.Exceptions.vba_compile_exception import (
+    VbaCompileException,
+)
+from vba_types import VBAArray
 import pytest
 from tests.Functional.build import build_interp
 from vba_types import VBAInteger, VBALong
@@ -117,3 +121,144 @@ def test_array_index_out_of_bounds(invalid_index: int) -> None:
     with pytest.raises(SubscriptOutOfRangeError) as e:
         interpreter.run_function(func, [])
     assert "Subscript out of range" in str(e.value)
+
+
+def test_redim_after_scalar_dim() -> None:
+    code = ('Function Foo(NumPoints)\n'
+            '    Dim ReturnVector As Double\n'
+            '    ReDim ReturnVector(1 To NumPoints, 1 To 2)\n'
+            '    ReturnVector(1,1) = 1.0\n'
+            '    Foo = ReturnVector\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [VBAInteger(3)])
+    assert isinstance(result, VBAArray)
+    assert result[(1, 1)].value == 1.0
+
+
+def test_dim_non_constant_bounds_raises_compile_error() -> None:
+    code = ('Function Foo(NumPoints)\n'
+            '    Dim ReturnVector(1 To NumPoints, 1 To 2) as Double\n'
+            '    Foo = ReturnVector\n'
+            '    ReturnVector(1,1) = 1.0\n'
+            '    Foo = ReturnVector\n'
+            'End Function\n')
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    with pytest.raises(VbaCompileException) as exc_info:
+        interpreter.run_function(func, [VBAInteger(3)])
+    assert str(exc_info.value) == (
+        "Compile error:\nConstant expression required"
+    )
+
+
+def test_redim_preserve_1d_expand_and_shrink() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Arr() As Integer\n"
+        "    ReDim Arr(1 To 2)\n"
+        "    Arr(1) = 10\n"
+        "    Arr(2) = 20\n"
+        "    ReDim Preserve Arr(1 To 4)\n"
+        "    Arr(3) = 30\n"
+        "    Foo = Arr(1) + Arr(2) + Arr(3)\n"
+        "End Function\n"
+    )
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBAInteger)
+    assert int(result) == 60
+
+
+def test_redim_preserve_2d_last_dimension() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Grid() As Integer\n"
+        "    ReDim Grid(1 To 2, 1 To 2)\n"
+        "    Grid(1, 1) = 5\n"
+        "    Grid(2, 2) = 7\n"
+        "    ReDim Preserve Grid(1 To 2, 1 To 3)\n"
+        "    Grid(2, 3) = 8\n"
+        "    Foo = Grid(1, 1) + Grid(2, 2) + Grid(2, 3)\n"
+        "End Function\n"
+    )
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBAInteger)
+    assert int(result) == 20
+
+
+def test_redim_preserve_invalid_dimension_raises_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Grid() As Integer\n"
+        "    ReDim Grid(1 To 2, 1 To 2)\n"
+        "    ReDim Preserve Grid(1 To 3, 1 To 2)\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    with pytest.raises(SubscriptOutOfRangeError):
+        interpreter.run_function(func, [])
+
+
+def test_redim_fixed_array_raises_compile_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Bar(1 To 6)\n"
+        "    ReDim Bar(1 To 10)\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    with pytest.raises(VbaCompileException) as exc_info:
+        build_interp(code)
+    assert str(exc_info.value) == (
+        "Compile error:\nArray already dimensioned"
+    )
+
+
+def test_duplicate_dim_in_if_else_raises_compile_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    If False Then\n"
+        "        Dim Baz(1 To 6)\n"
+        "    Else\n"
+        "        Dim Baz(1 To 10)\n"
+        "    End If\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    with pytest.raises(VbaCompileException) as exc_info:
+        build_interp(code)
+    assert str(exc_info.value) == (
+        "Compile error:\nDuplicate declaration in current scope"
+    )
+
+
+def test_redim_change_data_type_raises_compile_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Qux() As Integer\n"
+        "    ReDim Qux(1 To 5) As Double\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    with pytest.raises(VbaCompileException) as exc_info:
+        build_interp(code)
+    assert str(exc_info.value) == (
+        "Compile error:\nCan't change data types of array elements"
+    )
