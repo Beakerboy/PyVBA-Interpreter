@@ -556,7 +556,7 @@ class VbaVisitor(Visitor):
                 return vba_types.array.VBAArray(*args)
             if defn is getattr(vba_types.array.VBAArray, "lbound"):
                 remaining = args[1:]
-                return args[0].lbound(*remaining)
+                return args[0].value.lbound(*remaining)
             if defn is getattr(vba_types.array.VBAArray, "ubound"):
                 remaining = args[1:]
                 return args[0].value.ubound(*remaining)
