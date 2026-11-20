@@ -556,10 +556,10 @@ class VbaVisitor(Visitor):
                 return vba_types.array.VBAArray(*args)
             if defn is getattr(vba_types.array.VBAArray, "lbound"):
                 remaining = args[1:]
-                return a.lbound(*remaining)
+                return args[0].lbound(*remaining)
             if defn is getattr(vba_types.array.VBAArray, "ubound"):
                 remaining = args[1:]
-                return a.ubound(*remaining)
+                return args[0].ubound(*remaining)
             unwrapped: list[Any] = [
                 a.value if isinstance(a, vba_types.VBAVariable) else a
                 for a in args
