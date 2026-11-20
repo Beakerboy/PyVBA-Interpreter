@@ -1,4 +1,6 @@
-from pyvba_interpreter.Exceptions.vba_compile_exception import VbaCompileException
+from pyvba_interpreter.Exceptions.vba_compile_exception import (
+    VbaCompileException,
+)
 from vba_types import VBAArray
 import pytest
 from tests.Functional.build import build_interp
