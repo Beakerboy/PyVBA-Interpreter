@@ -554,6 +554,12 @@ class VbaVisitor(Visitor):
         if isinstance(defn, Callable):
             if defn is getattr(vba_types.array.VBAArray, "__init__"):
                 return vba_types.array.VBAArray(*args)
+            if defn is getattr(vba_types.array.VBAArray, "lbound"):
+                remaining = args[1:]
+                return args[0].value.lbound(*remaining)
+            if defn is getattr(vba_types.array.VBAArray, "ubound"):
+                remaining = args[1:]
+                return args[0].value.ubound(*remaining)
             unwrapped: list[Any] = [
                 a.value if isinstance(a, vba_types.VBAVariable) else a
                 for a in args
