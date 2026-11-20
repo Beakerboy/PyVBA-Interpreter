@@ -1,7 +1,5 @@
 import copy
-import itertools
 import vba_types
-from vba_types.exceptions import SubscriptOutOfRangeError
 from typing import Any, Callable, TypeVar
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
@@ -368,48 +366,16 @@ class VbaVisitor(Visitor):
                 if visited_type is not None:
                     default_val = visited_type
             bounds = self._get_redim_bounds(dyn_dim)
-            if preserve and old_arr is not None:
-                self._validate_redim_preserve(old_arr._bounds, bounds)
-            arr = vba_types.VBAArray.initialize(*bounds, empty=default_val)
-            if preserve and old_arr is not None:
-                self._copy_preserved_elements(old_arr, arr)
-            if name in current_env and isinstance(
-                    current_env[name], vba_types.VBAVariable):
-                current_env[name].value = arr
+            if old_arr is not None:
+                old_arr.redim(*bounds, preserve=preserve, empty=default_val)
             else:
-                current_env[name] = vba_types.VBAVariable(value=arr)
+                arr = vba_types.VBAArray.initialize(*bounds, empty=default_val)
+                if name in current_env and isinstance(
+                        current_env[name], vba_types.VBAVariable):
+                    current_env[name].value = arr
+                else:
+                    current_env[name] = vba_types.VBAVariable(value=arr)
             i += 1
-
-    def _validate_redim_preserve(
-            self: T,
-            old_bounds: list[tuple[int, int]],
-            new_bounds: list[tuple[int, int]]) -> None:
-        if len(old_bounds) != len(new_bounds):
-            raise SubscriptOutOfRangeError(
-                "Cannot change number of dimensions with ReDim Preserve."
-            )
-        if old_bounds[:-1] != new_bounds[:-1]:
-            raise SubscriptOutOfRangeError(
-                "Can only resize the last dimension with ReDim Preserve."
-            )
-        if old_bounds[-1][0] != new_bounds[-1][0]:
-            raise SubscriptOutOfRangeError(
-                "Cannot change lower bound with ReDim Preserve."
-            )
-
-    def _copy_preserved_elements(
-            self: T,
-            old_arr: vba_types.VBAArray,
-            new_arr: vba_types.VBAArray) -> None:
-        ranges = []
-        for (old_low, old_high), (_, new_high) in zip(
-                old_arr._bounds, new_arr._bounds):
-            ranges.append(range(old_low, min(old_high, new_high) + 1))
-        for coords in itertools.product(*ranges):
-            key: int | tuple[int, ...] = (
-                coords[0] if len(coords) == 1 else coords
-            )
-            new_arr[key] = copy.deepcopy(old_arr[key])
 
     def _get_redim_bounds(
             self: T,

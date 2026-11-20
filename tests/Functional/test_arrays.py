@@ -214,3 +214,51 @@ def test_redim_preserve_invalid_dimension_raises_error() -> None:
     func = module["functions"]["foo"]
     with pytest.raises(SubscriptOutOfRangeError):
         interpreter.run_function(func, [])
+
+
+def test_redim_fixed_array_raises_compile_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Bar(1 To 6)\n"
+        "    ReDim Bar(1 To 10)\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    with pytest.raises(VbaCompileException) as exc_info:
+        build_interp(code)
+    assert str(exc_info.value) == (
+        "Compile error:\nArray already dimensioned"
+    )
+
+
+def test_duplicate_dim_in_if_else_raises_compile_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    If False Then\n"
+        "        Dim Baz(1 To 6)\n"
+        "    Else\n"
+        "        Dim Baz(1 To 10)\n"
+        "    End If\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    with pytest.raises(VbaCompileException) as exc_info:
+        build_interp(code)
+    assert str(exc_info.value) == (
+        "Compile error:\nDuplicate declaration in current scope"
+    )
+
+
+def test_redim_change_data_type_raises_compile_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Qux() As Integer\n"
+        "    ReDim Qux(1 To 5) As Double\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    with pytest.raises(VbaCompileException) as exc_info:
+        build_interp(code)
+    assert str(exc_info.value) == (
+        "Compile error:\nCan't change data types of array elements"
+    )
