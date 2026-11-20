@@ -155,3 +155,62 @@ def test_dim_non_constant_bounds_raises_compile_error() -> None:
     assert str(exc_info.value) == (
         "Compile error:\nConstant expression required"
     )
+
+
+def test_redim_preserve_1d_expand_and_shrink() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Arr() As Integer\n"
+        "    ReDim Arr(1 To 2)\n"
+        "    Arr(1) = 10\n"
+        "    Arr(2) = 20\n"
+        "    ReDim Preserve Arr(1 To 4)\n"
+        "    Arr(3) = 30\n"
+        "    Foo = Arr(1) + Arr(2) + Arr(3)\n"
+        "End Function\n"
+    )
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBAInteger)
+    assert int(result) == 60
+
+
+def test_redim_preserve_2d_last_dimension() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Grid() As Integer\n"
+        "    ReDim Grid(1 To 2, 1 To 2)\n"
+        "    Grid(1, 1) = 5\n"
+        "    Grid(2, 2) = 7\n"
+        "    ReDim Preserve Grid(1 To 2, 1 To 3)\n"
+        "    Grid(2, 3) = 8\n"
+        "    Foo = Grid(1, 1) + Grid(2, 2) + Grid(2, 3)\n"
+        "End Function\n"
+    )
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    result = interpreter.run_function(func, [])
+    assert isinstance(result, VBAInteger)
+    assert int(result) == 20
+
+
+def test_redim_preserve_invalid_dimension_raises_error() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Dim Grid() As Integer\n"
+        "    ReDim Grid(1 To 2, 1 To 2)\n"
+        "    ReDim Preserve Grid(1 To 3, 1 To 2)\n"
+        "    Foo = 1\n"
+        "End Function\n"
+    )
+    interpreter = build_interp(code)
+    modules = interpreter.table.definitions["vbaproject"]["modules"]
+    module = next(iter(modules.values()))
+    func = module["functions"]["foo"]
+    with pytest.raises(SubscriptOutOfRangeError):
+        interpreter.run_function(func, [])
