@@ -1,6 +1,6 @@
 import copy
 import vba_types
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, cast
 from antlr4_vba.vbaParser import ParserRuleContext, vbaParser as Parser
 from antlr4_vba.vbaParserVisitor import vbaParserVisitor as Visitor
 from .symbol_table import (
@@ -67,6 +67,17 @@ class VbaVisitor(Visitor):
         assert child is not None
         return child.symbol.text
 
+    def _resolve_value(self: T, val: Any) -> Any:
+        if isinstance(val, tuple):
+            val = val[1]
+        if isinstance(val, dict):
+            if val["type"] == "function":
+                return self.run_function(
+                    cast(FunctionDefinition | LibraryDefinition, val), []
+                )
+            raise VbaCompileException("Expected Function or variable")
+        return val
+
     def visitLetStatement(                                         # noqa: N802
             self: T,
             ctx: Parser.LetStatementContext) -> None:
@@ -80,11 +91,7 @@ class VbaVisitor(Visitor):
                 visited_args = self.visit(arg_list)
                 if visited_args is not None:
                     args = visited_args
-            value = self.visit(ctx.expression())
-            if isinstance(value, tuple):
-                value = value[1]
-            if isinstance(value, dict):
-                raise VbaCompileException("Expected Function or variable")
+            value = self._resolve_value(self.visit(ctx.expression()))
             target = current_env[arr_name]
             if isinstance(target, vba_types.VBAVariable):
                 target = target.value
@@ -105,11 +112,7 @@ class VbaVisitor(Visitor):
                     msg = f"Error On Line {ctx.start.line}, {var_name}"
                     raise VbaException(msg)
             current_env[var_name] = vba_types.VBAVariable()
-        value = self.visit(ctx.expression())
-        if isinstance(value, tuple):
-            value = value[1]
-        if isinstance(value, dict):
-            raise VbaCompileException("Expected Function or variable")
+        value = self._resolve_value(self.visit(ctx.expression()))
         if isinstance(value, vba_types.VBAVariable):
             value = copy.deepcopy(value.value)
         current_env[var_name].value = value
@@ -152,7 +155,8 @@ class VbaVisitor(Visitor):
             if ctx.conditionClause(1) is not None:
                 raise VbaCompileException("Loop without Do")
             cond_clau = ctx.conditionClause(0)
-            cond = self.visit(cond_clau.getChild(0).booleanExpression())
+            cond = self._resolve_value(
+                self.visit(cond_clau.getChild(0).booleanExpression()))
             condition = (bool(cond) == (cond_clau.whileClause() is not None))
             run_while = True
         elif ctx.conditionClause(1) is not None:
@@ -177,13 +181,14 @@ class VbaVisitor(Visitor):
                         self.visit(ctx.statementBlock())
                     except ExitDoException:
                         break
-                cond = self.visit(cond_clau.getChild(0).booleanExpression())
+                bool_expr = cond_clau.getChild(0).booleanExpression()
+                cond = self._resolve_value(self.visit(bool_expr))
                 condition = (bool(cond) == (type == "while"))
 
     def visitIfStatement(                                          # noqa: N802
             self: T,
             ctx: Parser.IfStatementContext) -> None:
-        condition = self.visit(ctx.booleanExpression())
+        condition = self._resolve_value(self.visit(ctx.booleanExpression()))
         if bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
@@ -191,7 +196,8 @@ class VbaVisitor(Visitor):
             i = 0
             run_else = False
             while ctx.elseIfBlock(i) is not None:
-                condition = self.visit(ctx.elseIfBlock(i).booleanExpression())
+                condition = self._resolve_value(
+                    self.visit(ctx.elseIfBlock(i).booleanExpression()))
                 if bool(condition):
                     if ctx.elseIfBlock(i).statementBlock() is not None:
                         self.visit(ctx.elseIfBlock(i).statementBlock())
@@ -206,7 +212,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.SingleLineIfStatementContext) -> None:
         stmt = ctx.getChild(0)
         assert stmt is not None
-        condition = self.visit(stmt.booleanExpression())
+        condition = self._resolve_value(self.visit(stmt.booleanExpression()))
         if bool(condition):
             if hasattr(type(stmt), "listOrLabel"):
                 self.visit(stmt.listOrLabel())
@@ -217,11 +223,12 @@ class VbaVisitor(Visitor):
     def visitWhileStatement(                                       # noqa: N802
             self: T,
             ctx: Parser.WhileStatementContext) -> None:
-        condition = self.visit(ctx.booleanExpression())
+        condition = self._resolve_value(self.visit(ctx.booleanExpression()))
         while bool(condition):
             if ctx.statementBlock() is not None:
                 self.visit(ctx.statementBlock())
-            condition = self.visit(ctx.booleanExpression())
+            bool_expr = ctx.booleanExpression()
+            condition = self._resolve_value(self.visit(bool_expr))
 
     def visitForStatement(                                         # noqa: N802
             self: T,
@@ -232,12 +239,13 @@ class VbaVisitor(Visitor):
             stmt = ctx.explicitForStatement()
         clause = stmt.forClause()
         n = clause.boundVariableExpression().getText().lower()
-        start = self.visit(clause.startValue())
-        end_value = self.visit(clause.endValue())
+        start = self._resolve_value(self.visit(clause.startValue()))
+        end_value = self._resolve_value(self.visit(clause.endValue()))
         assert end_value is not None
         step = vba_types.VBAInteger(1)
         if clause.stepClause() is not None:
-            step = self.visit(clause.stepClause().stepIncrement())
+            step = self._resolve_value(
+                self.visit(clause.stepClause().stepIncrement()))
         current_env = self.env_stack[-1]
         self.raise_for_except = False
         current_env[n] = start
@@ -290,7 +298,7 @@ class VbaVisitor(Visitor):
                     isinstance(child, Parser.WscContext) or
                     child.getText() == ','
                 ):
-                    args += [self.visit(child)]
+                    args += [self._resolve_value(self.visit(child))]
         return args
 
     def visitLiteralExpression(                                    # noqa: N802
@@ -451,15 +459,13 @@ class VbaVisitor(Visitor):
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
-        if isinstance(left, tuple):
-            left = left[1]
+        left = self._resolve_value(left)
         assert left is not None
         last = ctx.getChildCount() - 1
         right_child = ctx.getChild(last)
         assert right_child is not None
         right = self.visit(right_child)
-        if isinstance(right, tuple):
-            right = right[1]
+        right = self._resolve_value(right)
         assert right is not None
         return vba_types.VBAString(str(left.value) + str(right.value))
 
@@ -469,15 +475,13 @@ class VbaVisitor(Visitor):
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
-        if isinstance(left, tuple):
-            left = left[1]
+        left = self._resolve_value(left)
         assert left is not None
         last = ctx.getChildCount() - 1
         right_child = ctx.getChild(last)
         assert right_child is not None
         right = self.visit(right_child)
-        if isinstance(right, tuple):
-            right = right[1]
+        right = self._resolve_value(right)
         assert right is not None
         op = self._get_op(ctx)
         if op == '*':
@@ -525,8 +529,7 @@ class VbaVisitor(Visitor):
             ctx: Parser.UnaryMinusExpressionContext) -> int | float:
         value = self.visit(ctx.expression())
         assert value is not None
-        if isinstance(value, tuple):
-            value = value[1]
+        value = self._resolve_value(value)
         return vba_types.VBAInteger(-1) * value
 
     def visitParenthesizedExpress(                                 # noqa: N802
@@ -535,8 +538,7 @@ class VbaVisitor(Visitor):
     ) -> Any:
         value = self.visit(ctx.parenthesizedExpression().expression())
         assert value is not None
-        if isinstance(value, tuple):
-            value = value[1]
+        value = self._resolve_value(value)
         return value
 
     def visitRelationExpression(                                   # noqa: N802
@@ -546,14 +548,12 @@ class VbaVisitor(Visitor):
         left_child = ctx.getChild(0)
         assert left_child is not None
         left = self.visit(left_child)
-        if isinstance(left, tuple):
-            left = left[1]
+        left = self._resolve_value(left)
         last = ctx.getChildCount() - 1
         right_child = ctx.getChild(last)
         assert right_child is not None
         right = self.visit(right_child)
-        if isinstance(right, tuple):
-            right = right[1]
+        right = self._resolve_value(right)
         assert left is not None
         assert right is not None
         op = self._get_op(ctx)
@@ -583,11 +583,9 @@ class VbaVisitor(Visitor):
         assert right_child is not None
         right = self.visit(right_child)
         assert left is not None
-        if isinstance(left, tuple):
-            left = left[1]
+        left = self._resolve_value(left)
         assert right is not None
-        if isinstance(right, tuple):
-            right = right[1]
+        right = self._resolve_value(right)
         op = self._get_op(ctx).upper()
         if op == "AND":
             return vba_types.VBABoolean(left and right)
@@ -611,11 +609,13 @@ class VbaVisitor(Visitor):
         if l_express["type"] == "project":
             if name in l_express["modules"]:
                 return l_express["modules"][name]
+            if "classes" in l_express and name in l_express["classes"]:
+                return l_express["classes"][name]
             for mod in l_express["modules"].values():
                 if name in mod["functions"]:
                     return mod["functions"][name]
             raise VbaCompileException("Method or data member not found")
-        if l_express["type"] == "module":
+        if l_express["type"] in ("module", "class"):
             if name in l_express["functions"]:
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
