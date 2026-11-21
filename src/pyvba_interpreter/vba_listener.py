@@ -1,4 +1,4 @@
-from typing import TypeVar
+from typing import Any, TypeVar
 from antlr4_vba.vbaParser import vbaParser as Parser
 from antlr4_vba.vbaParserListener import vbaParserListener as Listener
 from vba_types import literal_from_string, VBAVariable
@@ -15,6 +15,8 @@ class VbaListener(Listener):
         self.table = table
         self.module_name = ""
         self.project_name = project.lower()
+        self._in_procedure = False
+        self._local_vars: dict[str, dict[str, Any]] = {}
         if self.project_name not in self.table.definitions:
             self.table.definitions[self.project_name] = {
                 "name": self.project_name,
@@ -50,6 +52,7 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
+        self._start_procedure_scope(params)
         funcs[name.lower()] = {
             "name": name.lower(),
             "type": "function",
@@ -71,6 +74,7 @@ class VbaListener(Listener):
             raise VbaCompileException(f"Ambiguous name detected: {name}")
         # Save the context (subtree) so the Visitor can find it later
         params = self._get_params(ctx.procedureParameters())
+        self._start_procedure_scope(params)
         funcs[name.lower()] = {
             "name": name.lower(),
             "type": "sub",
@@ -107,6 +111,108 @@ class VbaListener(Listener):
         type_expres = untyped_name.parameterType()
         declared_type = type_expres.typeExpression().getText().lower()
         return (name, declared_type)
+
+    def exitFunctionDeclaration(                                   # noqa: N802
+            self: T,
+            ctx: Parser.FunctionDeclarationContext) -> None:
+        self._end_procedure_scope()
+
+    def exitSubroutineDeclaration(                                 # noqa: N802
+            self: T,
+            ctx: Parser.SubroutineDeclarationContext) -> None:
+        self._end_procedure_scope()
+
+    def _start_procedure_scope(
+            self: T, params: list[ParamDefinition]) -> None:
+        self._in_procedure = True
+        self._local_vars = {}
+        for param in params:
+            self._local_vars[param["name"].lower()] = {
+                "fixed_array": False,
+                "type_name": None,
+            }
+
+    def _end_procedure_scope(self: T) -> None:
+        self._in_procedure = False
+        self._local_vars = {}
+
+    @staticmethod
+    def _extract_as_clause_type(
+            as_clause: Parser.AsClauseContext | None) -> str | None:
+        if as_clause is None:
+            return None
+        text = as_clause.getText().lower()
+        if text.startswith("as"):
+            return text[2:].strip()
+        return text
+
+    def enterLocalVariableDeclaration(                             # noqa: N802
+            self: T,
+            ctx: Parser.LocalVariableDeclarationContext) -> None:
+        if not self._in_procedure or ctx.variableDeclarationList() is None:
+            return
+        dcl_list = ctx.variableDeclarationList()
+        i = 0
+        while dcl_list.variableDcl(i) is not None:
+            untyped = dcl_list.variableDcl(i).untypedVariableDcl()
+            if untyped is not None:
+                name = untyped.ambiguousIdentifier().getText().lower()
+                if name in self._local_vars:
+                    raise VbaCompileException(
+                        "Duplicate declaration in current scope"
+                    )
+                type_name = self._extract_as_clause_type(untyped.asClause())
+                array_clause = untyped.arrayClause()
+                fixed_array = (
+                    array_clause is not None
+                    and array_clause.arrayDim() is not None
+                    and array_clause.arrayDim().boundsList() is not None
+                )
+                self._local_vars[name] = {
+                    "fixed_array": fixed_array,
+                    "type_name": type_name,
+                }
+            i += 1
+
+    def enterRedimStatement(                                       # noqa: N802
+            self: T,
+            ctx: Parser.RedimStatementContext) -> None:
+        if not self._in_procedure or ctx.redimDeclarationList() is None:
+            return
+        dcl_list = ctx.redimDeclarationList()
+        i = 0
+        while dcl_list.redimVariableDcl(i) is not None:
+            dcl = dcl_list.redimVariableDcl(i)
+            untyped = dcl.redimUntypedDcl()
+            typed = dcl.redimTypedVariableDcl()
+            as_clause = None
+            if untyped is not None:
+                name = untyped.untypedName().getText().lower()
+                dyn_clause = untyped.dynamicArrayClause()
+                if dyn_clause is not None:
+                    as_clause = dyn_clause.asClause()
+            elif typed is not None:
+                ident = typed.typedName().ambiguousIdentifier()
+                name = ident.getText().lower()
+            else:
+                i += 1
+                continue
+
+            new_type = self._extract_as_clause_type(as_clause)
+            if name in self._local_vars:
+                info = self._local_vars[name]
+                if info["fixed_array"]:
+                    raise VbaCompileException("Array already dimensioned")
+                if as_clause is not None and new_type != info["type_name"]:
+                    raise VbaCompileException(
+                        "Can't change data types of array elements"
+                    )
+            else:
+                self._local_vars[name] = {
+                    "fixed_array": False,
+                    "type_name": new_type,
+                }
+            i += 1
 
     def _get_params(
             self: T,
