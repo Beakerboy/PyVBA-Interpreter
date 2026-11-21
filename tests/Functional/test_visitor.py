@@ -1,3 +1,4 @@
+import math
 import os
 import pytest
 import vba_types
@@ -382,3 +383,62 @@ def test_errors(code: str, error: str) -> None:
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\n" + error
+
+
+def _acos_handler(arg: Any) -> vba_types.VBADouble:
+    return vba_types.VBADouble(math.acos(float(arg)))
+
+
+@pytest.mark.parametrize(
+    "expr", [
+        "WorksheetFunction.Acos(0.5)",
+        "Application.Acos(0.5)",
+        "Excel.WorksheetFunction.Acos(0.5)",
+        "Excel.Application.Acos(0.5)",
+    ])
+def test_application_acos(expr: str) -> None:
+    acos_def = {
+        "name": "acos",
+        "type": "function",
+        "handle": _acos_handler,
+        "project": "excel",
+        "module": "worksheetfunction",
+        "params": [{
+            "name": "arg1",
+            "optional": False,
+            "default": 0,
+        }],
+    }
+    excel_project = {
+        "name": "excel",
+        "type": "project",
+        "modules": {},
+        "classes": {
+            "worksheetfunction": {
+                "name": "worksheetfunction",
+                "type": "class",
+                "functions": {
+                    "acos": acos_def,
+                },
+            },
+            "application": {
+                "name": "application",
+                "type": "class",
+                "functions": {
+                    "acos": acos_def,
+                },
+            },
+        },
+    }
+    code = (
+        "Function Foo()\n"
+        f"    Foo = {expr}\n"
+        "End Function\n"
+    )
+    visitor = build_interp(code)
+    visitor.table.library_definitions["excel"] = excel_project
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
+    assert isinstance(result, vba_types.VBADouble)
+    assert float(result) == pytest.approx(math.acos(0.5))
