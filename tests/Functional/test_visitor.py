@@ -191,6 +191,8 @@ def test_array_index(input: str) -> None:
     "arg_list, input, args, expected", [
         ('Arg', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
         ('Arg As Integer', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
+        ('Arg%', 'hello = Arg', [vba_types.VBAInteger(1)], 1),
+        ('Arg$', 'hello = Arg', [vba_types.VBAString("hi")], "hi"),
     ])
 def test_function_arguments(
         arg_list: str, input: str, args: list, expected: Any) -> None:
