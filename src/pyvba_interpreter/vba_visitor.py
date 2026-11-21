@@ -611,11 +611,13 @@ class VbaVisitor(Visitor):
         if l_express["type"] == "project":
             if name in l_express["modules"]:
                 return l_express["modules"][name]
+            if "classes" in l_express and name in l_express["classes"]:
+                return l_express["classes"][name]
             for mod in l_express["modules"].values():
                 if name in mod["functions"]:
                     return mod["functions"][name]
             raise VbaCompileException("Method or data member not found")
-        if l_express["type"] == "module":
+        if l_express["type"] in ("module", "class"):
             if name in l_express["functions"]:
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
@@ -649,7 +651,7 @@ class VbaVisitor(Visitor):
         if isinstance(defn, dict):
             if defn["type"] == "sub":
                 raise VbaCompileException("Expected Function or variable")
-            if defn["type"] == "module":
+            if defn["type"] in ("module", "class"):
                 msg = "Expected variable or procedure, not module"
                 raise VbaCompileException(msg)
             if defn["type"] == "project":
@@ -718,7 +720,7 @@ class VbaVisitor(Visitor):
         assert defn is not None
         if isinstance(defn, tuple):
             defn = defn[0]
-        if defn["type"] == "module":
+        if defn["type"] in ("module", "class"):
             msg = "Expected variable or procedure, not module"
             raise VbaCompileException(msg)
         if defn["type"] == "project":
