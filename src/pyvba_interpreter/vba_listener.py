@@ -223,7 +223,14 @@ class VbaListener(Listener):
                 opt_params = parameter_list.optionalParameters()
                 while opt_params.optionalParam(i) is not None:
                     opt_param = opt_params.optionalParam(i)
-                    name = opt_param.paramDcl().getText().lower()
+                    untyped_name = opt_param.paramDcl().untypedNameParamDcl()
+                    name = untyped_name.ambiguousIdentifier().getText().lower()
+                    declared_type = "variant"
+                    if untyped_name.parameterType() is not None:
+                        type_expres = untyped_name.parameterType()
+                        declared_type = (
+                            type_expres.typeExpression().getText().lower()
+                        )
                     mech = "byref"
                     prefix = opt_param.optionalPrefix()
                     if prefix.parameterMechanism() is not None:
@@ -236,7 +243,7 @@ class VbaListener(Listener):
                         default = literal_from_string(
                             def_val.constantExpression().getText()
                         )
-                    var = VBAVariable(value=default)
+                    var = VBAVariable(declared_type, value=default)
                     param = {
                         "name": name,
                         "optional": True,
