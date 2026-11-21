@@ -801,6 +801,30 @@ class VbaVisitor(Visitor):
             type_name = ctx.typeExpression().builtinType().getText().lower()
             return self._new_type_from_string(type_name)
 
+    @staticmethod
+    def _validate_byref_arg(param: Any, arg: Any) -> None:
+        if param["mech"] != "byref":
+            return
+        param_var = param["var"]
+        if not isinstance(param_var, vba_types.VBAVariable):
+            return
+        declared_type = getattr(param_var, "_declared_type", "variant")
+        if not declared_type or declared_type == "variant":
+            return
+        expected_cls = type(param_var.value)
+
+        if isinstance(arg, vba_types.VBAVariable):
+            if (
+                getattr(arg, "_declared_type", "variant") == "variant"
+                and isinstance(arg.value, vba_types.VBAEmpty)
+            ):
+                return
+            if not isinstance(arg.value, expected_cls):
+                raise VbaCompileException("ByRef argument type mismatch")
+        elif isinstance(arg, vba_types.VBATypeBase):
+            if not isinstance(arg, expected_cls):
+                raise VbaCompileException("ByRef argument type mismatch")
+
     def run_function(self: T,
                      defn: FunctionDefinition | LibraryDefinition,
                      args: list[Any]) -> Any:
@@ -826,6 +850,7 @@ class VbaVisitor(Visitor):
             i = 0
             for param in defn["params"]:
                 if not param["optional"]:
+                    self._validate_byref_arg(param, args[i])
                     if isinstance(args[i], vba_types.VBATypeBase):
                         var = copy.copy(param["var"])
                         var.value = args[i]
@@ -836,6 +861,7 @@ class VbaVisitor(Visitor):
                     current_env[param["name"]] = var
                 else:
                     if len(args) > i:
+                        self._validate_byref_arg(param, args[i])
                         current_env[param["name"]] = copy.copy(args[i])
                     else:
                         new_obj = copy.copy(param["default"])
