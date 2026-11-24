@@ -115,12 +115,12 @@ def test_byref_type_mismatch_compile_error(code: str) -> None:
          'End Function\n'
          'Sub Bar(ByVal Num1 As Integer)\n'
          '    Num1 = 11\n'
-         'End Sub\n', 11),
+         'End Sub\n', 10.5),
     ])
 def test_byref_compatible_types(code: str, expected: int) -> None:
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["module1"]["functions"]["foo"]
     result = visitor.run_function(func, [])
-    assert isinstance(result, VBAInteger)
-    assert int(result) == expected
+    assert isinstance(result, VBADouble)
+    assert result.value == expected
