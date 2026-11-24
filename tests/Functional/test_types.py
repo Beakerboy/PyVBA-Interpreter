@@ -52,6 +52,13 @@ def test_byref(code: str, expected: int) -> None:
 @pytest.mark.parametrize(
     "code", [
         ('Function Foo()\n'
+         '    Bar 10.5\n'
+         '    Foo = 1\n'
+         'End Function\n'
+         'Sub Bar(Num1 As Integer)\n'
+         '    Num1 = 11\n'
+         'End Sub\n', id="Implicit Byref"),
+        ('Function Foo()\n'
          '    Dim Num As Double\n'
          '    Num = 10.5\n'
          '    Bar Num\n'
@@ -59,7 +66,7 @@ def test_byref(code: str, expected: int) -> None:
          'End Function\n'
          'Sub Bar(ByRef Num1 As Integer)\n'
          '    Num1 = 11\n'
-         'End Sub\n'),
+         'End Sub\n', id="Explicit Byref"),
     ])
 def test_byref_type_mismatch_compile_error(code: str) -> None:
     visitor = build_interp(code)
