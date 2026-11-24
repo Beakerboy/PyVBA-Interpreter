@@ -313,9 +313,9 @@ def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
         ('Function Bar(Mass, Optional Temp = 5, Optional Spin = 1)\n'
          '    Bar = Temp\n'
          'End Function\n'
-         'Function Foo()'
-         '    Foo = Bar(1, , 2)'
-         'End Function'),
+         'Function Foo()\n'
+         '    Foo = Bar(1, , 2)\n'
+         'End Function\n'),
     ])
 def test_default_arg(code: str) -> None:
     visitor = build_interp(code)
