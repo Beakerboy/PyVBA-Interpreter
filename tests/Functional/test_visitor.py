@@ -305,13 +305,22 @@ def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
     mock_print.assert_called_with(f"Microsoft Excel\n\n{expected}\nOK")
 
 
-def test_default_arg() -> None:
-    code = ('Function hello(Optional Temp = 5)\n'
-            '    hello = Temp\n'
-            'End Function\n')
+@pytest.mark.parametrize(
+    "code", [
+        ('Function Foo(Optional Temp = 5)\n'
+         '    Foo = Temp\n'
+         'End Function\n'),
+        ('Function Bar(Mass, Optional Temp = 5, Optional Spin = 1)\n'
+         '    Bar = Temp\n'
+         'End Function\n'
+         'Function Foo()'
+         '    Foo = Bar(1, , 2)
+         'End Function'),
+    ])
+def test_default_arg(code: str) -> None:
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
-    func = modules["helloworld"]["functions"]["hello"]
+    func = modules["helloworld"]["functions"]["Foo"]
     result = visitor.run_function(func, [])
     assert result.value == 5
 
