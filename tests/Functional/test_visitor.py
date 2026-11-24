@@ -314,7 +314,7 @@ def test_no_short_circuit(statement: str, mocker: MockerFixture) -> None:
          '    Bar = Temp\n'
          'End Function\n'
          'Function Foo()'
-         '    Foo = Bar(1, , 2)
+         '    Foo = Bar(1, , 2)'
          'End Function'),
     ])
 def test_default_arg(code: str) -> None:
