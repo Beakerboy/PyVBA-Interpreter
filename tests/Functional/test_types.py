@@ -32,13 +32,16 @@ from vba_types import VBAInteger, VBADouble
          'Sub Bar(ByVal Num1)\n'
          '    Num1 = 11\n'
          'End Sub\n', 10),
-        ('Function Foo()\n'
-         '    Bar 10.5\n'
-         '    Foo = 1\n'
-         'End Function\n'
-         'Sub Bar(ByRef Num1 As Integer)\n'
-         '    Num1 = 11\n'
-         'End Sub\n', 1),
+        pytest.param(
+            'Function Foo()\n'
+            '    Bar 10.5\n'
+            '    Foo = 1\n'
+            'End Function\n'
+            'Sub Bar(ByRef Num1 As Integer)\n'
+            '    Num1 = 11\n'
+            'End Sub\n', 1,
+            id="ByRef with Variant"
+        ),
     ])
 def test_byref(code: str, expected: int) -> None:
     visitor = build_interp(code)
