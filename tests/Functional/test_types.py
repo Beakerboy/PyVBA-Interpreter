@@ -107,6 +107,18 @@ def test_byref_type_mismatch_compile_error(code: str) -> None:
          'Sub Bar(ByRef Num1 As Variant)\n'
          '    Num1 = 11\n'
          'End Sub\n', 11),
+    ])
+def test_byref_compatible_types(code: str, expected: int) -> None:
+    visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["module1"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
+    assert isinstance(result, VBAInteger)
+    assert result.value == expected
+
+
+@pytest.mark.parametrize(
+    "code, expected", [
         ('Function Foo()\n'
          '    Dim Num As Double\n'
          '    Num = 10.5\n'
@@ -117,7 +129,7 @@ def test_byref_type_mismatch_compile_error(code: str) -> None:
          '    Num1 = 11\n'
          'End Sub\n', 10.5),
     ])
-def test_byref_compatible_types(code: str, expected: int) -> None:
+def test_byref_compatible_types_double(code: str, expected: int) -> None:
     visitor = build_interp(code)
     modules = visitor.table.definitions["vbaproject"]["modules"]
     func = modules["module1"]["functions"]["foo"]
