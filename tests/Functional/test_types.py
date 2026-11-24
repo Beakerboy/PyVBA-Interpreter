@@ -3,7 +3,7 @@ from pyvba_interpreter.Exceptions.vba_compile_exception import (
 )
 import pytest
 from tests.Functional.build import build_interp
-from vba_types import VBAInteger
+from vba_types import VBAInteger, VBADouble
 
 
 @pytest.mark.parametrize(
