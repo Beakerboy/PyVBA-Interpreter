@@ -111,11 +111,11 @@ def test_byref_type_mismatch_compile_error(code: str) -> None:
          '    Dim Num As Double\n'
          '    Num = 10.5\n'
          '    Bar Num\n'
-         '    Foo = 10\n'
+         '    Foo = Num\n'
          'End Function\n'
          'Sub Bar(ByVal Num1 As Integer)\n'
          '    Num1 = 11\n'
-         'End Sub\n', 10),
+         'End Sub\n', 11),
     ])
 def test_byref_compatible_types(code: str, expected: int) -> None:
     visitor = build_interp(code)
