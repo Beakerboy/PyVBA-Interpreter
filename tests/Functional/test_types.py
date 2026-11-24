@@ -37,7 +37,7 @@ from vba_types import VBAInteger, VBADouble
             '    Bar 10.5\n'
             '    Foo = 1\n'
             'End Function\n'
-            'Sub Bar(ByRef Num1 As Integer)\n'
+            'Sub Bar(ByRef Num1 As Variant)\n'
             '    Num1 = 11\n'
             'End Sub\n', 1,
             id="ByRef with Variant"
