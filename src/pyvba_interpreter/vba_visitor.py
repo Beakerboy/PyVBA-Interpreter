@@ -811,7 +811,6 @@ class VbaVisitor(Visitor):
         declared_type = getattr(param_var, "_declared_type", "variant")
         if not declared_type or declared_type == "variant":
             return
-        expected_cls = type(param_var.value)
 
         if isinstance(arg, vba_types.VBAVariable):
             if (
@@ -819,10 +818,8 @@ class VbaVisitor(Visitor):
                 and isinstance(arg.value, vba_types.VBAEmpty)
             ):
                 return
+            expected_cls = type(param_var.value)
             if not isinstance(arg.value, expected_cls):
-                raise VbaCompileException("ByRef argument type mismatch")
-        elif isinstance(arg, vba_types.VBATypeBase):
-            if not isinstance(arg, expected_cls):
                 raise VbaCompileException("ByRef argument type mismatch")
 
     def run_function(self: T,
@@ -853,7 +850,17 @@ class VbaVisitor(Visitor):
                     self._validate_byref_arg(param, args[i])
                     if isinstance(args[i], vba_types.VBATypeBase):
                         var = copy.copy(param["var"])
-                        var.value = args[i]
+                        try:
+                            var.value = args[i]
+                        except TypeError:
+                            if (
+                                isinstance(var.value, vba_types.VBAInteger) and
+                                isinstance(args[i], vba_types.VBADouble)
+                            ):
+                                val = round(args[i].value)
+                                var.value = vba_types.VBAInteger(val)
+                            else:
+                                raise
                     elif param["mech"] == "byref":
                         var = args[i]
                     else:
