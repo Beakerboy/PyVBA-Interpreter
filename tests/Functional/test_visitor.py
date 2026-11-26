@@ -278,6 +278,23 @@ def test_two_functions() -> None:
     assert result.value == 2
 
 
+def test_missing_optional() -> None:
+    """
+    Test that a function call can include a missing parameter
+    """
+    code = ('Function Foo()\n'
+            '    Foo = Bar(1, , 1)\n'
+            'End Function\n'
+            'Function Bar(Num1, Optional Num2 = 1, Optional Num3 = 2)\n'
+            '    Bar = 2\n'
+            'End Function\n')
+    visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
+    assert result.value == 2
+
+
 @pytest.mark.parametrize(
     "statement", [
         ('True Or Bar()'),
