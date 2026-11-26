@@ -619,7 +619,7 @@ class VbaVisitor(Visitor):
             if name in l_express["functions"]:
                 return l_express["functions"][name]
             raise VbaCompileException("Method or data member not found")
-        raise VbaException("Not Supported")
+        raise VbaException(f"{l_express['type']} Not Supported")
 
     def visitMemberAccessExpression(                             # noqa N802
             self: T,
