@@ -382,3 +382,109 @@ def test_errors(code: str, error: str) -> None:
     with pytest.raises(VbaCompileException) as e:
         visitor.run_function(func, [])
     assert str(e.value) == "Compile error:\n" + error
+
+
+def _pi_handler() -> vba_types.VBADouble:
+    return vba_types.VBADouble(3.14159265358979)
+
+
+@pytest.mark.parametrize(
+    "expr, expected", [
+        ("WorksheetFunction.Pi", 3.14159265358979),
+        ("WorksheetFunction.Pi()", 3.14159265358979),
+        ("Excel.WorksheetFunction.Pi", 3.14159265358979),
+        ("WorksheetFunction.Pi * 2", 6.28318530717958),
+    ])
+def test_worksheetfunction_pi_no_parens(expr: str, expected: float) -> None:
+    pi_fn = {
+        "name": "pi",
+        "type": "function",
+        "handle": _pi_handler,
+        "project": "excel",
+        "module": "worksheetfunction",
+        "params": [],
+        "extra": {},
+    }
+    excel_lib: Any = {
+        "name": "excel",
+        "type": "project",
+        "modules": {},
+        "classes": {
+            "worksheetfunction": {
+                "name": "worksheetfunction",
+                "type": "class",
+                "functions": {"pi": pi_fn},
+            },
+        },
+    }
+    code = (
+        "Function Foo()\n"
+        f"    Foo = {expr}\n"
+        "End Function\n"
+    )
+    visitor = build_interp(code)
+    visitor.table.library_definitions["excel"] = excel_lib
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
+    assert isinstance(result, vba_types.VBADouble)
+    assert float(result) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "code, expected", [
+        ("Function Foo()\n"
+         "    Foo = Bar\n"
+         "End Function\n"
+         "Function Bar()\n"
+         "    Bar = 42\n"
+         "End Function\n", 42),
+        ("Function Foo()\n"
+         "    Foo = Bar + 8\n"
+         "End Function\n"
+         "Function Bar()\n"
+         "    Bar = 42\n"
+         "End Function\n", 50),
+        ("Function Foo()\n"
+         "    Foo = DoubleVal(Bar)\n"
+         "End Function\n"
+         "Function Bar()\n"
+         "    Bar = 21\n"
+         "End Function\n"
+         "Function DoubleVal(x)\n"
+         "    DoubleVal = x * 2\n"
+         "End Function\n", 42),
+        ("Function Foo()\n"
+         "    If IsReady Then\n"
+         "        Foo = 1\n"
+         "    Else\n"
+         "        Foo = 0\n"
+         "    End If\n"
+         "End Function\n"
+         "Function IsReady()\n"
+         "    IsReady = True\n"
+         "End Function\n", 1),
+    ])
+def test_no_arg_function_without_parens(code: str, expected: int) -> None:
+    visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    result = visitor.run_function(func, [])
+    assert int(result) == expected
+
+
+def test_required_arg_function_without_parens_errors() -> None:
+    code = (
+        "Function Foo()\n"
+        "    Foo = NeedsArg\n"
+        "End Function\n"
+        "Function NeedsArg(x)\n"
+        "    NeedsArg = x\n"
+        "End Function\n"
+    )
+    visitor = build_interp(code)
+    modules = visitor.table.definitions["vbaproject"]["modules"]
+    func = modules["helloworld"]["functions"]["foo"]
+    with pytest.raises(VbaCompileException) as e:
+        visitor.run_function(func, [])
+    assert str(e.value) == "Compile error:\nArgument not optional"
